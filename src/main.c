@@ -66,7 +66,7 @@ char* tok_to_string(tokens_e tok) {
 }
 
 lab_lexer_token_t alpha_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    char buffer[128];
+    static char buffer[128];
     memset(buffer, 0, sizeof(buffer));
     size_t bufpos = 0;
     static const char* reserved[]    = { "Func", "let" };
@@ -142,7 +142,7 @@ lab_lexer_token_t whitespace_callback(const char* code, size_t* iter, size_t max
 }
 
 lab_lexer_token_t numeric_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    char buffer[128];
+    static char buffer[128];
     memset(buffer, 0, sizeof(buffer));
     size_t bufpos = 0;
     for(;(*iter) < max_len; (*iter)++ ) {
@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
 
     if(argc > 1) {
         for(int i = 1; i < argc; i++) {
-            
+
         }
     }
     
