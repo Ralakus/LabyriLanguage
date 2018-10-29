@@ -1,4 +1,4 @@
 Func main(argc: Int16, argv: Str[]): Int16 {
-    let x: Int16 = 1.5;
-    return x;
+    let x: Str = "Hello world!"
+    return 0;
 }
