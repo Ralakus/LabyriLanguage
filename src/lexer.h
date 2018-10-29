@@ -12,18 +12,18 @@ typedef struct lab_lexer_token_container_t {
     size_t count;
     lab_lexer_token_t* tokens;
 } lab_lexer_token_container_t;
-// ^ holds tokens in a dynamic int array
+// ^ holds tokens in a dynamic array
+
+typedef struct lab_lexer_iterator_t {
+    size_t iter;
+    size_t line;
+    size_t column;
+} lab_lexer_iterator_t;
 
 typedef struct lab_lexer_rules_t     lab_lexer_rules_t;
 //             ^ contains lexer rules, id est what to look for and callback
-typedef lab_lexer_token_t  (*lab_lexer_callback_t)(const char* code, size_t* iter, size_t max_length, void* user_data);
+typedef lab_lexer_token_t  (*lab_lexer_callback_t)(const char* code, lab_lexer_iterator_t* iter, size_t max_length, void* user_data);
 //             ^ returns token type by int id
-
-typedef struct lab_lexer_cursor_pos_t {
-    size_t line;
-    size_t column;
-} lab_lexer_cursor_pos_t;
-// ^ holds a line and column position of a string
 
 extern lab_lexer_rules_t* lab_lexer_rules_new();
 //         ^ intializes new rules struct
@@ -46,3 +46,4 @@ extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, la
 */
 extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, const lab_lexer_rules_t* rules, void* user_data);
 //  ^ runs lexer with rules
+extern int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);

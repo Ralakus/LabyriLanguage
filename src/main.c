@@ -10,7 +10,11 @@
 typedef enum tokens_e {
     tok_nil,
 
-    tok_whitespace,
+    tok_whitespace_space,
+    tok_whitespace_tab,
+    tok_whitespace_return,
+    tok_whitespace_newline,
+
     tok_identifier,
     tok_number,
 
@@ -30,17 +34,19 @@ typedef enum tokens_e {
 
     tok_func,
     tok_let,
+    tok_return,
 
     tok_operator_plus,
     tok_operator_minus,
     tok_operator_mul,
     tok_operator_div,
     tok_operator_equals,
-    tok_operator_chevron,
+    tok_operator_xor,
     tok_operator_and,
     tok_operator_lesst,
     tok_operator_greatert,
-    tok_operator_pipe,
+    tok_operator_or,
+    tok_operator_not,
 
 }   tokens_e;
 
@@ -59,7 +65,10 @@ char* tok_to_string(tokens_e tok) {
     char* buffer = NULL;
     switch(tok) {
         TOK_TO_STRING_TEMPLATE(tok_nil, "nil")
-        TOK_TO_STRING_TEMPLATE(tok_whitespace, "whitespace")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_space, "whitespace space")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_tab, "whitespace tab")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_newline, "whitespace newline")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_return, "whitespace return")
         TOK_TO_STRING_TEMPLATE(tok_identifier, "identifier")
         TOK_TO_STRING_TEMPLATE(tok_number, "number")
         TOK_TO_STRING_TEMPLATE(tok_char, "char")
@@ -75,16 +84,18 @@ char* tok_to_string(tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(tok_semicolon, "semicolon")
         TOK_TO_STRING_TEMPLATE(tok_func, "function")
         TOK_TO_STRING_TEMPLATE(tok_let, "let")
+        TOK_TO_STRING_TEMPLATE(tok_return, "return")
         TOK_TO_STRING_TEMPLATE(tok_operator_plus, "operator plus")
         TOK_TO_STRING_TEMPLATE(tok_operator_minus, "operator minus")
         TOK_TO_STRING_TEMPLATE(tok_operator_mul, "operator multiply")
         TOK_TO_STRING_TEMPLATE(tok_operator_div, "operator divide")
         TOK_TO_STRING_TEMPLATE(tok_operator_equals, "operator equals")
-        TOK_TO_STRING_TEMPLATE(tok_operator_chevron, "operator chevron")
+        TOK_TO_STRING_TEMPLATE(tok_operator_xor, "operator xor")
         TOK_TO_STRING_TEMPLATE(tok_operator_and, "operator and")
         TOK_TO_STRING_TEMPLATE(tok_operator_lesst, "operator less than")
         TOK_TO_STRING_TEMPLATE(tok_operator_greatert, "operator greater than")
-        TOK_TO_STRING_TEMPLATE(tok_operator_pipe, "operator pipe")
+        TOK_TO_STRING_TEMPLATE(tok_operator_or, "operator or")
+        TOK_TO_STRING_TEMPLATE(tok_operator_not, "operator not")
         default: {
             break;
         }
@@ -92,29 +103,27 @@ char* tok_to_string(tokens_e tok) {
     return buffer;
 }
 
-lab_lexer_token_t alpha_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
+lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     static char buffer[128];
     memset(buffer, 0, sizeof(buffer));
     size_t bufpos = 0;
-    static const char* reserved[]    = { "Func", "let" };
-    static tokens_e reserved_types[] = { tok_func, tok_let };
-    for(;(*iter) < max_len; (*iter)++) {
-        buffer[bufpos] = code[*iter];
+    static const char* reserved[]    = { "Func", "let", "return" };
+    static tokens_e reserved_types[] = { tok_func, tok_let, tok_return };
+    for(;(*iter).iter < max_len; lab_lexer_iter_next(code, iter) ) {
+        buffer[bufpos] = code[(*iter).iter];
         ++bufpos;
         if(bufpos >= sizeof(buffer)) {
             lab_errorln("Identifier exceeds 128 char limit!");
             return lab_lexer_token_make((int)tok_nil, NULL);
         }
-        if(bufpos % 2 == 0) {
-            for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
-                if(buffer[0] != '\0') {
-                    if(strcmp(buffer, reserved[i])==0 && (!isalpha(code[(*iter) + 1]) && !isdigit(code[(*iter) + 1]))) {
-                        return lab_lexer_token_make((int)reserved_types[i], NULL);
-                    }
+        for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
+            if(buffer[0] != '\0') {
+                if(strcmp(buffer, reserved[i])==0 && (!isalpha(code[(*iter).iter + 1]) && !isdigit(code[(*iter).iter + 1]))) {
+                    return lab_lexer_token_make((int)reserved_types[i], NULL);
                 }
             }
         }
-        if(!isalpha(code[(*iter) + 1]) && !isdigit(code[(*iter) + 1])) {
+        if(!isalpha(code[(*iter).iter + 1]) && !isdigit(code[(*iter).iter + 1])) {
 
             if(bufpos > 0) {
                 char* ident = calloc(bufpos, sizeof(char));
@@ -131,67 +140,34 @@ lab_lexer_token_t alpha_callback(const char* code, size_t* iter, size_t max_len,
     return lab_lexer_token_make((int)tok_nil, NULL);
 }
 
-lab_lexer_token_t whitespace_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    char type = code[*iter];
+lab_lexer_token_t whitespace_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    char type = code[(*iter).iter];
     char* type_name = NULL;
     switch (type) {
-        case ' ': {
-            type_name = malloc(sizeof("space"));
-            if(type_name==NULL) {
-                lab_errorln("Failed to allocate buffer for whitespace type: space");
-            } else {
-                type_name[sizeof("space")-1] = '\0';
-                memcpy(type_name, "space", sizeof("space"));
-            }
-            break;
-        } case '\t': {
-            type_name = malloc(sizeof("tab"));
-            if(type_name==NULL) {
-                lab_errorln("Failed to allocate buffer for whitespace type: tab");
-            } else {
-                type_name[sizeof("tab")-1] = '\0';
-                memcpy(type_name, "tab", sizeof("tab"));
-            }
-            break;
-        } case '\n': {
-            type_name = malloc(sizeof("newline"));
-            if(type_name==NULL) {
-                lab_errorln("Failed to allocate buffer for whitespace type: newline");
-            } else {
-                type_name[sizeof("newline")-1] = '\0';
-                memcpy(type_name, "newline", sizeof("newline"));
-            }
-            break;
-        } case '\r':
-            type_name = malloc(sizeof("return"));
-            if(type_name==NULL) {
-                lab_errorln("Failed to allocate buffer for whitespace type: return");
-            } else {
-                type_name[sizeof("return")-1] = '\0';
-                memcpy(type_name, "return", sizeof("return"));
-            }
-            break;
-        default: break;
+        case ' ' : return lab_lexer_token_make((int)tok_whitespace_space, NULL);
+        case '\t': return lab_lexer_token_make((int)tok_whitespace_tab, NULL);
+        case '\n': return lab_lexer_token_make((int)tok_whitespace_newline, NULL);
+        case '\r': return lab_lexer_token_make((int)tok_whitespace_return, NULL);
+        default  : return lab_lexer_token_make((int)tok_nil, type_name);;
     }
-    return lab_lexer_token_make((int)tok_whitespace, type_name);
 }
 
-lab_lexer_token_t numeric_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
+lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     static char buffer[128];
     memset(buffer, 0, sizeof(buffer));
     size_t bufpos = 0;
-    for(;(*iter) < max_len; (*iter)++ ) {
-        buffer[bufpos] = code[*iter];
+    for(;(*iter).iter < max_len; lab_lexer_iter_next(code, iter) ) {
+        buffer[bufpos] = code[(*iter).iter];
         ++bufpos;
         if(bufpos >= sizeof(buffer)) {
-            lab_errorln("Number exceeds 128 char limit!");
+            lab_errorln("Number at line: %d, column: %d exceeds 128 char limit!", (*iter).line, (*iter).column);
             return lab_lexer_token_make((int)tok_nil, NULL);
         }
-        if(!isdigit(code[(*iter) + 1]) && code[(*iter) + 1] != '.') {
+        if(!isdigit(code[(*iter).iter + 1]) && code[(*iter).iter + 1] != '.') {
             if(bufpos > 0) {
                 char* num = calloc(bufpos, sizeof(char));
                 if(num==NULL) {
-                    lab_errorln("Failed to allocate buffer for numerical token!");
+                    lab_errorln("Failed to allocate buffer for numerical token for number at at line: %d, column: %d!", (*iter).line, (*iter).column);
                 } else {
                     memcpy(num, buffer, bufpos);
                 }
@@ -202,8 +178,8 @@ lab_lexer_token_t numeric_callback(const char* code, size_t* iter, size_t max_le
     return lab_lexer_token_make((int)tok_nil, NULL);
 }
 
-lab_lexer_token_t symbol_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    switch(code[*iter]) {
+lab_lexer_token_t symbol_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    switch(code[(*iter).iter]) {
         case '(': return lab_lexer_token_make((int)tok_lparen,    NULL);
         case ')': return lab_lexer_token_make((int)tok_rparen,    NULL);
         case '[': return lab_lexer_token_make((int)tok_lbracket,  NULL);
@@ -217,41 +193,44 @@ lab_lexer_token_t symbol_callback(const char* code, size_t* iter, size_t max_len
     }
 }
 
-lab_lexer_token_t operator_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    switch(code[*iter]) {
-        case '+': return lab_lexer_token_make((int)tok_operator_plus,    NULL);
-        case '-': return lab_lexer_token_make((int)tok_operator_minus,    NULL);
-        case '*': return lab_lexer_token_make((int)tok_operator_mul,  NULL);
-        case '/': return lab_lexer_token_make((int)tok_operator_div,  NULL);
-        case '=': return lab_lexer_token_make((int)tok_operator_equals,   NULL);
-        case '<': return lab_lexer_token_make((int)tok_operator_lesst,   NULL);
+lab_lexer_token_t operator_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    switch(code[(*iter).iter]) {
+        case '+': return lab_lexer_token_make((int)tok_operator_plus,         NULL);
+        case '-': return lab_lexer_token_make((int)tok_operator_minus,        NULL);
+        case '*': return lab_lexer_token_make((int)tok_operator_mul,          NULL);
+        case '/': return lab_lexer_token_make((int)tok_operator_div,          NULL);
+        case '=': return lab_lexer_token_make((int)tok_operator_equals,       NULL);
+        case '^': return lab_lexer_token_make((int)tok_operator_xor,          NULL);
+        case '<': return lab_lexer_token_make((int)tok_operator_lesst,        NULL);
         case '>': return lab_lexer_token_make((int)tok_operator_greatert,     NULL);
-        case '|': return lab_lexer_token_make((int)tok_operator_pipe,     NULL);
-        default:  return lab_lexer_token_make((int)tok_nil,       NULL);
+        case '|': return lab_lexer_token_make((int)tok_operator_or,           NULL);
+        case '!': return lab_lexer_token_make((int)tok_operator_not,          NULL);
+        default:  return lab_lexer_token_make((int)tok_nil,                   NULL);
     }
 }
 
-lab_lexer_token_t string_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
-    int mode = code[*iter]=='\"' ? 1 : -1; // 1 means it's lexing a string, -1 means char
-    size_t begin_index = *iter;
+lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    int mode = code[(*iter).iter]=='\"' ? 1 : -1; // 1 means it's lexing a string, -1 means char
+    size_t begin_index = (*iter).iter;
     size_t end_index = 0;
-    ++(*iter);
-    for(;(*iter) < max_len; (*iter)++ ) {
-        if(code[*iter]=='\"' && mode == 1) {
-            end_index = (*iter) - 1;
+    lab_lexer_iter_next(code, iter);
+    lab_lexer_iterator_t begin_pos = *iter;
+    for(;(*iter).iter < max_len; lab_lexer_iter_next(code, iter) ) {
+        if(code[(*iter).iter]=='\"' && mode == 1) {
+            end_index = (*iter).iter - 1;
             break;
-        } else if(code[*iter]=='\'' && mode == -1) {
-            end_index = (*iter) -1;
+        } else if(code[(*iter).iter]=='\'' && mode == -1) {
+            end_index = (*iter).iter -1;
             break;
         }
     }
     if(end_index==0) {
-        lab_errorln("Failed to find string closing statement!");
+        lab_errorln("Failed to find string closing statement for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
         return lab_lexer_token_make((int)tok_nil, NULL);
     } else {
         char* buffer = malloc((end_index - begin_index) + 1);
         if(buffer==NULL) {
-            lab_errorln("Failed to allocate string buffer!");
+            lab_errorln("Failed to allocate string buffer for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
             return lab_lexer_token_make((int)tok_nil, NULL);
         }
         buffer[end_index - begin_index] = '\0';
@@ -407,11 +386,11 @@ int main(int argc, char* argv[]) {
         lab_lexer_lex(&tokens, file_contents[i], rules, NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        for(size_t j = 0; j < tokens.count; j++) {
+        /*for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
             lab_successln("Token: %s: %s", tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }
+        }*/
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);

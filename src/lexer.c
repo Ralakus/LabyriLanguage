@@ -103,20 +103,16 @@ int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_cal
 
 int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const lab_lexer_rules_t* rules, void* user_data) {
     size_t code_len = strlen(code);
-    size_t line   = 1;
-    size_t column = 0;
 
-    for (size_t i = 0; i < code_len; i++) {
+    lab_lexer_iterator_t pos;
+    pos.iter   = 0;
+    pos.line   = 1;
+    pos.column = 0;
+
+    for (pos.iter = 0; pos.iter < code_len; lab_lexer_iter_next(code, &pos)) {
         
-        char cur_char = code[i];
+        char cur_char = code[pos.iter];
         int found_callback = 0;
-
-        if(cur_char=='\n') {
-            ++line;
-            column = 0;
-        } else {
-            ++column;
-        }
 
         for(size_t j = 0; j < rules->count; j++) {
 
@@ -124,7 +120,8 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const l
             for(size_t k = 0; k < rule_j_len; k++) {
 
                 if(cur_char==rules->rules[j].rule[k]) {
-                    _tok_append(tokens, rules->rules[j].callback(code, &i, code_len, user_data));
+                    size_t old_i = pos.iter;
+                    _tok_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data));
                     found_callback = 1;
                     break;
                 }
@@ -138,8 +135,21 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const l
         }
 
         if(found_callback==0) {
-            lab_errorln("Unexpected character: \"%c\" at line: %d, column: %d", cur_char, line, column);
+            lab_errorln("Unexpected character: \"%c\" at line: %d, column: %d", cur_char, pos.line, pos.column);
         }
+    }
+    return 0;
+}
+
+int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
+    ++(*iter).iter;
+    if(code[(*iter).iter]=='\n') {
+        ++(*iter).line;
+        (*iter).column = 0;
+    } else if(code[(*iter).iter] == '\0') {
+        return 1;
+    } else{
+        ++(*iter).column;
     }
     return 0;
 }
