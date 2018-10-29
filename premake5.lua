@@ -43,7 +43,7 @@ workspace "Labyrinth"
     end
 
     if UseClang then
-        toolset "clang"
+       toolset "clang"
     end
 
 project "Language"
@@ -53,8 +53,6 @@ project "Language"
     files { "src/**.h", "src/**.c"  }
 
     includedirs { "src/" }
-
-    links { "m" }
 
     filter "configurations:Debug"
             defines { "DEBUG" }

@@ -367,7 +367,6 @@ int main(int argc, char* argv[]) {
 
     lab_lexer_rules_t* rules = lab_lexer_rules_new();
     lab_lexer_token_container_t tokens;
-    lab_lexer_token_container_init(&tokens);
 
     lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
     lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
@@ -383,14 +382,15 @@ int main(int argc, char* argv[]) {
     start = clock();
 
     for(size_t i = 0; i < file_count; i++) {
+        lab_lexer_token_container_init(&tokens);
         lab_lexer_lex(&tokens, file_contents[i], rules, NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        /*for(size_t j = 0; j < tokens.count; j++) {
+        for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
-            lab_successln("Token: %s: %s", tok_str, tokens.tokens[j].data);
+            lab_println("Token: %s: %s", tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }*/
+        }
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);

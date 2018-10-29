@@ -132,8 +132,3 @@ void lab_successln(const char* fmt, ...) {
     
     );
 }
-
-void* lab_safe_delete(void* pointer) {
-    free(pointer);
-    return (pointer = NULL, pointer);
-}
