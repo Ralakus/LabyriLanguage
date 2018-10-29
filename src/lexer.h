@@ -19,6 +19,12 @@ typedef struct lab_lexer_rules_t     lab_lexer_rules_t;
 typedef lab_lexer_token_t  (*lab_lexer_callback_t)(const char* code, size_t* iter, size_t max_length, void* user_data);
 //             ^ returns token type by int id
 
+typedef struct lab_lexer_cursor_pos_t {
+    size_t line;
+    size_t column;
+} lab_lexer_cursor_pos_t;
+// ^ holds a line and column position of a string
+
 extern lab_lexer_rules_t* lab_lexer_rules_new();
 //         ^ intializes new rules struct
 extern int lab_lexer_rules_free(lab_lexer_rules_t* rules);

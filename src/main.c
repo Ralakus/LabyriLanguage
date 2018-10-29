@@ -13,6 +13,9 @@ typedef enum tokens_e {
     tok_identifier,
     tok_number,
 
+    tok_char,
+    tok_string,
+
     tok_lparen,
     tok_rparen,
     tok_lbracket,
@@ -58,6 +61,8 @@ char* tok_to_string(tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(tok_whitespace, "whitespace")
         TOK_TO_STRING_TEMPLATE(tok_identifier, "identifier")
         TOK_TO_STRING_TEMPLATE(tok_number, "number")
+        TOK_TO_STRING_TEMPLATE(tok_char, "char")
+        TOK_TO_STRING_TEMPLATE(tok_string, "string")
         TOK_TO_STRING_TEMPLATE(tok_lparen, "left paren")
         TOK_TO_STRING_TEMPLATE(tok_rparen, "right paren")
         TOK_TO_STRING_TEMPLATE(tok_lbracket, "left bracket")
@@ -217,6 +222,36 @@ lab_lexer_token_t operator_callback(const char* code, size_t* iter, size_t max_l
     }
 }
 
+lab_lexer_token_t string_callback(const char* code, size_t* iter, size_t max_len, void* user_data) {
+    int mode = code[*iter]=='\"' ? 1 : -1; // 1 means it's lexing a string, -1 means char
+    size_t begin_index = *iter;
+    size_t end_index = 0;
+    ++(*iter);
+    for(;(*iter) < max_len; (*iter)++ ) {
+        if(code[*iter]=='\"' && mode == 1) {
+            end_index = (*iter) - 1;
+            break;
+        } else if(code[*iter]=='\'' && mode == -1) {
+            end_index = (*iter) -1;
+            break;
+        }
+    }
+    if(end_index==0) {
+        lab_errorln("Failed to find string closing statement!");
+        return lab_lexer_token_make((int)tok_nil, NULL);
+    } else {
+        char* buffer = malloc((end_index - begin_index) + 1);
+        if(buffer==NULL) {
+            lab_errorln("Failed to allocate string buffer!");
+            return lab_lexer_token_make((int)tok_nil, NULL);
+        }
+        buffer[end_index - begin_index] = '\0';
+        memcpy(buffer, code + begin_index + 1, end_index - begin_index);
+        return lab_lexer_token_make(mode == 1 ? (int)tok_string : (int)tok_char, buffer);
+    }
+    return lab_lexer_token_make((int)tok_nil, NULL);
+}
+
 
 
 int main(int argc, char* argv[]) {
@@ -340,6 +375,7 @@ int main(int argc, char* argv[]) {
     lab_lexer_add_rule(rules, "1234567890.", numeric_callback);
     lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
     lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
+    lab_lexer_add_rule(rules, "\"\'", string_callback);
 
     for(size_t i = 0; i < file_count; i++) {
         lab_lexer_lex(&tokens, file_contents[i], rules, NULL);
