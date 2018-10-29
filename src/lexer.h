@@ -40,5 +40,9 @@ extern lab_lexer_token_t lab_lexer_token_make(int id, char* data);
 
 extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, lab_lexer_callback_t     callback);
 //  ^ adds rule to rule container
+/*
+    A rule is a string like "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm".
+    What it means is whenever the lexer encounters one of those characters, it calls the callback function
+*/
 extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, const lab_lexer_rules_t* rules, void* user_data);
 //  ^ runs lexer with rules

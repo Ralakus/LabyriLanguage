@@ -392,7 +392,7 @@ int main(int argc, char* argv[]) {
 
     lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
     lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
-    lab_lexer_add_rule(rules, "1234567890.", numeric_callback);
+    lab_lexer_add_rule(rules, "1234567890", numeric_callback);
     lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
     lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
     lab_lexer_add_rule(rules, "\"\'", string_callback);
