@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct _lab_lexer_rule_t {
     const char*          rule;
@@ -14,14 +15,18 @@ struct lab_lexer_rules_t {
     _lab_lexer_rule_t* rules;
 };
 
-static int _tok_append(lab_lexer_token_container_t* container, lab_lexer_token_t token) {
+static int _tok_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
 
     ++container->count;
+    if(container->count > container->alloc_count) {
+        container->alloc_count = (size_t)ceil(container->count *
+        (((float)max_code_len / (float)pos->iter) > 1.f ? ((float)max_code_len / (float)pos->iter) : 1.f));
+    }
 
-    if(container->tokens == NULL) {
-        container->tokens = malloc(sizeof(_lab_lexer_rule_t) * container->count);
+    if(container->tokens == NULL) { 
+        container->tokens = malloc(sizeof(_lab_lexer_rule_t) * container->alloc_count);
     } else {
-        container->tokens = realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->count);
+        container->tokens = realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->alloc_count);
     }
 
     if(container->tokens == NULL) {
@@ -57,6 +62,7 @@ int lab_lexer_rules_free(lab_lexer_rules_t* rules) {
 }
 
 int lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
+    container->alloc_count = 0;
     container->count  = 0;
     container->tokens = NULL;
     return 0;
@@ -121,7 +127,7 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const l
 
                 if(cur_char==rules->rules[j].rule[k]) {
                     size_t old_i = pos.iter;
-                    _tok_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data));
+                    _tok_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data), &pos, code_len);
                     found_callback = 1;
                     break;
                 }

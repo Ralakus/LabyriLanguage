@@ -54,6 +54,8 @@ project "Language"
 
     includedirs { "src/" }
 
+    links { "m" }
+
     filter "configurations:Debug"
             defines { "DEBUG" }
 
