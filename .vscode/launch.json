@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/build64/bin/Language/Debug/Language",
-            "args": [],
+            "args": [ "test/test1.lab", "test/test2.lab" ],
             "cwd": "${workspaceFolder}"
         }
     ]

@@ -9,10 +9,10 @@
 #define _LAB_ERROR_PREFIX   LAB_ANSI_COLOR_RED    "[!]: " LAB_ANSI_COLOR_RESET
 #define _LAB_SUCCESS_PREFIX LAB_ANSI_COLOR_GREEN  "[^]: " LAB_ANSI_COLOR_RESET
 
-#define _LAB_PRINT_TEMPLATE(target, exec) va_list args; \
-                                          va_start(args, fmt); \
+#define _LAB_PRINT_TEMPLATE(target, exec) va_list args;                       \
+                                          va_start(args, fmt);                \
                                           FILE* print_stream = (FILE*)target; \
-                                          exec \
+                                          exec                                \
                                           va_end(args)
 
 static FILE* _g_lab_print_stream = NULL;
