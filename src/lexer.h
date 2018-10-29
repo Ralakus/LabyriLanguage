@@ -9,7 +9,7 @@ typedef struct lab_lexer_token_t {
 // ^ Contains the id of a token and any data it might need, the data is freed when lab_lexer_token_container_free is called
 
 typedef struct lab_lexer_token_container_t {
-    int  count;
+    size_t count;
     lab_lexer_token_t* tokens;
 } lab_lexer_token_container_t;
 // ^ holds tokens in a dynamic int array
