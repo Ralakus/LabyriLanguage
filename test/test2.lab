@@ -1,4 +1,0 @@
-Func main(argc: Int16, argv: Str[]): Int16 {
-    let x: Str = "Hello world!"
-    return 0;
-}

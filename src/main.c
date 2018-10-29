@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <time.h>
 
 typedef enum tokens_e {
     tok_nil,
@@ -161,7 +162,15 @@ lab_lexer_token_t whitespace_callback(const char* code, size_t* iter, size_t max
                 memcpy(type_name, "newline", sizeof("newline"));
             }
             break;
-        }
+        } case '\r':
+            type_name = malloc(sizeof("return"));
+            if(type_name==NULL) {
+                lab_errorln("Failed to allocate buffer for whitespace type: return");
+            } else {
+                type_name[sizeof("return")-1] = '\0';
+                memcpy(type_name, "return", sizeof("return"));
+            }
+            break;
         default: break;
     }
     return lab_lexer_token_make((int)tok_whitespace, type_name);
@@ -256,11 +265,16 @@ lab_lexer_token_t string_callback(const char* code, size_t* iter, size_t max_len
 
 int main(int argc, char* argv[]) {
 
+    clock_t start, end;
+    double lex_read_files_time, lex_rule_add_time, lex_time, lex_rule_clear_time, lex_total_time;
+
     size_t file_count           = argc - 1;
     char** file_names           = NULL;
     size_t* file_name_sizes     = NULL;
     char** file_contents        = NULL;
     size_t* file_contents_sizes = NULL;
+
+    start = clock();
 
     if(argc > 1) {
         FILE* cur_file = NULL;
@@ -365,17 +379,29 @@ int main(int argc, char* argv[]) {
         lab_errorln("No input files!");
         return 1;
     }
+
+    end = clock();
+
+    lex_read_files_time = ((double)(end - start)) / CLOCKS_PER_SEC;
     
+    start = clock();
+
     lab_lexer_rules_t* rules = lab_lexer_rules_new();
     lab_lexer_token_container_t tokens;
     lab_lexer_token_container_init(&tokens);
 
     lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
-    lab_lexer_add_rule(rules, " \n\t", whitespace_callback);
+    lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
     lab_lexer_add_rule(rules, "1234567890.", numeric_callback);
     lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
     lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
     lab_lexer_add_rule(rules, "\"\'", string_callback);
+
+    end = clock();
+
+    lex_rule_add_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
 
     for(size_t i = 0; i < file_count; i++) {
         lab_lexer_lex(&tokens, file_contents[i], rules, NULL);
@@ -391,9 +417,23 @@ int main(int argc, char* argv[]) {
         lab_lexer_token_container_free(&tokens);
     }
 
-    lab_lexer_rules_free(rules);
+    end = clock();
 
-    
+    lex_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
+    lab_lexer_rules_free(rules);
+    end  = clock();
+
+    lex_rule_clear_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    lex_total_time = lex_read_files_time + lex_rule_add_time + lex_time + lex_rule_clear_time;
+
+    lab_successln("Read files time %fms", lex_read_files_time * 1000);
+    lab_successln("Rule add time: %fms", lex_rule_add_time * 1000);
+    lab_successln("Lex time %fms", lex_time * 1000);
+    lab_successln("Rule clear time %fms", lex_rule_clear_time * 1000);
+    lab_successln("Total time: %fms", lex_total_time * 1000);
 
     return 0;
 }
