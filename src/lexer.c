@@ -14,13 +14,14 @@ struct lab_lexer_rules_t {
     _lab_lexer_rule_t* rules;
 };
 
-#define FAST_CEIL(x) ((float)(long)((x)+1))
+#define NOT_SO_FAST_CEIL(x) ((float)(long)((x)+1))
 
 static int _tok_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
 
     ++container->count;
     if(container->count > container->alloc_count) {
-        container->alloc_count = (size_t)FAST_CEIL(container->count *
+        container->alloc_count = //container->count * ( max_code_len / pos->iter + (max_code_len % pos->iter != 0));
+        (size_t)NOT_SO_FAST_CEIL(container->count *
         (((float)max_code_len / (float)pos->iter) > 1.f ? ((float)max_code_len / (float)pos->iter) : 1.f));
     }
 
