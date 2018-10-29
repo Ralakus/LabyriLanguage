@@ -6,6 +6,7 @@ typedef struct lab_lexer_token_t {
     int id;
     char* data;
 } lab_lexer_token_t;
+// ^ Contains the id of a token and any data it might need, the data is freed when lab_lexer_token_container_free is called
 
 typedef struct lab_lexer_token_container_t {
     int  count;
