@@ -17,7 +17,7 @@ struct lab_lexer_rules_t {
 
 #define NOT_SO_FAST_CEIL(x) ((float)(long)((x)+1))
 
-static int _tok_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
+int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
 
     ++container->count;
     if(container->count > container->alloc_count) {
@@ -134,8 +134,7 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t 
                 }
 
                 if(cur_char==rules->rules[j].rule[k]) {
-                    size_t old_i = pos.iter;
-                    _tok_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data), &pos, code_len);
+                    lab_token_container_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data), &pos, code_len);
                     found_callback = 1;
                     break;
                 }

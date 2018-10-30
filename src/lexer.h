@@ -35,6 +35,8 @@ extern int lab_lexer_token_container_init(lab_lexer_token_container_t* container
 //         ^ inits token container
 extern int lab_lexer_token_container_free(lab_lexer_token_container_t* container);
 //         ^ frees token container
+extern int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len);
+//         ^ appends a token to a token container
 
 extern lab_lexer_token_t lab_lexer_token_make(int id, char* data);
 //                       ^ makes new token with id and data
@@ -48,4 +50,4 @@ extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, la
 extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data);
 //  ^ runs lexer with rules
 extern int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);
-extern int lab_lexer_iter_prev(const char* code, lab_lexer_iterator_t* iter);
+//         ^ iterates to next character in code, automatically changes lines and columns

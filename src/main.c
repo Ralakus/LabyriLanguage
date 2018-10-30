@@ -258,6 +258,39 @@ lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, siz
     return lab_lexer_token_make((int)tok_eof, NULL);
 }
 
+int custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, void* user_data) {
+    if(code_len == 0) {
+        code_len = strlen(code);
+    }
+
+    lab_lexer_iterator_t pos;
+    pos.iter   = 0;
+    pos.line   = 1;
+    pos.column = 0;
+
+    for (pos.iter = 0; pos.iter < code_len; lab_lexer_iter_next(code, &pos)) {
+        
+        char cur_char = code[pos.iter];
+
+        if(isalpha(cur_char)) {
+            lab_token_container_append(tokens, alpha_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (isdigit(cur_char) || cur_char == '.') {
+           lab_token_container_append(tokens, numeric_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if(isspace(cur_char)) {
+            lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (cur_char=='(' || cur_char==')' || cur_char=='[' || cur_char==']' || cur_char=='{' || cur_char=='}' ||
+                   cur_char==',' || cur_char==':' || cur_char==';') {
+            lab_token_container_append(tokens, symbol_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (cur_char=='+' || cur_char=='-' || cur_char=='*' || cur_char=='/' || cur_char=='=' || cur_char=='^' ||
+                   cur_char=='&' || cur_char=='<' || cur_char=='>' || cur_char=='|') {
+            lab_token_container_append(tokens, operator_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if(cur_char=='\"' || cur_char=='\'') {
+            lab_token_container_append(tokens, string_callback(code, &pos, code_len, user_data), &pos, code_len);
+        }
+
+    }
+    return 0;
+}
 
 int main(int argc, char* argv[]) {
 
@@ -379,15 +412,15 @@ int main(int argc, char* argv[]) {
     
     start = clock();
 
-    lab_lexer_rules_t* rules = lab_lexer_rules_new();
+    //lab_lexer_rules_t* rules = lab_lexer_rules_new();
     lab_lexer_token_container_t tokens;
 
-    lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
-    lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
-    lab_lexer_add_rule(rules, "1234567890", numeric_callback);
-    lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
-    lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
-    lab_lexer_add_rule(rules, "\"\'", string_callback);
+    //lab_lexer_add_rule(rules, "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm", alpha_callback);
+    //lab_lexer_add_rule(rules, " \n\t\r", whitespace_callback);
+    //lab_lexer_add_rule(rules, "1234567890", numeric_callback);
+    //lab_lexer_add_rule(rules, "()[]{},:;", symbol_callback);
+    //lab_lexer_add_rule(rules, "+-*/=^&<>|", operator_callback);
+    //lab_lexer_add_rule(rules, "\"\'", string_callback);
 
     end = clock();
 
@@ -397,14 +430,15 @@ int main(int argc, char* argv[]) {
 
     for(size_t i = 0; i < file_count; i++) {
         lab_lexer_token_container_init(&tokens);
-        lab_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, rules, NULL);
+        //lab_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, rules, NULL);
+        custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        /*for(size_t j = 0; j < tokens.count; j++) {
+        for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
             lab_println("Token: %s: %s", tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }*/
+        }
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);
@@ -415,7 +449,7 @@ int main(int argc, char* argv[]) {
     lex_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     start = clock();
-    lab_lexer_rules_free(rules);
+    //lab_lexer_rules_free(rules);
     end  = clock();
 
     lex_rule_clear_time = ((double)(end - start)) / CLOCKS_PER_SEC;
