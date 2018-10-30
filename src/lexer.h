@@ -45,6 +45,7 @@ extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, la
     A rule is a string like "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm".
     What it means is whenever the lexer encounters one of those characters, it calls the callback function
 */
-extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, const lab_lexer_rules_t* rules, void* user_data);
+extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data);
 //  ^ runs lexer with rules
 extern int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);
+extern int lab_lexer_iter_prev(const char* code, lab_lexer_iterator_t* iter);

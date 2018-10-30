@@ -1,5 +1,6 @@
 #include "logger.h"
 #include "lexer.h"
+#include "helper_macros.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -77,6 +78,7 @@ int lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
         }
         free(container->tokens);
     }
+    container->alloc_count = 0;
     container->count = 0;
     return 0;
 }
@@ -109,8 +111,10 @@ int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_cal
     return 0;
 }
 
-int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const lab_lexer_rules_t* rules, void* user_data) {
-    size_t code_len = strlen(code);
+int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data) {
+    if(code_len == 0) {
+        code_len = strlen(code);
+    }
 
     lab_lexer_iterator_t pos;
     pos.iter   = 0;
@@ -124,8 +128,10 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const l
 
         for(size_t j = 0; j < rules->count; j++) {
 
-            size_t rule_j_len = strlen(rules->rules[j].rule);
-            for(size_t k = 0; k < rule_j_len; k++) {
+            for(size_t k = 0;; k++) {
+                if(rules->rules[j].rule[k]=='\0') {
+                    break;
+                }
 
                 if(cur_char==rules->rules[j].rule[k]) {
                     size_t old_i = pos.iter;
@@ -150,14 +156,21 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, const l
 }
 
 int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
-    ++(*iter).iter;
-    if(code[(*iter).iter]=='\n') {
-        ++(*iter).line;
-        (*iter).column = 0;
-    } else if(code[(*iter).iter] == '\0') {
+    ++iter->iter;
+
+    if(code[iter->iter]=='\n') {
+
+        ++iter->line;
+          iter->column = 0;
+
+    } /*else if(code[iter->iter] == '\0') { // Removed since it's not used
+
         return 1;
-    } else{
-        ++(*iter).column;
+
+    } */else{
+
+        ++iter->column;
+
     }
     return 0;
 }
