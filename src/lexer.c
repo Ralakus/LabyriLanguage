@@ -23,13 +23,13 @@ int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer
     if(container->count > container->alloc_count) {
         container->alloc_count = //container->count * ( max_code_len / pos->iter + (max_code_len % pos->iter != 0));
         (size_t)NOT_SO_FAST_CEIL(container->count *
-        (((float)max_code_len / (float)pos->iter) > 1.f ? ((float)max_code_len / (float)pos->iter) : 1.f));
+        (((float)max_code_len / (float)pos->iter) > 1.0f ? ((float)max_code_len / (float)pos->iter) : 1.0f));
     }
 
     if(container->tokens == NULL) { 
-        container->tokens = malloc(sizeof(_lab_lexer_rule_t) * container->alloc_count);
+        container->tokens = (lab_lexer_token_t*)malloc(sizeof(_lab_lexer_rule_t) * container->alloc_count);
     } else {
-        container->tokens = realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->alloc_count);
+        container->tokens = (lab_lexer_token_t*)realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->alloc_count);
     }
 
     if(container->tokens == NULL) {
@@ -43,7 +43,7 @@ int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer
 }
 
 lab_lexer_rules_t* lab_lexer_rules_new() {
-    lab_lexer_rules_t* rules = malloc(sizeof(lab_lexer_rules_t));
+    lab_lexer_rules_t* rules = (lab_lexer_rules_t*)malloc(sizeof(lab_lexer_rules_t));
     if(rules==NULL) {
         return NULL;
     } else {
@@ -95,9 +95,9 @@ int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_cal
     ++rules->count;
 
     if(rules->rules == NULL) {
-        rules->rules = malloc(sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (_lab_lexer_rule_t*)malloc(sizeof(_lab_lexer_rule_t) * rules->count);
     } else {
-        rules->rules = realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
+        rules->rules = (_lab_lexer_rule_t*)realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
     }
 
     if(rules->rules == NULL) {
@@ -154,7 +154,7 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t 
     return 0;
 }
 
-int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
+void lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
     ++iter->iter;
 
     if(code[iter->iter]=='\n') {
@@ -171,5 +171,5 @@ int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
         ++iter->column;
 
     }
-    return 0;
+    return;
 }

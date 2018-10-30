@@ -49,5 +49,5 @@ extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, la
 */
 extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data);
 //  ^ runs lexer with rules
-extern int lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);
+extern void lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);
 //         ^ iterates to next character in code, automatically changes lines and columns

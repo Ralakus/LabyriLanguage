@@ -53,7 +53,7 @@ typedef enum tokens_e {
 }   tokens_e;
 
 #define TOK_TO_STRING_TEMPLATE(token, string) case token: {                                                                 \
-                                                  buffer = malloc(strlen(string)+1);                                        \
+                                                  buffer = (char*)malloc(strlen(string)+1);                                 \
                                                   if(buffer==NULL) {                                                        \
                                                       lab_errorln("Failed to allocate buffer for function "#string"!");     \
                                                       return NULL;                                                          \
@@ -134,7 +134,7 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
                 }
             }
 
-            char* ident = malloc((iter->iter - begin_iter.iter) + 2);
+            char* ident = (char*)malloc((iter->iter - begin_iter.iter) + 2);
             if(ident==NULL) {
 
                 lab_errorln("Failed to allocate buffer for identifier token for identifier at line: %d, column: %d!", begin_iter.line, begin_iter.column);
@@ -171,7 +171,7 @@ lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter,
 
         if(!isdigit(code[iter->iter + 1]) && code[iter->iter + 1] != '.') {
 
-            char* num = malloc((iter->iter - begin_iter.iter) + 2);
+            char* num = (char*)malloc((iter->iter - begin_iter.iter) + 2);
             if(num==NULL) {
 
                 lab_errorln("Failed to allocate buffer for numerical token for number at line: %d, column: %d!", iter->line, iter->column);
@@ -239,7 +239,7 @@ lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, 
         lab_errorln("Failed to find string closing statement for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
         return lab_lexer_token_make((int)tok_nil, NULL);
     } else {
-        char* buffer = malloc((end_index - begin_index) + 1);
+        char* buffer = (char*)malloc((end_index - begin_index) + 1);
         if(buffer==NULL) {
             lab_errorln("Failed to allocate string buffer for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
             return lab_lexer_token_make((int)tok_nil, NULL);
@@ -307,10 +307,10 @@ int main(int argc, char* argv[]) {
 
     if(argc > 1) {
         FILE* cur_file = NULL;
-        file_names          = malloc(sizeof(char*)  * file_count);
-        file_name_sizes     = malloc(sizeof(size_t) * file_count);
-        file_contents       = malloc(sizeof(char*)  * file_count);
-        file_contents_sizes = malloc(sizeof(size_t) * file_count);
+        file_names          = (char**)malloc(sizeof(char*)  * file_count);
+        file_name_sizes     = (size_t*)malloc(sizeof(size_t) * file_count);
+        file_contents       = (char**)malloc(sizeof(char*)  * file_count);
+        file_contents_sizes = (size_t*)malloc(sizeof(size_t) * file_count);
 
         if(file_names==NULL) {
             lab_errorln("Failed to allocate file name buffer!");
@@ -345,7 +345,7 @@ int main(int argc, char* argv[]) {
         for(int i = 1; i < argc; i++) {
 
             file_name_sizes[i-1] = strlen(argv[i])+1;
-            file_names[i-1] = malloc(file_name_sizes[i-1]);
+            file_names[i-1] = (char*)malloc(file_name_sizes[i-1]);
             if(file_names[i-1]==NULL) {
                 lab_errorln("Failed to allocate file name for file: \"%s\"!", argv[i]);
                 for(int j = 0; j < file_count; j++) {
@@ -380,7 +380,7 @@ int main(int argc, char* argv[]) {
             fseek(cur_file, 0, SEEK_END);
             file_contents_sizes[i-1] = ftell(cur_file)+1;
             fseek(cur_file, 0, SEEK_SET);
-            file_contents[i-1] = malloc(file_contents_sizes[i-1]);
+            file_contents[i-1] = (char*)malloc(file_contents_sizes[i-1]);
 
             if(file_contents[i-1]==NULL) {
                 lab_errorln("Failed to allocate file buffer for file: \"%s\"!", argv[i]);
@@ -434,11 +434,11 @@ int main(int argc, char* argv[]) {
         custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        for(size_t j = 0; j < tokens.count; j++) {
+        /*for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
             lab_println("Token: %s: %s", tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }
+        }*/
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);
