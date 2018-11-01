@@ -1,117 +1,214 @@
-#include "logger.h"
 #include "lexer.h"
-#include "helper_macros.h"
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdio.h>
 
-typedef struct _lab_lexer_rule_t {
-    const char*          rule;
-    lab_lexer_callback_t callback;
-} _lab_lexer_rule_t;
+#define TOK_TO_STRING_TEMPLATE(token, string) case token: {                                                                 \
+                                                  buffer = (char*)malloc(strlen(string)+1);                                 \
+                                                  if(buffer==NULL) {                                                        \
+                                                      lab_errorln("Failed to allocate buffer for function "#string"!");     \
+                                                      return NULL;                                                          \
+                                                  }                                                                         \
+                                                  buffer[strlen(string)] = '\0';                                            \
+                                                  strcpy(buffer, string);                                                   \
+                                                  break;                                                                    \
+                                              }
 
-struct lab_lexer_rules_t {
-    int count;
-    _lab_lexer_rule_t* rules;
-};
-
-#define NOT_SO_FAST_CEIL(x) ((float)(long)((x)+1))
-
-int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len) {
-
-    ++container->count;
-    if(container->count > container->alloc_count) {
-        container->alloc_count = //container->count * ( max_code_len / pos->iter + (max_code_len % pos->iter != 0));
-        (size_t)NOT_SO_FAST_CEIL(container->count *
-        (((float)max_code_len / (float)pos->iter) > 1.0f ? ((float)max_code_len / (float)pos->iter) : 1.0f));
-    }
-
-    if(container->tokens == NULL) { 
-        container->tokens = (lab_lexer_token_t*)malloc(sizeof(_lab_lexer_rule_t) * container->alloc_count);
-    } else {
-        container->tokens = (lab_lexer_token_t*)realloc(container->tokens, sizeof(_lab_lexer_rule_t) * container->alloc_count);
-    }
-
-    if(container->tokens == NULL) {
-        lab_errorln("Failed to reallocate and add rule!");
-        return 1;
-    }
-
-    memcpy(&container->tokens[container->count-1], &token, sizeof(lab_lexer_token_t));
-
-    return 0;
-}
-
-lab_lexer_rules_t* lab_lexer_rules_new() {
-    lab_lexer_rules_t* rules = (lab_lexer_rules_t*)malloc(sizeof(lab_lexer_rules_t));
-    if(rules==NULL) {
-        return NULL;
-    } else {
-        rules->count = 0;
-        rules->rules = NULL;
-        return rules;
-    }
-}
-
-int lab_lexer_rules_free(lab_lexer_rules_t* rules) {
-    if(rules->rules == NULL) {
-        return 0;
-    } else {
-        free(rules->rules);
-        rules->rules = NULL;
-        rules->count = 0;
-        return 0;
-    }
-}
-
-int lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
-    container->alloc_count = 0;
-    container->count  = 0;
-    container->tokens = NULL;
-    return 0;
-}
-int lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
-    if(container->tokens==NULL) {
-    } else {
-        for(size_t i = 0; i < container->count; i++) {
-            free(container->tokens[i].data);
+char* tok_to_string(tokens_e tok) {
+    char* buffer = NULL;
+    switch(tok) {
+        TOK_TO_STRING_TEMPLATE(tok_nil, "nil")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_space, "whitespace space")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_tab, "whitespace tab")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_newline, "whitespace newline")
+        TOK_TO_STRING_TEMPLATE(tok_whitespace_return, "whitespace return")
+        TOK_TO_STRING_TEMPLATE(tok_identifier, "identifier")
+        TOK_TO_STRING_TEMPLATE(tok_number, "number")
+        TOK_TO_STRING_TEMPLATE(tok_char, "char")
+        TOK_TO_STRING_TEMPLATE(tok_string, "string")
+        TOK_TO_STRING_TEMPLATE(tok_lparen, "left paren")
+        TOK_TO_STRING_TEMPLATE(tok_rparen, "right paren")
+        TOK_TO_STRING_TEMPLATE(tok_lbracket, "left bracket")
+        TOK_TO_STRING_TEMPLATE(tok_rbracket, "right bracket")
+        TOK_TO_STRING_TEMPLATE(tok_lcurley, "left curley")
+        TOK_TO_STRING_TEMPLATE(tok_rcurley, "right curley")
+        TOK_TO_STRING_TEMPLATE(tok_comma, "comma")
+        TOK_TO_STRING_TEMPLATE(tok_colon, "colon")
+        TOK_TO_STRING_TEMPLATE(tok_semicolon, "semicolon")
+        TOK_TO_STRING_TEMPLATE(tok_func, "function")
+        TOK_TO_STRING_TEMPLATE(tok_let, "let")
+        TOK_TO_STRING_TEMPLATE(tok_return, "return")
+        TOK_TO_STRING_TEMPLATE(tok_operator_plus, "operator plus")
+        TOK_TO_STRING_TEMPLATE(tok_operator_minus, "operator minus")
+        TOK_TO_STRING_TEMPLATE(tok_operator_mul, "operator multiply")
+        TOK_TO_STRING_TEMPLATE(tok_operator_div, "operator divide")
+        TOK_TO_STRING_TEMPLATE(tok_operator_equals, "operator equals")
+        TOK_TO_STRING_TEMPLATE(tok_operator_xor, "operator xor")
+        TOK_TO_STRING_TEMPLATE(tok_operator_and, "operator and")
+        TOK_TO_STRING_TEMPLATE(tok_operator_lesst, "operator less than")
+        TOK_TO_STRING_TEMPLATE(tok_operator_greatert, "operator greater than")
+        TOK_TO_STRING_TEMPLATE(tok_operator_or, "operator or")
+        TOK_TO_STRING_TEMPLATE(tok_operator_not, "operator not")
+        default: {
+            break;
         }
-        free(container->tokens);
     }
-    container->alloc_count = 0;
-    container->count = 0;
-    return 0;
+    return buffer;
 }
 
-lab_lexer_token_t lab_lexer_token_make(int id, char* data) {
-    lab_lexer_token_t token;
-    token.id = id;
-    token.data = data;
-    return token;
+lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    lab_lexer_iterator_t begin_iter = *iter;
+
+    static const char* reserved[]    = {    "Func",   "let",   "return" };
+    static tokens_e reserved_types[] = { tok_func, tok_let, tok_return };
+
+    for(;iter->iter < max_len; lab_lexer_iter_next(code, iter) ) {
+
+        if(!isalpha(code[iter->iter + 1]) && !isdigit(code[iter->iter + 1])) {
+
+            for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
+
+                for(size_t j = 0;; j++) {
+
+                    if(j >= iter->iter - begin_iter.iter) {
+
+                        return lab_lexer_token_make((int)reserved_types[i], NULL);
+
+                    } else if(reserved[i][j]=='\0') {
+                        break;
+                    }
+                    if(reserved[i][j]==(code + begin_iter.iter)[j]) {
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            char* ident = (char*)malloc((iter->iter - begin_iter.iter) + 2);
+            if(ident==NULL) {
+
+                lab_errorln("Failed to allocate buffer for identifier token for identifier at line: %d, column: %d!", begin_iter.line, begin_iter.column);
+
+            } else {
+
+                ident[(iter->iter - begin_iter.iter) + 1] = '\0';
+                memcpy(ident, code + begin_iter.iter, (iter->iter - begin_iter.iter) + 1);
+
+            }
+
+            return lab_lexer_token_make((int)tok_identifier, ident);
+        }
+    }
+    return lab_lexer_token_make((int)tok_nil, NULL);
 }
 
-int lab_lexer_add_rule(lab_lexer_rules_t* rules, const char* rule, lab_lexer_callback_t callback) {
+lab_lexer_token_t whitespace_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    char type = code[iter->iter];
+    char* type_name = NULL;
+    switch (type) {
+        case ' ' : return lab_lexer_token_make((int)tok_whitespace_space, NULL);
+        case '\t': return lab_lexer_token_make((int)tok_whitespace_tab, NULL);
+        case '\n': return lab_lexer_token_make((int)tok_whitespace_newline, NULL);
+        case '\r': return lab_lexer_token_make((int)tok_whitespace_return, NULL);
+        default  : return lab_lexer_token_make((int)tok_nil, type_name);;
+    }
+}
 
-    ++rules->count;
+lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    lab_lexer_iterator_t begin_iter = *iter;
 
-    if(rules->rules == NULL) {
-        rules->rules = (_lab_lexer_rule_t*)malloc(sizeof(_lab_lexer_rule_t) * rules->count);
+    for(;iter->iter < max_len; lab_lexer_iter_next(code, iter) ) {
+
+        if(!isdigit(code[iter->iter + 1]) && code[iter->iter + 1] != '.') {
+
+            char* num = (char*)malloc((iter->iter - begin_iter.iter) + 2);
+            if(num==NULL) {
+
+                lab_errorln("Failed to allocate buffer for numerical token for number at line: %d, column: %d!", iter->line, iter->column);
+
+            } else {
+
+                num[(iter->iter - begin_iter.iter) + 1] = '\0';
+                memcpy(num, code + begin_iter.iter, (iter->iter - begin_iter.iter) + 1);
+
+            }
+
+            return lab_lexer_token_make((int)tok_number, num);
+        }
+    }
+    return lab_lexer_token_make((int)tok_nil, NULL);
+}
+
+lab_lexer_token_t symbol_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    switch(code[iter->iter]) {
+        case '(': return lab_lexer_token_make((int)tok_lparen,    NULL);
+        case ')': return lab_lexer_token_make((int)tok_rparen,    NULL);
+        case '[': return lab_lexer_token_make((int)tok_lbracket,  NULL);
+        case ']': return lab_lexer_token_make((int)tok_rbracket,  NULL);
+        case '{': return lab_lexer_token_make((int)tok_lcurley,   NULL);
+        case '}': return lab_lexer_token_make((int)tok_rcurley,   NULL);
+        case ',': return lab_lexer_token_make((int)tok_comma,     NULL);
+        case ':': return lab_lexer_token_make((int)tok_colon,     NULL);
+        case ';': return lab_lexer_token_make((int)tok_semicolon, NULL);
+        default:  return lab_lexer_token_make((int)tok_nil,       NULL);
+    }
+}
+
+lab_lexer_token_t operator_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    switch(code[iter->iter]) {
+        case '+': return lab_lexer_token_make((int)tok_operator_plus,         NULL);
+        case '-': return lab_lexer_token_make((int)tok_operator_minus,        NULL);
+        case '*': return lab_lexer_token_make((int)tok_operator_mul,          NULL);
+        case '/': return lab_lexer_token_make((int)tok_operator_div,          NULL);
+        case '=': return lab_lexer_token_make((int)tok_operator_equals,       NULL);
+        case '^': return lab_lexer_token_make((int)tok_operator_xor,          NULL);
+        case '<': return lab_lexer_token_make((int)tok_operator_lesst,        NULL);
+        case '>': return lab_lexer_token_make((int)tok_operator_greatert,     NULL);
+        case '|': return lab_lexer_token_make((int)tok_operator_or,           NULL);
+        case '!': return lab_lexer_token_make((int)tok_operator_not,          NULL);
+        default:  return lab_lexer_token_make((int)tok_nil,                   NULL);
+    }
+}
+
+lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    int mode = code[iter->iter]=='\"' ? 1 : -1; // 1 means it's lexing a string, -1 means char
+    size_t begin_index = iter->iter;
+    size_t end_index = 0;
+    lab_lexer_iter_next(code, iter);
+    lab_lexer_iterator_t begin_pos = *iter;
+    for(;iter->iter < max_len; lab_lexer_iter_next(code, iter) ) {
+        if(code[iter->iter]=='\"' && mode == 1) {
+            end_index = iter->iter - 1;
+            break;
+        } else if(code[iter->iter]=='\'' && mode == -1) {
+            end_index = iter->iter -1;
+            break;
+        }
+    }
+    if(end_index==0) {
+        lab_errorln("Failed to find string closing statement for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
+        return lab_lexer_token_make((int)tok_nil, NULL);
     } else {
-        rules->rules = (_lab_lexer_rule_t*)realloc(rules->rules, sizeof(_lab_lexer_rule_t) * rules->count);
+        char* buffer = (char*)malloc((end_index - begin_index) + 1);
+        if(buffer==NULL) {
+            lab_errorln("Failed to allocate string buffer for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
+            return lab_lexer_token_make((int)tok_nil, NULL);
+        }
+        buffer[end_index - begin_index] = '\0';
+        memcpy(buffer, code + begin_index + 1, end_index - begin_index);
+        return lab_lexer_token_make(mode == 1 ? (int)tok_string : (int)tok_char, buffer);
     }
-
-    if(rules->rules == NULL) {
-        lab_errorln("Failed to reallocate and add rule!");
-        return 1;
-    }
-
-    rules->rules[rules->count-1].callback = callback;
-    rules->rules[rules->count-1].rule     = rule;
-
-    return 0;
+    return lab_lexer_token_make((int)tok_nil, NULL);
 }
 
-int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data) {
+lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
+    return lab_lexer_token_make((int)tok_eof, NULL);
+}
+
+int custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, void* user_data) {
     if(code_len == 0) {
         code_len = strlen(code);
     }
@@ -124,52 +221,23 @@ int lab_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t 
     for (pos.iter = 0; pos.iter < code_len; lab_lexer_iter_next(code, &pos)) {
         
         char cur_char = code[pos.iter];
-        int found_callback = 0;
 
-        for(size_t j = 0; j < rules->count; j++) {
-
-            for(size_t k = 0;; k++) {
-                if(rules->rules[j].rule[k]=='\0') {
-                    break;
-                }
-
-                if(cur_char==rules->rules[j].rule[k]) {
-                    lab_token_container_append(tokens, rules->rules[j].callback(code, &pos, code_len, user_data), &pos, code_len);
-                    found_callback = 1;
-                    break;
-                }
-
-            }
-
-            if(found_callback==1) {
-                break;
-            }
-
+        if(isalpha(cur_char)) {
+            lab_token_container_append(tokens, alpha_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (isdigit(cur_char) || cur_char == '.') {
+           lab_token_container_append(tokens, numeric_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if(isspace(cur_char)) {
+            lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (cur_char=='(' || cur_char==')' || cur_char=='[' || cur_char==']' || cur_char=='{' || cur_char=='}' ||
+                   cur_char==',' || cur_char==':' || cur_char==';') {
+            lab_token_container_append(tokens, symbol_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if (cur_char=='+' || cur_char=='-' || cur_char=='*' || cur_char=='/' || cur_char=='=' || cur_char=='^' ||
+                   cur_char=='&' || cur_char=='<' || cur_char=='>' || cur_char=='|') {
+            lab_token_container_append(tokens, operator_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if(cur_char=='\"' || cur_char=='\'') {
+            lab_token_container_append(tokens, string_callback(code, &pos, code_len, user_data), &pos, code_len);
         }
 
-        if(found_callback==0) {
-            lab_errorln("Unexpected character: \"%c\" at line: %d, column: %d", cur_char, pos.line, pos.column);
-        }
     }
     return 0;
-}
-
-void lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter) {
-    ++iter->iter;
-
-    if(code[iter->iter]=='\n') {
-
-        ++iter->line;
-          iter->column = 0;
-
-    } /*else if(code[iter->iter] == '\0') { // Removed since it's not used
-
-        return 1;
-
-    } */else{
-
-        ++iter->column;
-
-    }
-    return;
 }

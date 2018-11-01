@@ -1,0 +1,3 @@
+[submodule "LabyrinthLexer"]
+	path = LabyrinthLexer
+	url = git@github.com:Ralakus/LabyrinthLexer.git

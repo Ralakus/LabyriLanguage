@@ -1,53 +1,70 @@
 #pragma once
 
-#include <stddef.h>
+#include <logger.h>
+#include <lexer.h>
 
-typedef struct lab_lexer_token_t {
-    int id;
-    char* data;
-} lab_lexer_token_t;
-// ^ Contains the id of a token and any data it might need, the data is freed when lab_lexer_token_container_free is called
+typedef enum tokens_e {
+    tok_nil,
 
-typedef struct lab_lexer_token_container_t {
-    size_t alloc_count;
-    size_t count;
-    lab_lexer_token_t* tokens;
-} lab_lexer_token_container_t;
-// ^ holds tokens in a dynamic array
+    tok_whitespace_space,
+    tok_whitespace_tab,
+    tok_whitespace_return,
+    tok_whitespace_newline,
 
-typedef struct lab_lexer_iterator_t {
-    size_t iter;
-    size_t line;
-    size_t column;
-} lab_lexer_iterator_t;
+    tok_identifier,
+    tok_number,
 
-typedef struct lab_lexer_rules_t     lab_lexer_rules_t;
-//             ^ contains lexer rules, id est what to look for and callback
-typedef lab_lexer_token_t  (*lab_lexer_callback_t)(const char* code, lab_lexer_iterator_t* iter, size_t max_length, void* user_data);
-//             ^ returns token type by int id
+    tok_char,
+    tok_string,
 
-extern lab_lexer_rules_t* lab_lexer_rules_new();
-//         ^ intializes new rules struct
-extern int lab_lexer_rules_free(lab_lexer_rules_t* rules);
-//         ^ frees rules struct
+    tok_lparen,
+    tok_rparen,
+    tok_lbracket,
+    tok_rbracket,
+    tok_lcurley,
+    tok_rcurley,
 
-extern int lab_lexer_token_container_init(lab_lexer_token_container_t* container);
-//         ^ inits token container
-extern int lab_lexer_token_container_free(lab_lexer_token_container_t* container);
-//         ^ frees token container
-extern int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer_token_t token, const lab_lexer_iterator_t* pos, size_t max_code_len);
-//         ^ appends a token to a token container
+    tok_comma,
+    tok_colon,
+    tok_semicolon,
 
-extern lab_lexer_token_t lab_lexer_token_make(int id, char* data);
-//                       ^ makes new token with id and data
+    tok_func,
+    tok_let,
+    tok_return,
 
-extern int lab_lexer_add_rule(lab_lexer_rules_t*     rules, const char* rule, lab_lexer_callback_t     callback);
-//  ^ adds rule to rule container
+    tok_operator_plus,
+    tok_operator_minus,
+    tok_operator_mul,
+    tok_operator_div,
+    tok_operator_equals,
+    tok_operator_xor,
+    tok_operator_and,
+    tok_operator_lesst,
+    tok_operator_greatert,
+    tok_operator_or,
+    tok_operator_not,
+
+    tok_eof,
+
+}   tokens_e;
+
+extern char* tok_to_string(tokens_e tok);
+
+extern lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern lab_lexer_token_t whitespace_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern lab_lexer_token_t symbol_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern lab_lexer_token_t operator_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
 /*
-    A rule is a string like "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm".
-    What it means is whenever the lexer encounters one of those characters, it calls the callback function
+    TODO: Find a way to make the lexer take an a null termination as a rule
 */
-extern int lab_lexer_lex     (lab_lexer_token_container_t* lexer, const char* code, size_t code_len, const lab_lexer_rules_t* rules, void* user_data);
-//  ^ runs lexer with rules
-extern void lab_lexer_iter_next(const char* code, lab_lexer_iterator_t* iter);
-//         ^ iterates to next character in code, automatically changes lines and columns
+extern lab_lexer_token_t eof_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data);
+
+extern int custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size_t code_len, void* user_data);
