@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
     clock_t start, end;
-    double lex_read_files_time, lex_rule_add_time, lex_time, lex_rule_clear_time, lex_total_time;
+    double lex_read_files_time, lex_time, lex_file_free_time, lex_total_time;
 
     size_t file_count           = argc - 1;
     char** file_names           = NULL;
@@ -122,13 +122,8 @@ int main(int argc, char* argv[]) {
     end = clock();
 
     lex_read_files_time = ((double)(end - start)) / CLOCKS_PER_SEC;
-    
-    start = clock();
+
     lab_lexer_token_container_t tokens;
-
-    end = clock();
-
-    lex_rule_add_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     start = clock();
 
@@ -152,16 +147,25 @@ int main(int argc, char* argv[]) {
     lex_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
     start = clock();
+
+    for(int j = 0; j < file_count; j++) {
+        free(file_names[j]);
+        free(file_contents[j]);
+    }
+    free(file_names);
+    free(file_name_sizes);
+    free(file_contents);
+    free(file_contents_sizes);
+
     end  = clock();
 
-    lex_rule_clear_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+    lex_file_free_time = ((double)(end - start)) / CLOCKS_PER_SEC;
 
-    lex_total_time = lex_read_files_time + lex_rule_add_time + lex_time + lex_rule_clear_time;
+    lex_total_time = lex_read_files_time + lex_time + lex_file_free_time;
 
     lab_successln("Read files time %fms", lex_read_files_time * 1000);
-    lab_successln("Rule add time: %fms", lex_rule_add_time * 1000);
     lab_successln("Lex time %fms", lex_time * 1000);
-    lab_successln("Rule clear time %fms", lex_rule_clear_time * 1000);
+    lab_successln("File free time %fms", lex_file_free_time * 1000);
     lab_successln("Total time: %fms", lex_total_time * 1000);
 
     return 0;
