@@ -15,10 +15,12 @@ file(GLOB_RECURSE all_c_src
 )
 
 add_executable(LabyrinthCompiler ${all_c_src})
-set_property(TARGET LabyrinthCompiler PROPERTY C_STANDARD 11)
-target_include_directories(LabyrinthCompiler PUBLIC LabyrinthLexer/src)
 
-add_subdirectory(LabyrinthLexer)
+set_property(TARGET LabyrinthCompiler PROPERTY C_STANDARD 11)
+
+target_include_directories(LabyrinthCompiler PUBLIC lib/LabyrinthLexer/src)
+
+add_subdirectory(lib/LabyrinthLexer)
 target_link_libraries(LabyrinthCompiler PUBLIC LabLexer)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)     # 64 bit
