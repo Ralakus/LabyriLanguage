@@ -1,0 +1,5 @@
+Func main(argc: Int16, argv: Str[]): Int16 {
+    let x: Str = "Hello world!";
+    let y: Int16 = 1.5;
+    return 0;
+}
