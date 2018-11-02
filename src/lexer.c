@@ -61,8 +61,8 @@ char* tok_to_string(tokens_e tok) {
 lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     lab_lexer_iterator_t begin_iter = *iter;
 
-    static const char* reserved[]    = {    "Func",   "let",   "return" };
-    static tokens_e reserved_types[] = { tok_func, tok_let, tok_return };
+    static const char* reserved[]    = {       "Func",      "let",      "return" };
+    static tokens_e reserved_types[] = { tok_kw_func, tok_kw_let, tok_kw_return };
 
     for(;iter->iter < max_len; lab_lexer_iter_next(code, iter) ) {
 

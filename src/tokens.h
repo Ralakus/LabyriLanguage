@@ -25,9 +25,9 @@ typedef enum tokens_e {
     tok_colon,
     tok_semicolon,
 
-    tok_func,
-    tok_let,
-    tok_return,
+    tok_kw_func,
+    tok_kw_let,
+    tok_kw_return,
 
     tok_operator_plus,
     tok_operator_minus,
