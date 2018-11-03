@@ -61,8 +61,8 @@ char* tok_to_string(tokens_e tok) {
 lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, size_t max_len, void* user_data) {
     lab_lexer_iterator_t begin_iter = *iter;
 
-    static const char* reserved[]    = {       "Func",      "let",      "return" };
-    static tokens_e reserved_types[] = { tok_kw_func, tok_kw_let, tok_kw_return };
+    static const char* reserved[]    = {       "Func",      "let",      "return", "reg" };
+    static tokens_e reserved_types[] = { tok_kw_func, tok_kw_let, tok_kw_return, tok_eof };
 
     for(;iter->iter < max_len; lab_lexer_iter_next(code, iter) ) {
 
@@ -72,7 +72,7 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
 
                 for(size_t j = 0;; j++) {
 
-                    if(j >= iter->iter - (begin_iter.iter + 1)) {
+                    if(j > iter->iter - (begin_iter.iter + 1) && reserved[i][j]==(code + begin_iter.iter)[j]) {
 
                         return lab_lexer_token_make((int)reserved_types[i], NULL);
 
@@ -236,6 +236,10 @@ int custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, size
             lab_token_container_append(tokens, operator_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else if(cur_char=='\"' || cur_char=='\'') {
             lab_token_container_append(tokens, string_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else if(cur_char=='\0') {
+            lab_token_container_append(tokens, eof_callback(code, &pos, code_len, user_data), &pos, code_len);
+        } else {
+            lab_errorln("Unexpected character at line: %d, column: %d", pos.line, pos.column);
         }
 
     }

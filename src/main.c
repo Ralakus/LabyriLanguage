@@ -133,9 +133,9 @@ int main(int argc, char* argv[]) {
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
         for(size_t j = 0; j < tokens.count; j++) {
-            //char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
-            lab_println("Token: %d: %s", tokens.tokens[j].id, tokens.tokens[j].data);
-            //free(tok_str);
+            char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
+            lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
+            free(tok_str);
         }
         lab_noticeln("END");
 
