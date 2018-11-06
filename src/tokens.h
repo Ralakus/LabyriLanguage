@@ -24,6 +24,7 @@ typedef enum tokens_e {
     tok_comma,
     tok_colon,
     tok_semicolon,
+    tok_comment,
 
     tok_kw_func,
     tok_kw_let,
@@ -40,6 +41,8 @@ typedef enum tokens_e {
     tok_operator_greatert,
     tok_operator_or,
     tok_operator_not,
+    tok_operator_bitshiftl,
+    tok_operator_bitshiftr,
 
     tok_eof,
 

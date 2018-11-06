@@ -1,5 +1,5 @@
-Func main(argc: Int16, argv: Str[]): Int16 {
+Func main(args: Str[]): Int16 {
     let x: Str = "Hello world!";
-    let y: Int16 = 1.5;
-    return 0;
+    println x; // This is a comment
+    return 0.0;
 }

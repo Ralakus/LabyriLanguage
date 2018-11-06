@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "lexer_conf.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 
     for(size_t i = 0; i < file_count; i++) {
         lab_lexer_token_container_init(&tokens);
-        custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i]-1, NULL);
+        lab_custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i], NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
         for(size_t j = 0; j < tokens.count; j++) {
