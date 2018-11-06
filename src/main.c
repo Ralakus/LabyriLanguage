@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "parser.h"
+
 int main(int argc, char* argv[]) {
     clock_t start, end;
     double lex_read_files_time, lex_time, lex_file_free_time, lex_total_time;
@@ -133,7 +135,7 @@ int main(int argc, char* argv[]) {
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
         for(size_t j = 0; j < tokens.count; j++) {
-            char* tok_str = tok_to_string((tokens_e)tokens.tokens[j].id);
+            char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
             lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
             free(tok_str);
         }
