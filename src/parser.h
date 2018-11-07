@@ -42,3 +42,18 @@ typedef struct lab_parser_ast_expr_var_t {
     char* name;
 
 } lab_parser_ast_expr_var_t;
+
+typedef struct lab_parser_ast_expr_bin_t {
+    
+    int op;
+    lab_parser_ast_expr_t* lhs, *rhs;
+
+} lab_parser_ast_expr_bin_t;
+
+typedef struct lab_parser_ast_expr_call_t {
+    char* callee;
+    size_t argc;
+    lab_parser_ast_expr_t* args;
+
+} lab_parser_ast_expr_call_t;
+
