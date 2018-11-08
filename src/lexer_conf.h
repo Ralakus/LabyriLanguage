@@ -1,7 +1,7 @@
 #pragma once
 
-#include <logger.h>
-#include <lexer.h>
+#include <lab/logger.h>
+#include "lexer.h"
 #include "tokens.h"
 
 extern char* tok_to_string(lab_tokens_e tok);
