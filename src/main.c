@@ -228,10 +228,27 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    lab_lexer_token_container_t tokens;
+
     for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {
-        lab_successln("%s :\n %s", 
-        (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data,
-        (char*)((lab_vec_t*)lab_vec_at(&file_contents, i))->raw_data);
+        lab_lexer_token_container_init(&tokens);
+        lab_custom_lexer_lex(
+            &tokens,
+            (char*)((lab_vec_t*)lab_vec_at(&file_contents, i))->raw_data,
+            lab_vec_size((lab_vec_t*)lab_vec_at(&file_contents, i)),
+            NULL
+        );
+
+        lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
+        for(size_t j = 0; j < tokens.count; j++) {
+            char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
+            lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
+            free(tok_str);
+        }
+        lab_noticeln("END");
+
+        lab_lexer_token_container_free(&tokens);
+
     }
 
 
