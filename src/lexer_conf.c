@@ -273,6 +273,7 @@ int lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, 
             lab_token_container_append(tokens, string_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else if(cur_char=='\0') {
             lab_token_container_append(tokens, eof_callback(code, &pos, code_len, user_data), &pos, code_len);
+            break;
         } else {
             lab_errorln("Unexpected character \'%c\' at line: %d, column: %d", cur_char, pos.line, pos.column);
         }

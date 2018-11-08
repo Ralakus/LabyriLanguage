@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
         lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
         for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
-            lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
+            lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tokens.tokens[j].data, tokens.tokens[j].line, tokens.tokens[j].column);
             free(tok_str);
         }
         lab_noticeln("END");
