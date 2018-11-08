@@ -187,7 +187,6 @@ int main(int argc, char* argv[]) {
             fseek(cur_file, 0, SEEK_END);
             size_t file_size = ftell(cur_file) + 1;
             lab_vec_t temp;
-            lab_vec_init(&temp, sizeof(char), file_size);
             if(!lab_vec_init(&temp, sizeof(char), file_size)) {
                 lab_errorln("Failed to allocate file content buffer for file: \"%s\"!", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
 
@@ -224,6 +223,12 @@ int main(int argc, char* argv[]) {
 
     } else {
         lab_errorln("No input files!");
+
+        for(size_t i = 0; i < lab_vec_size(&args); i++) {  // Free arguments vector
+            lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
+        }
+        lab_vec_free(&args);
+
         lab_print_help_err();
         return 1;
     }
