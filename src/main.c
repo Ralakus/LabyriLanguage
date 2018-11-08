@@ -6,7 +6,81 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "parser.h"
+#include <stdbool.h>
+
+typedef struct lab_vec_t {
+    
+    size_t type_size;
+    size_t alloc_size;
+    size_t used_size;
+    void* raw_data;
+
+} lab_vec_t;
+
+bool lab_vec_init(lab_vec_t* vec, size_t type_size, size_t init_size) {
+    vec->type_size  = type_size;
+    vec->used_size  = 0;
+    vec->alloc_size = init_size;
+    vec->raw_data   = malloc(type_size * vec->alloc_size);
+    if(vec->raw_data == NULL) {
+        lab_errorln("Failed to allocate vector array with size of %d and type size of %d", vec->alloc_size, vec->type_size);
+        return false;
+    } else {
+        return true;
+    }
+}
+
+size_t lab_vec_size(lab_vec_t* vec) {
+    return vec->used_size;
+}
+
+size_t lab_vec_alloc_size(lab_vec_t* vec) {
+    return vec->alloc_size;
+}
+
+size_t lab_vec_type_size(lab_vec_t* vec) {
+    return vec->type_size;
+}
+
+void* lab_vec_at(lab_vec_t* vec, size_t index) {
+    if(index >= vec->used_size) {
+        lab_errorln("Tried to access data outside of vector of size %d but access index of %d", vec->used_size, index);
+        return NULL;
+    } else {
+        return vec->raw_data + (vec->type_size * index);
+    }
+}
+
+bool lab_vec_resize(lab_vec_t* vec, size_t new_size) {
+    vec->raw_data = realloc(vec->raw_data, vec->type_size * new_size);
+    if(vec->raw_data == NULL) {
+        lab_errorln("Failed to reallocate vector from size %d to %d with type size of %d", vec->alloc_size, vec->type_size * new_size, vec->type_size);
+        return false;
+    } else {
+        vec->alloc_size = vec->type_size * new_size;
+        if(vec->used_size > vec->alloc_size) {
+            vec->used_size = vec->alloc_size;
+        }
+        return true;
+    }
+}
+
+void* lab_vec_push_back(lab_vec_t* vec, void* raw_data) {
+    if(vec->used_size >= vec->alloc_size) {
+        if(!lab_vec_resize(vec, vec->alloc_size + 1)) {
+            lab_errorln("Failed to push back vector!");
+            return NULL;
+        }
+    }
+    if(memcpy(lab_vec_at(vec, vec->used_size + 1), raw_data, vec->type_size)==NULL) {
+        lab_errorln("Failed to copy data into vector!");
+        return NULL;
+    } else {
+        ++vec->used_size;
+        return lab_vec_at(vec, vec->used_size-1);
+    }
+}
+
 
 int main(int argc, char* argv[]) {
     clock_t start, end;
@@ -134,11 +208,11 @@ int main(int argc, char* argv[]) {
         lab_custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i], NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        for(size_t j = 0; j < tokens.count; j++) {
+        /*for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
             lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }
+        }*/
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);

@@ -90,7 +90,7 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
                     }
                 }
             }
-
+            
             char* ident = (char*)malloc((iter->iter - begin_iter.iter) + 2);
             if(ident==NULL) {
 
@@ -274,7 +274,7 @@ int lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, 
         } else if(cur_char=='\0') {
             lab_token_container_append(tokens, eof_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else {
-            lab_errorln("Unexpected character at line: %d, column: %d", pos.line, pos.column);
+            lab_errorln("Unexpected character \'%c\' at line: %d, column: %d", cur_char, pos.line, pos.column);
         }
 
     }
