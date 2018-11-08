@@ -8,6 +8,26 @@
 #include <stdio.h>
 #include <time.h>
 
+#define LAB_VERSION_NUMBER "0.1.0"
+
+void lab_print_version() {
+    lab_noticeln("Labyrinth Compiler Version: %s", LAB_VERSION_NUMBER);
+}
+
+_Noreturn void lab_print_help() {
+    lab_print_version();
+    lab_noticeln("-f or --file <files> to compile files");
+    lab_noticeln("-h or --help to print help");
+    exit(0);
+}
+
+_Noreturn void lab_print_help_err() {
+    lab_print_version();
+    lab_noticeln("-f or --file <files> to compile files");
+    lab_noticeln("-h or --help to print help");
+    exit(1);
+}
+
 int main(int argc, char* argv[]) {
 
     clock_t start, end;
@@ -54,6 +74,54 @@ int main(int argc, char* argv[]) {
         if(strcmp("-f", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--file", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
             parse_state = lab_parse_state_files;
             continue;
+        }
+
+        else if(strcmp("-h", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--help", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0){
+
+            for(size_t i = 0; i < lab_vec_size(&args); i++) {  // Free arguments vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
+            }
+            lab_vec_free(&args);
+
+            for(size_t i = 0; i < lab_vec_size(&file_names); i++) {  // Free file name vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&file_names, i));
+            }
+            lab_vec_free(&file_names);
+
+            lab_print_help();
+        }
+
+        else if(strcmp("-v", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--version", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
+            lab_print_version();
+
+            for(size_t i = 0; i < lab_vec_size(&args); i++) {  // Free arguments vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
+            }
+            lab_vec_free(&args);
+
+            for(size_t i = 0; i < lab_vec_size(&file_names); i++) {  // Free file name vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&file_names, i));
+            }
+            lab_vec_free(&file_names);
+
+            return 0;
+        }
+
+        else if(((char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)[0] == '-') {
+
+            lab_errorln("Invalid argument: \"%s\"!", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data);
+
+            for(size_t i = 0; i < lab_vec_size(&args); i++) {  // Free arguments vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
+            }
+            lab_vec_free(&args);
+
+            for(size_t i = 0; i < lab_vec_size(&file_names); i++) {  // Free file name vector
+                lab_vec_free((lab_vec_t*)lab_vec_at(&file_names, i));
+            }
+            lab_vec_free(&file_names);
+
+            lab_print_help_err();
         }
 
         if(parse_state == lab_parse_state_files) {
@@ -156,6 +224,7 @@ int main(int argc, char* argv[]) {
 
     } else {
         lab_errorln("No input files!");
+        lab_print_help_err();
         return 1;
     }
 
