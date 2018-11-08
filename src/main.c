@@ -21,13 +21,30 @@ bool lab_vec_init(lab_vec_t* vec, size_t type_size, size_t init_size) {
     vec->type_size  = type_size;
     vec->used_size  = 0;
     vec->alloc_size = init_size;
-    vec->raw_data   = malloc(type_size * vec->alloc_size);
-    if(vec->raw_data == NULL) {
-        lab_errorln("Failed to allocate vector array with size of %d and type size of %d", vec->alloc_size, vec->type_size);
-        return false;
-    } else {
+    if(init_size == 0) {
+
+        vec->raw_data = NULL;
+
         return true;
+
+    } else {
+
+        vec->raw_data   = malloc(type_size * vec->alloc_size);
+        if(vec->raw_data == NULL) {
+            lab_errorln("Failed to allocate vector array with size of %d and type size of %d", vec->alloc_size, vec->type_size);
+            return false;
+        } else {
+            return true;
+        }
+
     }
+}
+
+void lab_vec_free(lab_vec_t* vec) {
+    vec->type_size  = 0;
+    vec->used_size  = 0;
+    vec->alloc_size = 0;
+    free(vec->raw_data);
 }
 
 size_t lab_vec_size(lab_vec_t* vec) {
@@ -43,7 +60,7 @@ size_t lab_vec_type_size(lab_vec_t* vec) {
 }
 
 void* lab_vec_at(lab_vec_t* vec, size_t index) {
-    if(index >= vec->used_size) {
+    if(index > vec->used_size) {
         lab_errorln("Tried to access data outside of vector of size %d but access index of %d", vec->used_size, index);
         return NULL;
     } else {
@@ -51,13 +68,22 @@ void* lab_vec_at(lab_vec_t* vec, size_t index) {
     }
 }
 
+void* lab_vec_at_raw_alloc(lab_vec_t* vec, size_t index) {
+    if(index > vec->alloc_size) {
+        lab_errorln("Tried to access data outside of vector of alloc size %d but access index of %d", vec->alloc_size, index);
+        return NULL;
+    } else {
+        return vec->raw_data + (vec->type_size * index);
+    }
+}
+
 bool lab_vec_resize(lab_vec_t* vec, size_t new_size) {
-    vec->raw_data = realloc(vec->raw_data, vec->type_size * new_size);
+    vec->alloc_size = new_size;
+    vec->raw_data = realloc(vec->raw_data, vec->alloc_size * vec->type_size);
     if(vec->raw_data == NULL) {
         lab_errorln("Failed to reallocate vector from size %d to %d with type size of %d", vec->alloc_size, vec->type_size * new_size, vec->type_size);
         return false;
     } else {
-        vec->alloc_size = vec->type_size * new_size;
         if(vec->used_size > vec->alloc_size) {
             vec->used_size = vec->alloc_size;
         }
@@ -65,24 +91,50 @@ bool lab_vec_resize(lab_vec_t* vec, size_t new_size) {
     }
 }
 
-void* lab_vec_push_back(lab_vec_t* vec, void* raw_data) {
+void* lab_vec_push_back_arr(lab_vec_t* vec, void* raw_data, size_t count) {
+    vec->used_size += count;
     if(vec->used_size >= vec->alloc_size) {
-        if(!lab_vec_resize(vec, vec->alloc_size + 1)) {
+        if(!lab_vec_resize(vec, vec->alloc_size + (vec->used_size - vec->alloc_size))) {
             lab_errorln("Failed to push back vector!");
             return NULL;
         }
     }
-    if(memcpy(lab_vec_at(vec, vec->used_size + 1), raw_data, vec->type_size)==NULL) {
+    if(memcpy(lab_vec_at_raw_alloc(vec, vec->used_size - count), raw_data, vec->type_size * count)==NULL) {
         lab_errorln("Failed to copy data into vector!");
         return NULL;
     } else {
-        ++vec->used_size;
-        return lab_vec_at(vec, vec->used_size-1);
+        return lab_vec_at(vec, vec->used_size - count);
     }
 }
 
+void* lab_vec_push_back(lab_vec_t* vec, void* raw_data) {
+    return lab_vec_push_back_arr(vec, raw_data, 1);
+}
 
 int main(int argc, char* argv[]) {
+
+    lab_vec_t vec;
+    lab_vec_init(&vec, sizeof(int), 0);
+
+    int int_arr[] = {0, 1, 2, 3, 4};
+    lab_vec_push_back_arr(&vec, &int_arr, sizeof(int_arr) / sizeof(int));
+
+    for(size_t i = 0; i < lab_vec_size(&vec); i++) {
+        lab_successln("%d", *(int*)lab_vec_at(&vec, i));
+    }
+
+    lab_vec_free(&vec);
+
+    lab_vec_t str;
+    lab_vec_init(&str, sizeof(char), 0);
+
+    char char_str[] = "Hello world!";
+    lab_vec_push_back_arr(&str, &char_str, sizeof(char_str) / sizeof(char));
+
+    lab_successln("%s", (char*)str.raw_data);
+
+    lab_vec_free(&str);
+
     clock_t start, end;
     double lex_read_files_time, lex_time, lex_file_free_time, lex_total_time;
 
@@ -208,11 +260,11 @@ int main(int argc, char* argv[]) {
         lab_custom_lexer_lex(&tokens, file_contents[i], file_contents_sizes[i], NULL);
 
         lab_noticeln("Tokens for file: \"%s\"", file_names[i]);
-        /*for(size_t j = 0; j < tokens.count; j++) {
+        for(size_t j = 0; j < tokens.count; j++) {
             char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
             lab_println("Token: %s: %s", (const char*)tok_str, tokens.tokens[j].data);
             free(tok_str);
-        }*/
+        }
         lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);
