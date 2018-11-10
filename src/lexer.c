@@ -11,9 +11,9 @@ int lab_token_container_append(lab_lexer_token_container_t* container, lab_lexer
 
     ++container->count;
     if(container->count > container->alloc_count) {
-        container->alloc_count = //container->count * ( max_code_len / pos->iter + (max_code_len % pos->iter != 0));
-        (size_t)NOT_SO_FAST_CEIL(container->count *
-        (((float)max_code_len / (float)pos->iter == 0 ? 1 : (float)pos->iter) > 1.0f ? ((float)max_code_len / (float)pos->iter == 0 ? 1 : (float)pos->iter) : 1.0f));
+        container->alloc_count = container->count + ( max_code_len / pos->iter + (max_code_len % pos->iter != 0));
+        /*(size_t)NOT_SO_FAST_CEIL(container->count *
+        (((float)max_code_len / (float)pos->iter == 0 ? 1 : (float)pos->iter) > 1.0f ? ((float)max_code_len / (float)pos->iter == 0 ? 1 : (float)pos->iter) : 1.0f));*/
         
         container->tokens = (lab_lexer_token_t*)realloc(container->tokens, sizeof(lab_lexer_token_t) * container->alloc_count);
 
