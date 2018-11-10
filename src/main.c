@@ -32,9 +32,68 @@ _Noreturn void lab_print_help_err() {
     exit(1);
 }
 
+typedef struct lab_mempool_alloc_t {
+    
+    void* data;
+    size_t index;
+    size_t bytes;
+
+} lab_mempool_alloc_t;
+
+typedef struct lab_mempool_t {
+    
+    lab_vec_t data;
+    lab_vec_t sub_allocs;
+
+} lab_mempool_t;
+
+bool lab_mempool_init(lab_mempool_t* pool, size_t bytes) {
+    return lab_vec_init(&pool->data, 1, bytes) && lab_vec_init(&pool->sub_allocs, sizeof(lab_mempool_alloc_t), 0);
+}
+
+void lab_mempool_free(lab_mempool_t* pool) {
+    lab_vec_free(&pool->data);
+    lab_vec_free(&pool->sub_allocs);
+}
+
+lab_mempool_alloc_t* lab_mempool_alloc_alloc(lab_mempool_t* pool, size_t bytes) {
+    lab_mempool_alloc_t* alloc = (lab_mempool_alloc_t*)lab_vec_push_back(&pool->sub_allocs, NULL);
+    if(alloc == NULL) {
+        return NULL;
+    }
+    alloc->data  = lab_vec_push_back_arr(&pool->data, NULL, bytes);
+    alloc->index = lab_vec_size(&pool->sub_allocs) - 1;
+    alloc->bytes = bytes;
+    return alloc;
+}
+
+bool lab_mempool_alloc_free(lab_mempool_t* pool, lab_mempool_alloc_t* alloc) {
+    return  lab_vec_remove_arr(&pool->data, alloc->data - lab_vec_at(&pool->data, 0), alloc->bytes) &&
+            lab_vec_remove(&pool->sub_allocs, alloc->index);
+}
+
+
+
 int main(int argc, char* argv[]) {
 
-    clock_t start, end;
+    lab_mempool_t pool;
+    lab_mempool_init(&pool, 0);
+
+    char str1[] = "Hello";
+    lab_mempool_alloc_t* sub_alloc1 = lab_mempool_alloc_alloc(&pool, sizeof(str1));
+    memcpy(sub_alloc1->data, str1, sub_alloc1->bytes);
+
+    char str2[] = " world!";
+    lab_mempool_alloc_t* sub_alloc2 = lab_mempool_alloc_alloc(&pool, sizeof(str2));
+    memcpy(sub_alloc2->data, str2, sub_alloc2->bytes);
+
+    lab_successln("%s%s", (char*)sub_alloc1->data, (char*)sub_alloc2->data);
+
+    lab_mempool_free(&pool);
+
+    return 0;
+
+    /*clock_t start, end;
     double total_time, arg_convert_time, arg_parse_time, file_read_time, lex_time, arg_free_time, file_free_time;
 
     start = clock();
@@ -332,5 +391,5 @@ int main(int argc, char* argv[]) {
     lab_successln("File free time: %fms",        file_free_time   * 1000);
     lab_successln("Total time: %fms",            total_time       * 1000);
 
-    return 0;
+    return 0;*/
 }
