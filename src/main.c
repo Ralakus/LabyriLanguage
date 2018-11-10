@@ -1,4 +1,5 @@
 #include "lexer_conf.h"
+#include "parser.h"
 
 #include <lab/vector.h>
 
@@ -14,24 +15,29 @@ void lab_print_version() {
     lab_noticeln("Labyrinth Compiler Version: %s", LAB_VERSION_NUMBER);
 }
 
-_Noreturn void lab_print_help() {
+void lab_print_help_base(){
     lab_print_version();
     lab_noticeln("-f or --file <files> to compile files");
     lab_noticeln("-h or --help to print help");
+    lab_noticeln("-d or --debug to enable debug printing");
+}
+
+_Noreturn void lab_print_help() {
+    lab_print_help_base();
     exit(0);
 }
 
 _Noreturn void lab_print_help_err() {
-    lab_print_version();
-    lab_noticeln("-f or --file <files> to compile files");
-    lab_noticeln("-h or --help to print help");
+    lab_print_help_base();
     exit(1);
 }
 
 int main(int argc, char* argv[]) {
 
     clock_t start, end;
-    double lex_read_files_time, lex_time, lex_file_free_time, lex_total_time;
+    double total_time, arg_convert_time, arg_parse_time, file_read_time, lex_time, arg_free_time, file_free_time;
+
+    start = clock();
 
     lab_vec_t args;
     lab_vec_init(&args, sizeof(lab_vec_t), argc - 1);
@@ -58,6 +64,12 @@ int main(int argc, char* argv[]) {
         lab_vec_push_back(&args, &temp);
     }
 
+    end = clock();
+
+    arg_convert_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
+
     lab_vec_t file_names;
     lab_vec_init(&file_names, sizeof(lab_vec_t), 0);
 
@@ -70,9 +82,16 @@ int main(int argc, char* argv[]) {
 
     }   parse_state = lab_parse_state_other;
 
+    bool print_tokens = false;
+
     for(size_t i = 0; i < lab_vec_size(&args); i++) {
         if(strcmp("-f", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--file", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
             parse_state = lab_parse_state_files;
+            continue;
+        }
+
+        else if(strcmp("-d", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--debug", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
+            print_tokens = true;
             continue;
         }
 
@@ -149,6 +168,12 @@ int main(int argc, char* argv[]) {
             lab_vec_push_back(&file_names, &temp);
         }
     }
+
+    end = clock();
+
+    arg_parse_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
 
     lab_vec_t file_contents;
     lab_vec_init(&file_contents, sizeof(lab_vec_t), lab_vec_size(&file_names));
@@ -233,6 +258,12 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    end = clock();
+
+    file_read_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
+
     lab_lexer_token_container_t tokens;
 
     for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {
@@ -244,23 +275,38 @@ int main(int argc, char* argv[]) {
             NULL
         );
 
-        lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
-        for(size_t j = 0; j < tokens.count; j++) {
-            char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
-            lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tokens.tokens[j].data, tokens.tokens[j].line, tokens.tokens[j].column);
-            free(tok_str);
+        if(print_tokens) {
+            lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
+            for(size_t j = 0; j < tokens.count; j++) {
+                char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
+                lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tokens.tokens[j].data, tokens.tokens[j].line, tokens.tokens[j].column);
+                free(tok_str);
+            }
+            lab_noticeln("END");
+        } else {
+            lab_noticeln("Token debug printing off");
         }
-        lab_noticeln("END");
 
         lab_lexer_token_container_free(&tokens);
 
     }
 
+    end = clock();
+
+    lex_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
 
     for(size_t i = 0; i < lab_vec_size(&args); i++) {       // Free arguments vector
         lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
     }
     lab_vec_free(&args);
+
+    end = clock();
+
+    arg_free_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    start = clock();
 
     for(size_t i = 0; i < lab_vec_size(&file_names); i++) {  // Free file name vector
         lab_vec_free((lab_vec_t*)lab_vec_at(&file_names, i));
@@ -271,6 +317,20 @@ int main(int argc, char* argv[]) {
         lab_vec_free((lab_vec_t*)lab_vec_at(&file_contents, i));
     }
     lab_vec_free(&file_contents);
+
+    end = clock(); 
+
+    file_free_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
+    total_time = arg_convert_time + arg_parse_time + file_read_time + lex_time + arg_free_time + file_free_time;
+
+    lab_successln("Argument convert time: %fms", arg_convert_time);
+    lab_successln("Argument parse time: %fms",   arg_parse_time  );
+    lab_successln("File read time: %fms",        file_read_time  );
+    lab_successln("Lex time: %fms",              lex_time        );
+    lab_successln("Argument free time: %fms",    arg_free_time   );
+    lab_successln("File free time: %fms",        file_free_time  );
+    lab_successln("Total time: %fms",            total_time      );
 
     return 0;
 }

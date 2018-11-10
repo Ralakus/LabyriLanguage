@@ -1,6 +1,8 @@
 #include "lexer.h"
-#include <stdbool.h>
 
+#include <lab/vector.h>
+
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct lab_parser_token_container_t {
@@ -51,9 +53,47 @@ typedef struct lab_parser_ast_expr_bin_t {
 } lab_parser_ast_expr_bin_t;
 
 typedef struct lab_parser_ast_expr_call_t {
+
     char* callee;
     size_t argc;
     lab_parser_ast_expr_t* args;
 
 } lab_parser_ast_expr_call_t;
 
+
+
+
+typedef struct lab_parser_ast_prototype_parameter_t {
+
+    char* name;
+
+} lab_parser_ast_prototype_parameter_t;
+
+typedef struct lab_parser_ast_prototype_t {
+
+    char* name;
+    size_t argc;
+    lab_parser_ast_prototype_parameter_t* args;
+
+} lab_parser_ast_prototype_t;
+
+
+
+
+typedef struct lab_parser_ast_function_t {
+
+    lab_parser_ast_prototype_t* head;
+    lab_parser_ast_expr_t* body;
+
+} lab_parser_ast_function_t;
+
+
+
+
+typedef struct lab_parser_ast_t {
+
+    lab_vec_t main_exprs; // lab_parser_ast_expr_t
+    lab_vec_t prototypes; // lab_parser_ast_prototype_t
+    lab_vec_t functions;  // lab_parser_ast_function_t
+
+} lab_parser_ast_t;
