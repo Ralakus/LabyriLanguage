@@ -262,7 +262,8 @@ int lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, const char* code, 
         } else if (isdigit(cur_char) || cur_char == '.') {
            lab_token_container_append(tokens, numeric_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else if(isspace(cur_char)) {
-            lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
+            continue;
+            // lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else if (cur_char=='(' || cur_char==')' || cur_char=='[' || cur_char==']' || cur_char=='{' || cur_char=='}' ||
                    cur_char==',' || cur_char==':' || cur_char==';') {
             lab_token_container_append(tokens, symbol_callback(code, &pos, code_len, user_data), &pos, code_len);

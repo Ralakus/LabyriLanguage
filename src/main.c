@@ -324,13 +324,13 @@ int main(int argc, char* argv[]) {
 
     total_time = arg_convert_time + arg_parse_time + file_read_time + lex_time + arg_free_time + file_free_time;
 
-    lab_successln("Argument convert time: %fms", arg_convert_time);
-    lab_successln("Argument parse time: %fms",   arg_parse_time  );
-    lab_successln("File read time: %fms",        file_read_time  );
-    lab_successln("Lex time: %fms",              lex_time        );
-    lab_successln("Argument free time: %fms",    arg_free_time   );
-    lab_successln("File free time: %fms",        file_free_time  );
-    lab_successln("Total time: %fms",            total_time      );
+    lab_successln("Argument convert time: %fms", arg_convert_time * 1000);
+    lab_successln("Argument parse time: %fms",   arg_parse_time   * 1000);
+    lab_successln("File read time: %fms",        file_read_time   * 1000);
+    lab_successln("Lex time: %fms",              lex_time         * 1000);
+    lab_successln("Argument free time: %fms",    arg_free_time    * 1000);
+    lab_successln("File free time: %fms",        file_free_time   * 1000);
+    lab_successln("Total time: %fms",            total_time       * 1000);
 
     return 0;
 }

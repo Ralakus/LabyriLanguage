@@ -29,6 +29,8 @@ typedef enum lab_tokens_e {
     lab_tok_kw_func,
     lab_tok_kw_let,
     lab_tok_kw_return,
+    lab_tok_kw_as,
+    
 
     lab_tok_operator_plus,
     lab_tok_operator_minus,

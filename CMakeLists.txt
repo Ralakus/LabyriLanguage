@@ -23,6 +23,8 @@ target_include_directories(LabCompiler PUBLIC lib/LabyrinthCUtils/src)
 add_subdirectory(lib/LabyrinthCUtils)
 target_link_libraries(LabCompiler PUBLIC LabCUtils)
 
+set(CMAKE_C_FLAGS_RELEASE "-O3 -flto")
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)     # 64 bit
 
     target_compile_definitions(LabCompiler PUBLIC LAB_64_BIT)
