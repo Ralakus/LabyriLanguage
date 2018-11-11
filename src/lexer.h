@@ -37,8 +37,10 @@ typedef lab_vec_t lab_lexer_ruleset_t;
 
 /*
     Rulesets must be initilized before use and freed afterwards
+    rule_count in init can be left at 0, what it does is preallocate the amount of rules
 */
-extern bool lab_lexer_ruleset_init(lab_lexer_ruleset_t* ruleset);
+extern bool lab_lexer_ruleset_init(lab_lexer_ruleset_t* ruleset,
+                                   size_t rule_count);
 extern void lab_lexer_ruleset_free(lab_lexer_ruleset_t* ruleset);
 extern bool lab_lexer_ruleset_add_rule(lab_lexer_ruleset_t*      ruleset,
                                        lab_lexer_rule_callback_t rule_function,
@@ -50,6 +52,9 @@ extern bool lab_lexer_ruleset_add_rule(lab_lexer_ruleset_t*      ruleset,
 extern bool lab_lexer_token_container_init(lab_lexer_token_container_t* container);
 extern void lab_lexer_token_container_free(lab_lexer_token_container_t* container);
 
+/*
+    Adds new token
+*/
 extern bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
                                              const lab_vec_t* code,
                                              size_t iter,
@@ -70,4 +75,6 @@ extern bool lab_lexer_lex(lab_lexer_token_container_t* tokens,
     Automatically gets new line and column position while iterating
 */
 extern void lab_lexer_iter_next(const lab_vec_t* code, 
+                                lab_lexer_iterator_t* iter);
+extern void lab_lexer_iter_prev(const lab_vec_t* code, 
                                 lab_lexer_iterator_t* iter);

@@ -1,9 +1,10 @@
-//#include "lexer_conf.h"
+#include "lexer_conf.h"
 //#include "parser.h"
 
 #include "lexer.h"
 
 #include <lab/vector.h>
+#include <lab/mempool.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -266,26 +267,36 @@ int main(int argc, char* argv[]) {
 
     start = clock();
 
-    /*lab_lexer_token_container_t tokens;
+    lab_lexer_token_container_t tokens;
 
     lab_mempool_t token_data_mempool;
 
+    lab_lexer_ruleset_t ruleset;
+    lab_lexer_ruleset_init(&ruleset, 7);
+
+    lab_lexer_ruleset_add_rule(&ruleset, alpha_callback_rule,      alpha_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, whitespace_callback_rule, whitespace_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, symbol_callback_rule,     symbol_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, numeric_callback_rule,    numeric_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, operator_callback_rule,   operator_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, string_callback_rule,     string_callback);
+    lab_lexer_ruleset_add_rule(&ruleset, eof_callback_rule,        eof_callback);
+
     for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {
         lab_lexer_token_container_init(&tokens);
+
         size_t str_size = lab_vec_size((lab_vec_t*)lab_vec_at(&file_contents, i));
+
         lab_mempool_init(&token_data_mempool, str_size * 10, str_size / 10);
-        lab_custom_lexer_lex(
-            &tokens,
-            (char*)((lab_vec_t*)lab_vec_at(&file_contents, i))->raw_data,
-            str_size,
-            &token_data_mempool
-        );
+
+        lab_custom_lexer_lex(&tokens, &ruleset, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool);
 
         if(print_tokens) {
             lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
-            for(size_t j = 0; j < tokens.count; j++) {
-                char* tok_str = tok_to_string((lab_tokens_e)tokens.tokens[j].id);
-                lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tokens.tokens[j].data, tokens.tokens[j].line, tokens.tokens[j].column);
+            for(size_t j = 0; j < tokens.used_size; j++) {
+                lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
+                char* tok_str = tok_to_string(tok->id);
+                lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tok->data, tok->line, tok->column);
                 free(tok_str);
             }
             lab_noticeln("END");
@@ -293,10 +304,12 @@ int main(int argc, char* argv[]) {
             lab_noticeln("Token debug printing off");
         }
 
-        lab_lexer_token_container_free_mempool(&tokens);
+        lab_lexer_token_container_free(&tokens);
         lab_mempool_free(&token_data_mempool);
 
-    }*/
+    }
+
+    lab_lexer_ruleset_free(&ruleset);
 
     end = clock();
 
