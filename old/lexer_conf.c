@@ -41,6 +41,7 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_func, "function")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_let, "let")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_as, "as")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_plus, "operator plus")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_minus, "operator minus")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_mul, "operator multiply")
@@ -91,7 +92,11 @@ lab_lexer_token_t alpha_callback(const char* code, lab_lexer_iterator_t* iter, s
                 }
             }
             
-            char* ident = (char*)malloc((iter->iter - begin_iter.iter) + 2);
+            lab_mempool_t* pool = (lab_mempool_t*)user_data;
+
+            lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_iter.iter) + 2);
+            char* ident = alloc->data;
+
             if(ident==NULL) {
 
                 lab_errorln("Failed to allocate buffer for identifier token for identifier at line: %d, column: %d!", begin_iter.line, begin_iter.column);
@@ -127,7 +132,10 @@ lab_lexer_token_t numeric_callback(const char* code, lab_lexer_iterator_t* iter,
 
         if(!isdigit(code[iter->iter + 1]) && code[iter->iter + 1] != '.') {
 
-            char* num = (char*)malloc((iter->iter - begin_iter.iter) + 2);
+            lab_mempool_t* pool = (lab_mempool_t*)user_data;
+            lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_iter.iter) + 2);
+
+            char* num = alloc->data;
             if(num==NULL) {
 
                 lab_errorln("Failed to allocate buffer for numerical token for number at line: %d, column: %d!", iter->line, iter->column);
@@ -227,7 +235,9 @@ lab_lexer_token_t string_callback(const char* code, lab_lexer_iterator_t* iter, 
         lab_errorln("Failed to find string closing statement for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
         return lab_lexer_token_make((int)lab_tok_nil, NULL, &begin_pos);
     } else {
-        char* buffer = (char*)malloc((end_index - begin_index) + 1);
+        lab_mempool_t* pool = (lab_mempool_t*)user_data;
+        lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (end_index - begin_index) + 1);
+        char* buffer = alloc->data;
         if(buffer==NULL) {
             lab_errorln("Failed to allocate string buffer for string starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
             return lab_lexer_token_make((int)lab_tok_nil, NULL, &begin_pos);

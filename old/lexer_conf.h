@@ -1,6 +1,7 @@
 #pragma once
 
 #include <lab/logger.h>
+#include <lab/mempool.h>
 #include "lexer.h"
 #include "tokens.h"
 
