@@ -77,9 +77,7 @@ extern bool alpha_callback(const lab_vec_t* code,
     static lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
 
     for(; iter->iter < code->used_size; lab_lexer_iter_next(code, iter)) {
-        bool is_alpha = alpha_callback_rule(raw_code[iter->iter + 1]);
-        bool is_number = numeric_callback_rule(raw_code[iter->iter + 1]);
-        if((!is_alpha) && (!is_number)) {
+        if((!alpha_callback_rule(raw_code[iter->iter + 1])) && (!numeric_callback_rule(raw_code[iter->iter + 1]))) {
 
             size_t reserved_sub_str = 0;
             bool   matches          = true;
