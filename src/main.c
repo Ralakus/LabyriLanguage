@@ -271,17 +271,6 @@ int main(int argc, char* argv[]) {
 
     lab_mempool_t token_data_mempool;
 
-    lab_lexer_ruleset_t ruleset;
-    lab_lexer_ruleset_init(&ruleset, 7);
-
-    lab_lexer_ruleset_add_rule(&ruleset, alpha_callback_rule,      alpha_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, whitespace_callback_rule, whitespace_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, symbol_callback_rule,     symbol_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, numeric_callback_rule,    numeric_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, operator_callback_rule,   operator_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, string_callback_rule,     string_callback);
-    lab_lexer_ruleset_add_rule(&ruleset, eof_callback_rule,        eof_callback);
-
     for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {
         lab_lexer_token_container_init(&tokens);
 
@@ -289,7 +278,7 @@ int main(int argc, char* argv[]) {
 
         lab_mempool_init(&token_data_mempool, str_size * 10, str_size / 10);
 
-        lab_custom_lexer_lex(&tokens, &ruleset, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool);
+        lab_custom_lexer_lex(&tokens, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool);
 
         if(print_tokens) {
             lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
@@ -308,8 +297,6 @@ int main(int argc, char* argv[]) {
         lab_mempool_free(&token_data_mempool);
 
     }
-
-    lab_lexer_ruleset_free(&ruleset);
 
     end = clock();
 

@@ -49,6 +49,5 @@ extern bool eof_callback(const lab_vec_t* code,
                          void* user_data);
 
 extern bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, 
-                                 lab_lexer_ruleset_t* ruleset, 
                                  const lab_vec_t* code, 
                                  void* user_data);

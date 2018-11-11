@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <time.h>
 
 #define TOK_TO_STRING_TEMPLATE(token, string) case token: {                                                                 \
                                                   buffer = (char*)malloc(strlen(string)+1);                                 \
@@ -64,20 +65,76 @@ char* tok_to_string(lab_tokens_e tok) {
     return buffer;
 }
 
-extern bool alpha_callback_rule(char c) { return (isalpha(c) > 0 || c == '_'); }
-extern bool alpha_callback(const lab_vec_t* code,
+bool alpha_callback_rule(char c) { return (isalpha(c) > 0 || c == '_'); }
+bool alpha_callback(const lab_vec_t* code,
                            lab_lexer_iterator_t* iter, 
                            lab_lexer_token_container_t* tokens, 
                            void* user_data) {
-    
+
     lab_lexer_iterator_t begin_pos = *iter;
     char*                raw_code  = (char*)code->raw_data;
 
-    static const char reserved[]         = {           "Func\0"         "let\0"         "return\0"           "as" };
-    static lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
+    static const char* reserved[] = {"Func", "let", "return", "as"};
+    static const lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
+
+    for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
+
+        if(!isalpha(raw_code[iter->iter + 1]) && !isdigit(raw_code[iter->iter + 1])) {
+
+            for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
+
+                for(size_t j = 0;; j++) {
+
+                    if(j > iter->iter - (begin_pos.iter + 1) && reserved[i][j]==(raw_code + begin_pos.iter)[j]) {
+
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)reserved_types[i], NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                        //return lab_lexer_token_make((int)reserved_types[i], NULL, &begin_pos);
+
+                    } else if(reserved[i][j]=='\0') {
+                        break;
+                    }
+                    if(reserved[i][j]==(raw_code + begin_pos.iter)[j]) {
+                        continue;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            
+            lab_mempool_t* pool = (lab_mempool_t*)user_data;
+
+            lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_pos.iter) + 2);
+            char* ident = alloc->data;
+
+            if(ident==NULL) {
+
+                lab_errorln("Failed to allocate buffer for identifier token for identifier at line: %d, column: %d!", begin_pos.line, begin_pos.column);
+
+            } else {
+
+                ident[(iter->iter - begin_pos.iter) + 1] = '\0';
+                memcpy(ident, raw_code + begin_pos.iter, (iter->iter - begin_pos.iter) + 1);
+
+            }
+
+            lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_identifier, ident, begin_pos.line, begin_pos.column);
+            return true;
+        }
+    }
+     
+    /*
+
+        TODO: Somehow make the code below faster than the code above
+        The code below is more cache friendly but 23% slower
+
+    */
+
+    /*static const char reserved[]               = {           "Func\0"         "let\0"         "return\0"           "as" };
+    static const lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
 
     for(; iter->iter < code->used_size; lab_lexer_iter_next(code, iter)) {
-        if((!alpha_callback_rule(raw_code[iter->iter + 1])) && (!numeric_callback_rule(raw_code[iter->iter + 1]))) {
+        if((!alpha_callback_rule(raw_code[iter->iter + 1])) && (!isdigit(raw_code[iter->iter + 1]))) {
 
             size_t reserved_sub_str = 0;
             bool   matches          = true;
@@ -92,9 +149,9 @@ extern bool alpha_callback(const lab_vec_t* code,
                 }
 
                 if(matches) {
-                    size_t len = (iter->iter - begin_pos.iter) - 1;
-                    if(j > len && reserved[i] == (raw_code + begin_pos.iter)[j]) {
+                    if(j > (iter->iter - begin_pos.iter) - 1 && reserved[i] == (raw_code + begin_pos.iter)[j]) {
                         lab_lexer_token_container_append(tokens, code, iter->iter, (int)reserved_types[reserved_sub_str], NULL, begin_pos.line, begin_pos.column);
+
                         return true;
                     }
                     if(reserved[i] == (raw_code + begin_pos.iter)[j]) {
@@ -121,19 +178,20 @@ extern bool alpha_callback(const lab_vec_t* code,
                 ident[(iter->iter - begin_pos.iter) + 1] = '\0';
                 memcpy(ident, raw_code + begin_pos.iter, (iter->iter - begin_pos.iter) + 1);
                 lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_identifier, ident, begin_pos.line, begin_pos.column);
+
                 return true;
 
             }
 
         }
-    }
+    }*/
 
     return true;
 
 }
 
-extern bool whitespace_callback_rule(char c) { return (isspace(c) > 0); }
-extern bool whitespace_callback(const lab_vec_t* code,
+bool whitespace_callback_rule(char c) { return (isspace(c) > 0); }
+bool whitespace_callback(const lab_vec_t* code,
                                 lab_lexer_iterator_t* iter, 
                                 lab_lexer_token_container_t* tokens, 
                                 void* user_data) {
@@ -142,8 +200,8 @@ extern bool whitespace_callback(const lab_vec_t* code,
 
 }
 
-extern bool numeric_callback_rule(char c) { return (isdigit(c) > 0 || c == '.'); }
-extern bool numeric_callback(const lab_vec_t* code,
+bool numeric_callback_rule(char c) { return (isdigit(c) > 0 || c == '.'); }
+bool numeric_callback(const lab_vec_t* code,
                              lab_lexer_iterator_t* iter, 
                              lab_lexer_token_container_t* tokens, 
                              void* user_data) {
@@ -176,9 +234,9 @@ extern bool numeric_callback(const lab_vec_t* code,
 
 }
 
-extern bool symbol_callback_rule(char c) { return (c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' ||
+bool symbol_callback_rule(char c) { return (c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' ||
                                                    c==',' || c==':' || c==';'); }
-extern bool symbol_callback(const lab_vec_t* code,
+bool symbol_callback(const lab_vec_t* code,
                             lab_lexer_iterator_t* iter, 
                             lab_lexer_token_container_t* tokens, 
                             void* user_data){
@@ -200,9 +258,9 @@ extern bool symbol_callback(const lab_vec_t* code,
 
 }
 
-extern bool operator_callback_rule(char c) { return (c=='+' || c=='-' || c=='*' || c=='/' || c=='=' || c=='^' ||
+bool operator_callback_rule(char c) { return (c=='+' || c=='-' || c=='*' || c=='/' || c=='=' || c=='^' ||
                                                      c=='&' || c=='<' || c=='>' || c=='|'); }
-extern bool operator_callback(const lab_vec_t* code,
+bool operator_callback(const lab_vec_t* code,
                               lab_lexer_iterator_t* iter, 
                               lab_lexer_token_container_t* tokens, 
                               void* user_data) {
@@ -262,8 +320,8 @@ extern bool operator_callback(const lab_vec_t* code,
 
 }
 
-extern bool string_callback_rule(char c) { return (c == '\"' || c == '\''); }
-extern bool string_callback(const lab_vec_t* code,
+bool string_callback_rule(char c) { return (c == '\"' || c == '\''); }
+bool string_callback(const lab_vec_t* code,
                             lab_lexer_iterator_t* iter, 
                             lab_lexer_token_container_t* tokens, 
                             void* user_data) {
@@ -317,8 +375,8 @@ extern bool string_callback(const lab_vec_t* code,
 
 }
 
-extern bool eof_callback_rule(char c) { return (c == '\0'); }
-extern bool eof_callback(const lab_vec_t* code,
+bool eof_callback_rule(char c) { return (c == '\0'); }
+bool eof_callback(const lab_vec_t* code,
                          lab_lexer_iterator_t* iter, 
                          lab_lexer_token_container_t* tokens, 
                          void* user_data) {
@@ -328,8 +386,7 @@ extern bool eof_callback(const lab_vec_t* code,
 
 }
 
-extern bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, 
-                                 lab_lexer_ruleset_t* ruleset, 
+bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens, 
                                  const lab_vec_t* code, 
                                  void* user_data) {
 
@@ -345,22 +402,20 @@ extern bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens,
         
         char cur_char = raw_code[pos.iter];
 
-        if(isalpha(cur_char)) {
+        if(alpha_callback_rule(cur_char)) {
             alpha_callback(code, &pos, tokens, user_data);
-        } else if (isdigit(cur_char) || cur_char == '.') {
+        } else if (numeric_callback_rule(cur_char)) {
            numeric_callback(code, &pos, tokens, user_data);
         } else if(isspace(cur_char)) {
             continue;
             // lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
-        } else if (cur_char=='(' || cur_char==')' || cur_char=='[' || cur_char==']' || cur_char=='{' || cur_char=='}' ||
-                   cur_char==',' || cur_char==':' || cur_char==';') {
+        } else if (symbol_callback_rule(cur_char)) {
             symbol_callback(code, &pos, tokens, user_data);
-        } else if (cur_char=='+' || cur_char=='-' || cur_char=='*' || cur_char=='/' || cur_char=='=' || cur_char=='^' ||
-                   cur_char=='&' || cur_char=='<' || cur_char=='>' || cur_char=='|') {
+        } else if (operator_callback_rule(cur_char)) {
             operator_callback(code, &pos, tokens, user_data);
-        } else if(cur_char=='\"' || cur_char=='\'') {
+        } else if(string_callback_rule(cur_char)) {
             string_callback(code, &pos, tokens, user_data);
-        } else if(cur_char=='\0') {
+        } else if(eof_callback_rule(cur_char)) {
             eof_callback(code, &pos, tokens, user_data);
             break;
         } else {
