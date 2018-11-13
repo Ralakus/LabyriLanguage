@@ -21,7 +21,7 @@
 char* tok_to_string(lab_tokens_e tok) {
     char* buffer = NULL;
     switch(tok) {
-        TOK_TO_STRING_TEMPLATE(lab_tok_nil, "nil")
+        TOK_TO_STRING_TEMPLATE(lab_tok_err, "error")
         TOK_TO_STRING_TEMPLATE(lab_tok_whitespace_space, "whitespace space")
         TOK_TO_STRING_TEMPLATE(lab_tok_whitespace_tab, "whitespace tab")
         TOK_TO_STRING_TEMPLATE(lab_tok_whitespace_newline, "whitespace newline")
@@ -44,6 +44,13 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_let, "let")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_as, "as")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_if, "if")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_else, "else")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_nil, "nil ( keyword )")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_for, "for")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_while, "while")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_true, "true")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_false, "false")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_plus, "operator plus")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_minus, "operator minus")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_mul, "operator multiply")
@@ -74,8 +81,32 @@ bool alpha_callback(const lab_vec_t* code,
     lab_lexer_iterator_t begin_pos = *iter;
     char*                raw_code  = (char*)code->raw_data;
 
-    static const char* reserved[] = {"Func", "let", "return", "as"};
-    static const lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
+    static const char* reserved[] = { 
+        "Func",
+        "let",
+        "return",
+        "as", 
+        "if", 
+        "else", 
+        "nil", 
+        "for", 
+        "while", 
+        "true", 
+        "false"
+    };
+    static const lab_tokens_e reserved_types[] = {
+        lab_tok_kw_func, 
+        lab_tok_kw_let, 
+        lab_tok_kw_return, 
+        lab_tok_kw_as, 
+        lab_tok_kw_if, 
+        lab_tok_kw_else,
+        lab_tok_kw_nil,
+        lab_tok_kw_for,
+        lab_tok_kw_while,
+        lab_tok_kw_true,
+        lab_tok_kw_false
+    };
 
     for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
 

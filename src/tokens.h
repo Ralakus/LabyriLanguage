@@ -1,7 +1,7 @@
 #pragma once
 
 typedef enum lab_tokens_e {
-    lab_tok_nil,
+    lab_tok_err,
 
     lab_tok_whitespace_space,
     lab_tok_whitespace_tab,
@@ -30,6 +30,13 @@ typedef enum lab_tokens_e {
     lab_tok_kw_let,
     lab_tok_kw_return,
     lab_tok_kw_as,
+    lab_tok_kw_if,
+    lab_tok_kw_else,
+    lab_tok_kw_nil,
+    lab_tok_kw_for,
+    lab_tok_kw_while,
+    lab_tok_kw_true,
+    lab_tok_kw_false,
     
 
     lab_tok_operator_plus,
