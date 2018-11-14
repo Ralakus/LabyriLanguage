@@ -1,0 +1,37 @@
+Struct Rectangle {
+
+    width:  Int64;
+    height: Int64;
+
+    #[constructor]
+    Func new(width, height): Rectangle {
+
+        this.width  = width;
+        this.height = height;
+
+        return this;
+
+    }
+
+    Func area(this): Int64 {
+
+        return this.width * this.height;
+
+    }
+
+}
+
+
+Func main(args: Str[]): Int16 {
+
+    let rect: Rectangle = Rectangle::new 10 15;
+
+    let x: Str = "Hello world!";
+
+    println x; // This is a comment
+
+    println ( str rect.area )
+
+    return 0.0;
+
+}

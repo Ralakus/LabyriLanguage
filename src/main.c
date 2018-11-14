@@ -18,21 +18,11 @@ void lab_print_version() {
     lab_noticeln("Labyrinth Compiler Version: %s", LAB_VERSION_NUMBER);
 }
 
-void lab_print_help_base(){
+void lab_print_help(){
     lab_print_version();
     lab_noticeln("-f or --file <files> to compile files");
     lab_noticeln("-h or --help to print help");
     lab_noticeln("-d or --debug to enable debug printing");
-}
-
-_Noreturn void lab_print_help() {
-    lab_print_help_base();
-    exit(0);
-}
-
-_Noreturn void lab_print_help_err() {
-    lab_print_help_base();
-    exit(1);
 }
 
 int main(int argc, char* argv[]) {
@@ -111,6 +101,7 @@ int main(int argc, char* argv[]) {
             lab_vec_free(&file_names);
 
             lab_print_help();
+            return 0;
         }
 
         else if(strcmp("-v", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--version", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
@@ -143,7 +134,8 @@ int main(int argc, char* argv[]) {
             }
             lab_vec_free(&file_names);
 
-            lab_print_help_err();
+            lab_print_help();
+            return 1;
         }
 
         if(parse_state == lab_parse_state_files) {
@@ -257,7 +249,7 @@ int main(int argc, char* argv[]) {
         }
         lab_vec_free(&args);
 
-        lab_print_help_err();
+        lab_print_help();
         return 1;
     }
 
