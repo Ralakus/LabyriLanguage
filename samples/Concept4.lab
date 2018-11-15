@@ -24,7 +24,7 @@ Rectangle :: struct {
 
 main :: ( args: [] str ) -> int16 {
 
-    rect: Rectangle = Rectangle::new(10, 15);
+    rect: Rectangle = Rectangle.new(10, 15);
 
     x: str = "Hello world!";
 
