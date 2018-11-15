@@ -10,7 +10,7 @@ Rectangle :: struct {
         Rectangle.width  = width;
         Rectangle.height = height;
 
-        return Rectangle;
+        return temp_rect;
 
     }
 
