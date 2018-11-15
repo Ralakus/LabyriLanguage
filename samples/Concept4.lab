@@ -5,7 +5,7 @@ Rectangle :: struct {
 
     new :: (width: int64, height: int64) -> Rectangle {
 
-        temp_rect: Rectangle;
+        temp_rect: Rectangle; // Struct members are automagically initilized
 
         Rectangle.width  = width;
         Rectangle.height = height;
@@ -22,7 +22,7 @@ Rectangle :: struct {
 
 }
 
-main :: ( args: [] str ) {
+main :: ( args: [] str ) -> int16 {
 
     rect: Rectangle = Rectangle::new(10, 15);
 
