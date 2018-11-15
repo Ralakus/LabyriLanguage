@@ -40,10 +40,10 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_colon, "colon")
         TOK_TO_STRING_TEMPLATE(lab_tok_semicolon, "semicolon")
         TOK_TO_STRING_TEMPLATE(lab_tok_comment, "comment")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_func, "function")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_let, "let")
+        TOK_TO_STRING_TEMPLATE(lab_tok_double_colon, "double colon")
+        TOK_TO_STRING_TEMPLATE(lab_tok_rarrow, "right arrow")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_var, "var")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_as, "as")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_if, "if")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_else, "else")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_nil, "nil ( keyword )")
@@ -51,8 +51,8 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_while, "while")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_true, "true")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_false, "false")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_plus, "operator plus")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_minus, "operator minus")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_add, "operator add")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_sub, "operator sub")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_mul, "operator multiply")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_div, "operator divide")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_equals, "operator equals")
@@ -64,6 +64,7 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_not, "operator not")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftl, "left bitshift")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftr, "right bitshift")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_concat, "concat, double plus");
         TOK_TO_STRING_TEMPLATE(lab_tok_eof, "end of file")
         default: {
             break;
@@ -82,10 +83,8 @@ bool alpha_callback(const lab_vec_t* code,
     char*                raw_code  = (char*)code->raw_data;
 
     static const char* reserved[] = { 
-        "Func",
-        "let",
+        "var",
         "return",
-        "as", 
         "if", 
         "else", 
         "nil", 
@@ -95,10 +94,8 @@ bool alpha_callback(const lab_vec_t* code,
         "false"
     };
     static const lab_tokens_e reserved_types[] = {
-        lab_tok_kw_func, 
-        lab_tok_kw_let, 
+        lab_tok_kw_var, 
         lab_tok_kw_return, 
-        lab_tok_kw_as, 
         lab_tok_kw_if, 
         lab_tok_kw_else,
         lab_tok_kw_nil,
@@ -280,7 +277,18 @@ bool symbol_callback(const lab_vec_t* code,
         case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lcurley,   NULL, iter->line, iter->column); break;
         case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rcurley,   NULL, iter->line, iter->column); break;
         case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_comma,     NULL, iter->line, iter->column); break;
-        case ':': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_colon,     NULL, iter->line, iter->column); break;
+        case ':': {
+            if(((char*)code->raw_data)[iter->iter + 1]==':') {
+                lab_lexer_iter_next(code, iter);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_double_colon,  NULL, iter->line, iter->column);
+                return true;
+            } else {
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_colon,  NULL, iter->line, iter->column);
+                return true;
+            }
+
+            break;
+        }
         case ';': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_semicolon, NULL, iter->line, iter->column); break;
         default:  return false;
     }
@@ -297,8 +305,30 @@ bool operator_callback(const lab_vec_t* code,
                               void* user_data) {
 
     switch(((char*)code->raw_data)[iter->iter]) {
-        case '+': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_plus,   NULL, iter->line, iter->column); break;
-        case '-': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_minus,  NULL, iter->line, iter->column); break;
+        case '+': {
+            if(((char*)code->raw_data)[iter->iter + 1]=='+') {
+                lab_lexer_iter_next(code, iter);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_concat,  NULL, iter->line, iter->column);
+                return true;
+            } else {
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_add,  NULL, iter->line, iter->column);
+                return true;
+            }
+
+            break;
+        }
+        case '-': {
+            if(((char*)code->raw_data)[iter->iter + 1]=='>') {
+                lab_lexer_iter_next(code, iter);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rarrow,  NULL, iter->line, iter->column);
+                return true;
+            } else {
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_sub,  NULL, iter->line, iter->column);
+                return true;
+            }
+
+            break;
+        }
         case '*': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_mul,    NULL, iter->line, iter->column); break;
         case '=': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_equals, NULL, iter->line, iter->column); break;
         case '^': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_xor,    NULL, iter->line, iter->column); break;

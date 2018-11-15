@@ -26,10 +26,11 @@ typedef enum lab_tokens_e {
     lab_tok_semicolon,
     lab_tok_comment,
 
-    lab_tok_kw_func,
-    lab_tok_kw_let,
+    lab_tok_double_colon,
+    lab_tok_rarrow,
+
+    lab_tok_kw_var,
     lab_tok_kw_return,
-    lab_tok_kw_as,
     lab_tok_kw_if,
     lab_tok_kw_else,
     lab_tok_kw_nil,
@@ -39,8 +40,8 @@ typedef enum lab_tokens_e {
     lab_tok_kw_false,
     
 
-    lab_tok_operator_plus,
-    lab_tok_operator_minus,
+    lab_tok_operator_add,
+    lab_tok_operator_sub,
     lab_tok_operator_mul,
     lab_tok_operator_div,
     lab_tok_operator_equals,
@@ -52,6 +53,8 @@ typedef enum lab_tokens_e {
     lab_tok_operator_not,
     lab_tok_operator_bitshiftl,
     lab_tok_operator_bitshiftr,
+
+    lab_tok_operator_concat,
 
     lab_tok_eof,
 
