@@ -42,7 +42,6 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_semicolon, "semicolon")
         TOK_TO_STRING_TEMPLATE(lab_tok_double_colon, "double colon")
         TOK_TO_STRING_TEMPLATE(lab_tok_rarrow, "right arrow")
-        TOK_TO_STRING_TEMPLATE(lab_tok_comment, "comment")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_var, "var")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_struct, "struct")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
@@ -350,7 +349,6 @@ bool operator_callback(const lab_vec_t* code,
                 lab_lexer_iterator_t begin_pos = *iter;
                 for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
                     if(((char*)code->raw_data)[iter->iter] == '\n' || ((char*)code->raw_data)[iter->iter] == '\0') {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_comment, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }

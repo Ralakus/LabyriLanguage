@@ -28,8 +28,6 @@ typedef enum lab_tokens_e {
     lab_tok_double_colon,
     lab_tok_rarrow,
 
-    lab_tok_comment,
-
     lab_tok_kw_var,
     lab_tok_kw_struct,
     lab_tok_kw_return,
