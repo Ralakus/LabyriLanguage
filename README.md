@@ -25,6 +25,8 @@ Since the language will be interpreted at first, it will be dynamic
 * uint32
 * uint64
 * usize
+* float32
+* float64
 
 # Sample syntax 
 ```CS
