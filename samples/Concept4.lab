@@ -5,7 +5,8 @@ Rectangle :: struct {
 
     new :: (width: int64, height: int64) -> Rectangle {
 
-        temp_rect: Rectangle; // Struct members are automagically initilized
+        temp_rect: Rectangle; // Struct members are automagically initilized with default values
+                              // 0 for int64
 
         Rectangle.width  = width;
         Rectangle.height = height;
@@ -14,7 +15,7 @@ Rectangle :: struct {
 
     }
 
-    area :: (self) -> int64 {
+    area :: (self) -> int64 { // Function must have "self" in it's parameter list to be non-static
 
         return self.width * self.height;
 
@@ -28,9 +29,9 @@ main :: ( args: [] str ) -> int16 {
 
     x: str = "Hello world!";
 
-    print(x ++ "\n");
+    print(x ++ "\n"); // ++ is the array AND string concact operator
 
-    print("{rect.area()}");
+    print("{rect.area()}\n");
 
     return 0;
 
