@@ -26,7 +26,7 @@ Since the language will be interpreted at first, it will be dynamic
 * uint64
 * usize
 
-# Sample stynax 
+# Sample syntax 
 ```CS
 main :: (args: [] str) {
     x: var = "Hello world!" // var because the language is currently dynamic
