@@ -18,7 +18,7 @@ void lab_print_version() {
     lab_noticeln("Labyrinth Compiler Version: %s", LAB_VERSION_NUMBER);
 }
 
-void lab_print_help(){
+void lab_print_help() {
     lab_print_version();
     lab_noticeln("-f or --file <files> to compile files");
     lab_noticeln("-h or --help to print help");
