@@ -22,20 +22,24 @@ typedef enum lab_tokens_e {
     lab_tok_rcurley,
 
     lab_tok_comma,
+    lab_tok_decimal,
     lab_tok_colon,
     lab_tok_semicolon,
-    lab_tok_comment,
-
     lab_tok_double_colon,
     lab_tok_rarrow,
 
+    lab_tok_comment,
+
     lab_tok_kw_var,
+    lab_tok_kw_struct,
     lab_tok_kw_return,
     lab_tok_kw_if,
     lab_tok_kw_else,
     lab_tok_kw_nil,
     lab_tok_kw_for,
     lab_tok_kw_while,
+    lab_tok_kw_break,
+    lab_tok_kw_continue,
     lab_tok_kw_true,
     lab_tok_kw_false,
     

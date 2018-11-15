@@ -37,18 +37,22 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_lcurley, "left curley")
         TOK_TO_STRING_TEMPLATE(lab_tok_rcurley, "right curley")
         TOK_TO_STRING_TEMPLATE(lab_tok_comma, "comma")
+        TOK_TO_STRING_TEMPLATE(lab_tok_decimal, "decimal")
         TOK_TO_STRING_TEMPLATE(lab_tok_colon, "colon")
         TOK_TO_STRING_TEMPLATE(lab_tok_semicolon, "semicolon")
-        TOK_TO_STRING_TEMPLATE(lab_tok_comment, "comment")
         TOK_TO_STRING_TEMPLATE(lab_tok_double_colon, "double colon")
         TOK_TO_STRING_TEMPLATE(lab_tok_rarrow, "right arrow")
+        TOK_TO_STRING_TEMPLATE(lab_tok_comment, "comment")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_var, "var")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_struct, "struct")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_if, "if")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_else, "else")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_nil, "nil ( keyword )")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_nil, "nil")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_for, "for")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_while, "while")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_break, "break")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_continue, "continue")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_true, "true")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_false, "false")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_add, "operator add")
@@ -84,30 +88,36 @@ bool alpha_callback(const lab_vec_t* code,
 
     static const char* reserved[] = { 
         "var",
+        "struct"
         "return",
         "if", 
         "else", 
         "nil", 
         "for", 
         "while", 
+        "break",
+        "continue"
         "true", 
         "false"
     };
     static const lab_tokens_e reserved_types[] = {
         lab_tok_kw_var, 
+        lab_tok_kw_struct,
         lab_tok_kw_return, 
         lab_tok_kw_if, 
         lab_tok_kw_else,
         lab_tok_kw_nil,
         lab_tok_kw_for,
         lab_tok_kw_while,
+        lab_tok_kw_break,
+        lab_tok_kw_continue,
         lab_tok_kw_true,
         lab_tok_kw_false
     };
 
     for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
 
-        if(!isalpha(raw_code[iter->iter + 1]) && !isdigit(raw_code[iter->iter + 1])) {
+        if(!alpha_callback_rule(raw_code[iter->iter + 1])) {
 
             for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
 
@@ -228,7 +238,7 @@ bool whitespace_callback(const lab_vec_t* code,
 
 }
 
-bool numeric_callback_rule(char c) { return (isdigit(c) > 0 || c == '.'); }
+bool numeric_callback_rule(char c) { return (isdigit(c) > 0); }
 bool numeric_callback(const lab_vec_t* code,
                              lab_lexer_iterator_t* iter, 
                              lab_lexer_token_container_t* tokens, 
@@ -262,7 +272,7 @@ bool numeric_callback(const lab_vec_t* code,
 
 }
 
-bool symbol_callback_rule(char c) { return (c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' ||
+bool symbol_callback_rule(char c) { return (c=='(' || c==')' || c=='[' || c==']' || c=='{' || c=='}' || c=='.' ||
                                                    c==',' || c==':' || c==';'); }
 bool symbol_callback(const lab_vec_t* code,
                             lab_lexer_iterator_t* iter, 
@@ -276,6 +286,7 @@ bool symbol_callback(const lab_vec_t* code,
         case ']': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rbracket,  NULL, iter->line, iter->column); break;
         case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lcurley,   NULL, iter->line, iter->column); break;
         case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rcurley,   NULL, iter->line, iter->column); break;
+        case '.': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_decimal,   NULL, iter->line, iter->column); break;
         case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_comma,     NULL, iter->line, iter->column); break;
         case ':': {
             if(((char*)code->raw_data)[iter->iter + 1]==':') {
