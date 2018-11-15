@@ -1,0 +1,37 @@
+Rectangle :: struct {
+
+    width:  int64;
+    height: int64;
+
+    new :: (width: int64, height: int64) -> Rectangle {
+
+        temp_rect: Rectangle;
+
+        Rectangle.width  = width;
+        Rectangle.height = height;
+
+        return Rectangle;
+
+    }
+
+    area :: (self) -> int64 {
+
+        return self.width * self.height;
+
+    }
+
+}
+
+main :: ( args: [] str ) {
+
+    rect: Rectangle = Rectangle::new(10, 15);
+
+    x: str = "Hello world!";
+
+    print(x ++ "\n");
+
+    print("{rect.area()}");
+
+    return 0;
+
+}
