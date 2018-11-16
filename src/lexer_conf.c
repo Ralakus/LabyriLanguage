@@ -88,7 +88,7 @@ bool alpha_callback(const lab_vec_t* code,
 
     static const char* reserved[] = { 
         "var",
-        "struct"
+        "struct",
         "self",
         "return",
         "if", 
@@ -97,7 +97,7 @@ bool alpha_callback(const lab_vec_t* code,
         "for", 
         "while", 
         "break",
-        "continue"
+        "continue",
         "true", 
         "false"
     };
@@ -125,7 +125,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 for(size_t j = 0;; j++) {
 
-                    if(j > iter->iter - (begin_pos.iter + 1) && reserved[i][j]==(raw_code + begin_pos.iter)[j]) {
+                    if(j > iter->iter - (begin_pos.iter + 1) && reserved[i][j]==(raw_code + begin_pos.iter)[j] && reserved[i][j+1] == '\0') {
 
                         lab_lexer_token_container_append(tokens, code, iter->iter, (int)reserved_types[i], NULL, begin_pos.line, begin_pos.column);
                         return true;
