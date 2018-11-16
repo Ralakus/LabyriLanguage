@@ -44,6 +44,7 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_rarrow, "right arrow")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_var, "var")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_struct, "struct")
+        TOK_TO_STRING_TEMPLATE(lab_tok_kw_self, "self")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_if, "if")
         TOK_TO_STRING_TEMPLATE(lab_tok_kw_else, "else")
@@ -88,6 +89,7 @@ bool alpha_callback(const lab_vec_t* code,
     static const char* reserved[] = { 
         "var",
         "struct"
+        "self",
         "return",
         "if", 
         "else", 
@@ -102,6 +104,7 @@ bool alpha_callback(const lab_vec_t* code,
     static const lab_tokens_e reserved_types[] = {
         lab_tok_kw_var, 
         lab_tok_kw_struct,
+        lab_tok_kw_self,
         lab_tok_kw_return, 
         lab_tok_kw_if, 
         lab_tok_kw_else,

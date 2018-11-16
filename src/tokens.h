@@ -30,6 +30,7 @@ typedef enum lab_tokens_e {
 
     lab_tok_kw_var,
     lab_tok_kw_struct,
+    lab_tok_kw_self,
     lab_tok_kw_return,
     lab_tok_kw_if,
     lab_tok_kw_else,

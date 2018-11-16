@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) {
             for(size_t j = 0; j < tokens.used_size; j++) {
                 lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
                 char* tok_str = tok_to_string(tok->id);
-                lab_println("Token: %s: %s at line: %d, column: %d", (const char*)tok_str, tok->data, tok->line, tok->column);
+                lab_println("Token: %-32s: %-32s at line: %d, column: %d", (const char*)tok_str, tok->data, tok->line, tok->column);
                 free(tok_str);
             }
             lab_noticeln("END");
