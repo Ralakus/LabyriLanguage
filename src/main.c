@@ -75,7 +75,8 @@ int main(int argc, char* argv[]) {
 
     }   parse_state = lab_parse_state_other;
 
-    bool print_tokens = false;
+    bool print_tokens    = false;
+    bool print_all_times = false;
 
     for(size_t i = 0; i < lab_vec_size(&args); i++) {
         if(strcmp("-f", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--file", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
@@ -85,6 +86,11 @@ int main(int argc, char* argv[]) {
 
         else if(strcmp("-d", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--debug", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
             print_tokens = true;
+            continue;
+        }
+
+        else if(strcmp("--pallt", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
+            print_all_times = true;
             continue;
         }
 
@@ -268,7 +274,7 @@ int main(int argc, char* argv[]) {
 
         size_t str_size = lab_vec_size((lab_vec_t*)lab_vec_at(&file_contents, i));
 
-        lab_mempool_init(&token_data_mempool, str_size * 10, str_size / 10);
+        lab_mempool_init(&token_data_mempool, str_size * 7, str_size / 13);
 
         lab_custom_lexer_lex(&tokens, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool);
 
@@ -281,8 +287,6 @@ int main(int argc, char* argv[]) {
                 free(tok_str);
             }
             lab_noticeln("END");
-        } else {
-            lab_noticeln("Token debug printing off");
         }
 
         lab_lexer_token_container_free(&tokens);
@@ -323,13 +327,17 @@ int main(int argc, char* argv[]) {
 
     total_time = arg_convert_time + arg_parse_time + file_read_time + lex_time + arg_free_time + file_free_time;
 
-    lab_successln("Argument convert time: %fms", arg_convert_time * 1000);
-    lab_successln("Argument parse time: %fms",   arg_parse_time   * 1000);
-    lab_successln("File read time: %fms",        file_read_time   * 1000);
+    if(print_all_times){
+        lab_successln("Argument convert time: %fms", arg_convert_time * 1000);
+        lab_successln("Argument parse time: %fms",   arg_parse_time   * 1000);
+        lab_successln("File read time: %fms",        file_read_time   * 1000);
+    }
     lab_successln("Lex time: %fms",              lex_time         * 1000);
-    lab_successln("Argument free time: %fms",    arg_free_time    * 1000);
-    lab_successln("File free time: %fms",        file_free_time   * 1000);
-    lab_successln("Total time: %fms",            total_time       * 1000);
+    if(print_all_times) {
+        lab_successln("Argument free time: %fms",    arg_free_time    * 1000);
+        lab_successln("File free time: %fms",        file_free_time   * 1000);
+        lab_successln("Total time: %fms",            total_time       * 1000);
+    }
 
     return 0;
 }

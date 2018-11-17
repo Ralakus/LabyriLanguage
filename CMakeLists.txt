@@ -14,23 +14,23 @@ file(GLOB_RECURSE all_c_src
     "${PROJECT_SOURCE_DIR}/src/*.c"
 )
 
-add_executable(LabCompiler ${all_c_src})
+add_executable(lab ${all_c_src})
 
-set_property(TARGET LabCompiler PROPERTY C_STANDARD 11)
+set_property(TARGET lab PROPERTY C_STANDARD 11)
 
-target_include_directories(LabCompiler PUBLIC lib/LabyrinthCUtils/src)
+target_include_directories(lab PUBLIC lib/LabyrinthCUtils/src)
 
 add_subdirectory(lib/LabyrinthCUtils)
-target_link_libraries(LabCompiler PUBLIC LabCUtils)
+target_link_libraries(lab PUBLIC LabCUtils)
 
 set(CMAKE_C_FLAGS_RELEASE "-O3 -flto")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)     # 64 bit
 
-    target_compile_definitions(LabCompiler PUBLIC LAB_64_BIT)
+    target_compile_definitions(lab PUBLIC LAB_64_BIT)
 
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) # 32 bit
 
-    target_compile_definitions(LabCompiler PUBLIC LAB_32_BIT)
+    target_compile_definitions(lab PUBLIC LAB_32_BIT)
 
 endif()

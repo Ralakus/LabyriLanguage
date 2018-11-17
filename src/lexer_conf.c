@@ -77,6 +77,17 @@ char* tok_to_string(lab_tokens_e tok) {
     return buffer;
 }
 
+bool match_str_rest(const char* str, size_t expected_len, size_t start, size_t length, const char* rest) {
+
+    if(expected_len == (start + length)) {
+        if(memcmp(str + start, rest, length) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool alpha_callback_rule(char c) { return (isalpha(c) > 0 || c == '_'); }
 bool alpha_callback(const lab_vec_t* code,
                            lab_lexer_iterator_t* iter, 
@@ -86,62 +97,145 @@ bool alpha_callback(const lab_vec_t* code,
     lab_lexer_iterator_t begin_pos = *iter;
     char*                raw_code  = (char*)code->raw_data;
 
-    static const char* reserved[] = { 
-        "var",
-        "struct",
-        "self",
-        "return",
-        "if", 
-        "else", 
-        "nil", 
-        "for", 
-        "while", 
-        "break",
-        "continue",
-        "true", 
-        "false"
-    };
-    static const lab_tokens_e reserved_types[] = {
-        lab_tok_kw_var, 
-        lab_tok_kw_struct,
-        lab_tok_kw_self,
-        lab_tok_kw_return, 
-        lab_tok_kw_if, 
-        lab_tok_kw_else,
-        lab_tok_kw_nil,
-        lab_tok_kw_for,
-        lab_tok_kw_while,
-        lab_tok_kw_break,
-        lab_tok_kw_continue,
-        lab_tok_kw_true,
-        lab_tok_kw_false
-    };
-
     for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
 
         if(!alpha_callback_rule(raw_code[iter->iter + 1])) {
 
-            for(size_t i = 0; i < (sizeof(reserved) / sizeof(const char*)); i++) {
+            const char* ident_start = raw_code + begin_pos.iter;
 
-                for(size_t j = 0;; j++) {
+            switch (ident_start[0]) {
 
-                    if(j > iter->iter - (begin_pos.iter + 1) && reserved[i][j]==(raw_code + begin_pos.iter)[j] && reserved[i][j+1] == '\0') {
-
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)reserved_types[i], NULL, begin_pos.line, begin_pos.column);
+                case 'v': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 2, "ar")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_var, NULL, begin_pos.line, begin_pos.column);
                         return true;
-                        //return lab_lexer_token_make((int)reserved_types[i], NULL, &begin_pos);
-
-                    } else if(reserved[i][j]=='\0') {
-                        break;
                     }
-                    if(reserved[i][j]==(raw_code + begin_pos.iter)[j]) {
-                        continue;
-                    } else {
+                }
+                break;
+
+                case 's': {
+                    switch(ident_start[1]) {
+                        case 't': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 4, "ruct")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_struct, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
+                        break;
+
+                        case 'e': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 2, "lf")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_self, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
                         break;
                     }
                 }
+                break;
+
+                case 'r': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 5, "eturn")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_return, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'i': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 1, "f")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_if, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'e': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 3, "lse")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_else, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'n': {
+                    switch(ident_start[1]) {
+                        case 'o': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "t")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_not, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
+                        break;
+
+                        case 'i': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "l")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_nil, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
+                        break;
+                    }
+                }
+                break;
+
+                case 'f': {
+                    switch(ident_start[1]) {
+                        case 'o': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "r")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_for, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
+                        break;
+
+                        case 'a': {
+                            if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 3, "lse")) {
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_false, NULL, begin_pos.line, begin_pos.column);
+                                return true;
+                            }
+                        }
+                        break;
+                    }
+                }
+                break;
+
+                case 'w': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 4, "hile")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_while, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'b': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 4, "reak")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_break, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'c': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 7, "ontinue")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_continue, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 't': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 3, "rue")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_if, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                default:
+                    break;
             }
-            
+
             lab_mempool_t* pool = (lab_mempool_t*)user_data;
 
             lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_pos.iter) + 2);
@@ -162,69 +256,6 @@ bool alpha_callback(const lab_vec_t* code,
             return true;
         }
     }
-     
-    /*
-
-        TODO: Somehow make the code below faster than the code above
-        The code below is more cache friendly but 23% slower
-
-    */
-
-    /*static const char reserved[]               = {           "Func\0"         "let\0"         "return\0"           "as" };
-    static const lab_tokens_e reserved_types[] = { lab_tok_kw_func, lab_tok_kw_let, lab_tok_kw_return,   lab_tok_kw_as    };
-
-    for(; iter->iter < code->used_size; lab_lexer_iter_next(code, iter)) {
-        if((!alpha_callback_rule(raw_code[iter->iter + 1])) && (!isdigit(raw_code[iter->iter + 1]))) {
-
-            size_t reserved_sub_str = 0;
-            bool   matches          = true;
-            size_t j                = 0;
-
-            for(size_t i = 0; i < sizeof(reserved); i++, j++) {
-                if(reserved[i]=='\0') {
-                    j = -1;
-                    ++reserved_sub_str;
-                    matches = true;
-                    continue;
-                }
-
-                if(matches) {
-                    if(j > (iter->iter - begin_pos.iter) - 1 && reserved[i] == (raw_code + begin_pos.iter)[j]) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)reserved_types[reserved_sub_str], NULL, begin_pos.line, begin_pos.column);
-
-                        return true;
-                    }
-                    if(reserved[i] == (raw_code + begin_pos.iter)[j]) {
-                        continue;
-                    } else {
-                        matches = false;
-                    }
-                }
-            }
-
-            lab_mempool_t* pool = (lab_mempool_t*)user_data;
-
-
-            lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_pos.iter) + 2);
-            char* ident = alloc->data;
-
-            if(ident==NULL) {
-
-                lab_errorln("Failed to allocate buffer for identifier token for identifier at line: %d, column: %d!", begin_pos.line, begin_pos.column);
-                return false;
-
-            } else {
-
-                ident[(iter->iter - begin_pos.iter) + 1] = '\0';
-                memcpy(ident, raw_code + begin_pos.iter, (iter->iter - begin_pos.iter) + 1);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_identifier, ident, begin_pos.line, begin_pos.column);
-
-                return true;
-
-            }
-
-        }
-    }*/
 
     return true;
 
