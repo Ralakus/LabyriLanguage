@@ -289,7 +289,7 @@ int main(int argc, char* argv[]) {
                 lab_println("Token: "LAB_ANSI_COLOR_GREEN"%-32s"LAB_ANSI_COLOR_RESET": "LAB_ANSI_COLOR_YELLOW"%-32s"LAB_ANSI_COLOR_RESET"("LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET", "LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET")", (const char*)tok_str, tok->data == NULL ? " " : tok->data, tok->line, tok->column);
                 free(tok_str);
             }
-            lab_noticeln(LAB_ANSI_COLOR_CYAN"-------%-32s%-32s------------"LAB_ANSI_COLOR_RESET, "----------"PRINT_LINE"-", "----------"PRINT_LINE);
+            lab_noticeln(LAB_ANSI_COLOR_CYAN"-------%-32s%-32s------------"LAB_ANSI_COLOR_RESET, "----------"PRINT_LINE"-", "-----------"PRINT_LINE);
             lab_noticeln("END");
         }
 
