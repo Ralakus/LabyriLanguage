@@ -1,0 +1,20 @@
+stages:
+    - test
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+
+test:
+    stage: test
+    image: ubuntu
+    before_script:
+    - apt update
+    - apt install gcc cmake ninja-build -y
+    script:
+    - CC=gcc && cmake . -Bbuild -GNinja
+    - cd build
+    - cmake --build . --config Debug
+    - ./lab -f ../test/test1.lab
+    artifacts:
+        paths:
+        - build/lab
