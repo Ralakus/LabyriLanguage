@@ -34,8 +34,8 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_rparen, "right paren")
         TOK_TO_STRING_TEMPLATE(lab_tok_lbracket, "left bracket")
         TOK_TO_STRING_TEMPLATE(lab_tok_rbracket, "right bracket")
-        TOK_TO_STRING_TEMPLATE(lab_tok_lcurley, "left curley")
-        TOK_TO_STRING_TEMPLATE(lab_tok_rcurley, "right curley")
+        TOK_TO_STRING_TEMPLATE(lab_tok_lcurly, "left curly")
+        TOK_TO_STRING_TEMPLATE(lab_tok_rcurly, "right curly")
         TOK_TO_STRING_TEMPLATE(lab_tok_comma, "comma")
         TOK_TO_STRING_TEMPLATE(lab_tok_decimal, "decimal")
         TOK_TO_STRING_TEMPLATE(lab_tok_colon, "colon")
@@ -317,8 +317,8 @@ bool symbol_callback(const lab_vec_t* code,
         case ')': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rparen,    NULL, iter->line, iter->column); break;
         case '[': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lbracket,  NULL, iter->line, iter->column); break;
         case ']': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rbracket,  NULL, iter->line, iter->column); break;
-        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lcurley,   NULL, iter->line, iter->column); break;
-        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rcurley,   NULL, iter->line, iter->column); break;
+        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lcurly,   NULL, iter->line, iter->column); break;
+        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rcurly,   NULL, iter->line, iter->column); break;
         case '.': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_decimal,   NULL, iter->line, iter->column); break;
         case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_comma,     NULL, iter->line, iter->column); break;
         case ':': {

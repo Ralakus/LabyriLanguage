@@ -18,8 +18,8 @@ typedef enum lab_tokens_e {
     lab_tok_rparen,
     lab_tok_lbracket,
     lab_tok_rbracket,
-    lab_tok_lcurley,
-    lab_tok_rcurley,
+    lab_tok_lcurly,
+    lab_tok_rcurly,
 
     lab_tok_comma,
     lab_tok_decimal,
