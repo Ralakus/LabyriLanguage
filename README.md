@@ -1,5 +1,7 @@
 # Labyrinth Langauge
 
+![build](https://gitlab.com/Ralakus/LabyrinthLanguage/badges/master/build.svg)
+
 # Made in pure C11
 Why not use C++?
 I chose C since it is what most other languages are programmed in
