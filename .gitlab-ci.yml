@@ -5,8 +5,8 @@ stages:
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
 
-test:
-    stage: test
+build:
+    stage: build
     image: ubuntu
     before_script:
         - apt update
