@@ -282,14 +282,14 @@ int main(int argc, char* argv[]) {
 
         if(print_tokens) {
             lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
-            lab_noticeln(LAB_ANSI_COLOR_CYAN"-------%-32s%-32sline, column"LAB_ANSI_COLOR_RESET, "Token type"PRINT_LINE"--", "Token data"PRINT_LINE);
+            lab_noticeln(LAB_ANSI_COLOR_CYAN"%-32s%-32sline, column"LAB_ANSI_COLOR_RESET, "Token type"PRINT_LINE"--", "Token data"PRINT_LINE);
             for(size_t j = 0; j < tokens.used_size; j++) {
                 lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
                 char* tok_str = tok_to_string(tok->id);
-                lab_println("Token: "LAB_ANSI_COLOR_GREEN"%-32s"LAB_ANSI_COLOR_RESET": "LAB_ANSI_COLOR_YELLOW"%-32s"LAB_ANSI_COLOR_RESET"("LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET", "LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET")", (const char*)tok_str, tok->data == NULL ? " " : tok->data, tok->line, tok->column);
+                lab_println(LAB_ANSI_COLOR_GREEN"%-32s"LAB_ANSI_COLOR_RESET": "LAB_ANSI_COLOR_YELLOW"%-32s"LAB_ANSI_COLOR_RESET"("LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET", "LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET")", (const char*)tok_str, tok->data == NULL ? " " : tok->data, tok->line, tok->column);
                 free(tok_str);
             }
-            lab_noticeln(LAB_ANSI_COLOR_CYAN"-------%-32s%-32s------------"LAB_ANSI_COLOR_RESET, "----------"PRINT_LINE"-", "-----------"PRINT_LINE);
+            lab_noticeln(LAB_ANSI_COLOR_CYAN"%-32s%-32s------------"LAB_ANSI_COLOR_RESET, "----------"PRINT_LINE"-", "-----------"PRINT_LINE);
         }
 
         lab_lexer_token_container_free(&tokens);
