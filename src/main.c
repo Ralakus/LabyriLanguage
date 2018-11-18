@@ -290,7 +290,6 @@ int main(int argc, char* argv[]) {
                 free(tok_str);
             }
             lab_noticeln(LAB_ANSI_COLOR_CYAN"-------%-32s%-32s------------"LAB_ANSI_COLOR_RESET, "----------"PRINT_LINE"-", "-----------"PRINT_LINE);
-            lab_noticeln("END");
         }
 
         lab_lexer_token_container_free(&tokens);
