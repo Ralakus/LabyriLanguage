@@ -56,14 +56,15 @@ char* tok_to_string(lab_tokens_e tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_mul, "*")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_div, "/")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_equals, "=")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_xor, "^")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_and, "&")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_lesst, "<")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_greatert, ">")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_or, "|")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_compare, "==")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_not, "!")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftl, "<<")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftr, ">>")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_xor, "^")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_and, "&")
+        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_or, "|")
         TOK_TO_STRING_TEMPLATE(lab_tok_operator_concat, "++");
         TOK_TO_STRING_TEMPLATE(lab_tok_eof, "end of file")
         default: {
@@ -228,6 +229,22 @@ bool alpha_callback(const lab_vec_t* code,
                 }
                 break;
 
+                case 'o': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 1, "r")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_or, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
+                case 'a': {
+                    if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 2, "nd")) {
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_and, NULL, begin_pos.line, begin_pos.column);
+                        return true;
+                    }
+                }
+                break;
+
                 default:
                     break;
             }
@@ -370,9 +387,21 @@ bool operator_callback(const lab_vec_t* code,
             break;
         }
         case '*': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_mul,    NULL, iter->line, iter->column); break;
-        case '=': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_equals, NULL, iter->line, iter->column); break;
-        case '^': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_xor,    NULL, iter->line, iter->column); break;
-        case '|': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_or,     NULL, iter->line, iter->column); break;
+
+        case '=': {
+            if(((char*)code->raw_data)[iter->iter + 1]=='=') {
+                lab_lexer_iter_next(code, iter);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_compare,  NULL, iter->line, iter->column);
+                return true;
+            } else {
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_equals,  NULL, iter->line, iter->column);
+                return true;
+            }
+
+            break;
+        }
+        case '^': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bit_xor,NULL, iter->line, iter->column); break;
+        case '|': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bit_or, NULL, iter->line, iter->column); break;
         case '!': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_not,    NULL, iter->line, iter->column); break;
         case '/': { // Check to see if comment or not
             if(((char*)code->raw_data)[iter->iter + 1]=='/') {
