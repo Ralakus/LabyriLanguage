@@ -1,7 +1,8 @@
 # Labyrinth Langauge
 
 # Made in pure C11
-* It is built upon the Labyrinth compiler framework
+Why not use C++?
+I chose C since it is what most other languages are programmed in
 
 # Current state
 All that there is of the compiler is the lexer
