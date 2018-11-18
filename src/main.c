@@ -23,6 +23,7 @@ void lab_print_help() {
     lab_noticeln("-f or --file <files> to compile files");
     lab_noticeln("-h or --help to print help");
     lab_noticeln("-d or --debug to enable debug printing");
+    lab_noticeln("--pallt to print out all timer results");
 }
 
 #define PRINT_LINE "-------------------------------------------------------------------------"
