@@ -3,11 +3,6 @@
 typedef enum lab_tokens_e {
     lab_tok_err,
 
-    lab_tok_whitespace_space,
-    lab_tok_whitespace_tab,
-    lab_tok_whitespace_return,
-    lab_tok_whitespace_newline,
-
     lab_tok_identifier,
     lab_tok_number,
 
