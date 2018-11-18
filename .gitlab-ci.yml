@@ -22,4 +22,5 @@ build:
 run:
     stage: run
     script:
+        - cd build
         - ./lab -f ../test/test1.lab
