@@ -1,4 +1,4 @@
 [submodule "lib/LabyrinthCUtils"]
 	path = lib/LabyrinthCUtils
-	url = https://github.com/Ralakus/LabyrinthCUtils.git
+	url = https://gitlab.com/Ralakus/LabyrinthCUtils.git
 	branch = master
