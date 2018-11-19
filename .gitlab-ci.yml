@@ -12,7 +12,7 @@ build:
         - apt update
         - apt install gcc cmake ninja-build -y
     script:
-        - CC=gcc && cmake . -Bbuild -GNinja
+        - CC=gcc cmake . -Bbuild -GNinja
         - cd build
         - cmake --build . --config Debug
     artifacts:
