@@ -3,15 +3,13 @@ Rectangle :: struct {
     width:  int64;
     height: int64;
 
-    new :: (width: int64, height: int64) -> Rectangle {
+    new :: (self, width: int64, height: int64) -> Rectangle { // Delcaring a function named "new" will override the default constructor
+                                                              // This function will be static despite it having "self" in it's parameter list
 
-        temp_rect: Rectangle; // Struct members are automagically initilized with default values
-                              // 0 for int64
+        self.width  = width;
+        self.height = height;
 
-        Rectangle.width  = width;
-        Rectangle.height = height;
-
-        return temp_rect;
+        return self;
 
     }
 
