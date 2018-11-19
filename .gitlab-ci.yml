@@ -21,6 +21,7 @@ build:
 
 run:
     stage: run
+    image: ubuntu
     script:
         - cd build
         - ./lab -f ../test/test1.lab
