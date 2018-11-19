@@ -37,4 +37,5 @@ main :: (args: [] str) {
     x: var = "Hello world!" // var because the language is currently dynamic
     print(x ++ "\n");
     return 0;
-}```
+}
+```
