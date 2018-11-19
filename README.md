@@ -1,6 +1,6 @@
 # Labyrinth Langauge
 
-![build](https://gitlab.com/Ralakus/LabyrinthLanguage/badges/master/build.svg)
+[![build](https://gitlab.com/Ralakus/LabyrinthLanguage/badges/master/build.svg)](https://gitlab.com/Ralakus/LabyrinthLanguage/pipelines)
 
 # Made in pure C11
 Why not use C++?
