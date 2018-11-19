@@ -19,7 +19,7 @@ build:
         paths:
         - build/lab
         - build/CMakeFiles/lab.dir/src/*.o
-        - build/CMakeFiles/lab.dir/src/*.gcno
+        - build/CMakeFiles/lab.dir/src/*.c.gcno
 
 run:
     stage: run
