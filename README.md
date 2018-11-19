@@ -32,7 +32,7 @@ Since the language will be interpreted at first, it will be dynamic
 * float64
 
 # Sample syntax 
-```CS
+```javascript
 main :: (args: [] str) {
     x: var = "Hello world!" // var because the language is currently dynamic
     print(x ++ "\n");
