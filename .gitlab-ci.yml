@@ -18,6 +18,8 @@ build:
     artifacts:
         paths:
         - build/lab
+        - build/CMakeFiles/lab.dir/src/.*o
+        - build/CMakeFiles/lab.dir/src/.*gcno
 
 run:
     stage: run
