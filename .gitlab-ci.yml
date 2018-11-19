@@ -23,6 +23,7 @@ run:
     stage: run
     image: ubuntu
     before_script:
+    - apt update
     - apt install gcovr -y
     script:
     - cd build
