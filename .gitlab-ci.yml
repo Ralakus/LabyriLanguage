@@ -10,7 +10,7 @@ build:
     image: ubuntu
     before_script:
     - apt update
-    - apt install gcc cmake ninja-build gcovr -y
+    - apt install gcc cmake ninja-build -y
     script:
     - CC=gcc cmake . -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug
     - cd build
