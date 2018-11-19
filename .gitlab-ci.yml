@@ -12,14 +12,14 @@ build:
     - apt update
     - apt install gcc cmake ninja-build gcovr -y
     script:
-    - CC=gcc cmake . -Bbuild -GNinja
+    - CC=gcc cmake . -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug
     - cd build
     - cmake --build . --config Debug
     artifacts:
         paths:
         - build/lab
         - build/CMakeFiles/lab.dir/src/*.o
-        - build/CMakeFiles/lab.dir/src/*.c.gcno
+        - build/CMakeFiles/lab.dir/src/*.gcno
 
 run:
     stage: run
