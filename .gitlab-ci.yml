@@ -26,9 +26,9 @@ run:
     image: ubuntu
     before_script:
     - apt update
-    - apt install python3-pip
+    - apt install python3-pip -y
     - pip3 --version
-    - pip3 install gcovr
+    - pip3 install gcovr -y
     script:
     - cd build
     - ./lab -f ../test/test1.lab
