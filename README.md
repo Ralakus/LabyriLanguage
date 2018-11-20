@@ -6,7 +6,7 @@
 
 # Made in pure C11
 Why not use C++?
-
+C was chosen due to it being more challenging
 
 # Current state
 All that there is of the compiler is the lexer
