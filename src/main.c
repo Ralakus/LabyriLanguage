@@ -70,18 +70,18 @@ int main(int argc, char* argv[]) {
 
     // Parse arguments
 
-    enum lab_parse_state_e {
+    enum lab_parse_state_e_t {
 
-        lab_parse_state_other,
-        lab_parse_state_files,
+        LAB_PARSE_STATE_OTHER,
+        LAB_PARSE_STATE_FILES,
 
-    }   parse_state = lab_parse_state_other;
+    }   parse_state = LAB_PARSE_STATE_OTHER;
 
     bool debug_mode    = false;
 
     for(size_t i = 0; i < lab_vec_size(&args); i++) {
         if(strcmp("-f", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0 || strcmp("--file", (char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data)==0) {
-            parse_state = lab_parse_state_files;
+            parse_state = LAB_PARSE_STATE_FILES;
             continue;
         }
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        if(parse_state == lab_parse_state_files) {
+        if(parse_state == LAB_PARSE_STATE_FILES) {
             lab_vec_t temp;
             size_t arg_size = strlen((char*)((lab_vec_t*)lab_vec_at(&args, i))->raw_data) + 1; // +1 to include null termination
             if(!lab_vec_init(&temp, sizeof(char), arg_size)) {
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
             for(size_t j = 0; j < tokens.used_size; j++) {
                 lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
 
-                if(tok->id == lab_tok_err) {
+                if(tok->id == LAB_TOK_ERR) {
                     lab_errorln(LAB_ANSI_COLOR_RED"%25.25s""%7.25s"
                                 " : "
                                 "%-32.32s"LAB_ANSI_COLOR_RESET

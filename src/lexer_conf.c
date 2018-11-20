@@ -18,59 +18,59 @@
                                                   break;                                                                    \
                                               }
 
-char* tok_to_string(lab_tokens_e tok) {
+char* tok_to_string(lab_tokens_e_t tok) {
     char* buffer = NULL;
     switch(tok) {
-        TOK_TO_STRING_TEMPLATE(lab_tok_err, "error")
-        TOK_TO_STRING_TEMPLATE(lab_tok_identifier, "identifier")
-        TOK_TO_STRING_TEMPLATE(lab_tok_integer, "integer")
-        TOK_TO_STRING_TEMPLATE(lab_tok_float, "float")
-        TOK_TO_STRING_TEMPLATE(lab_tok_char, "char")
-        TOK_TO_STRING_TEMPLATE(lab_tok_string, "string")
-        TOK_TO_STRING_TEMPLATE(lab_tok_lparen, "(")
-        TOK_TO_STRING_TEMPLATE(lab_tok_rparen, ")")
-        TOK_TO_STRING_TEMPLATE(lab_tok_lbracket, "[")
-        TOK_TO_STRING_TEMPLATE(lab_tok_rbracket, "]")
-        TOK_TO_STRING_TEMPLATE(lab_tok_lcurly, "{")
-        TOK_TO_STRING_TEMPLATE(lab_tok_rcurly, "}")
-        TOK_TO_STRING_TEMPLATE(lab_tok_comma, ",")
-        TOK_TO_STRING_TEMPLATE(lab_tok_decimal, ".")
-        TOK_TO_STRING_TEMPLATE(lab_tok_colon, ":")
-        TOK_TO_STRING_TEMPLATE(lab_tok_semicolon, ";")
-        TOK_TO_STRING_TEMPLATE(lab_tok_double_colon, "::")
-        TOK_TO_STRING_TEMPLATE(lab_tok_rarrow, "->")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_bool, "bool")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_int, "int")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_float, "float")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_str, "str")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_struct, "struct")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_self, "self")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_return, "return")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_if, "if")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_else, "else")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_nil, "nil")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_for, "for")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_while, "while")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_break, "break")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_continue, "continue")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_true, "true")
-        TOK_TO_STRING_TEMPLATE(lab_tok_kw_false, "false")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_add, "+")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_sub, "-")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_mul, "*")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_div, "/")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_equals, "=")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_lesst, "<")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_greatert, ">")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_compare, "==")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_not, "!")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftl, "<<")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bitshiftr, ">>")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_xor, "^")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_and, "&")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_bit_or, "|")
-        TOK_TO_STRING_TEMPLATE(lab_tok_operator_concat, "++");
-        TOK_TO_STRING_TEMPLATE(lab_tok_eof, "end of file")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_ERR, "error")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_IDENTIFIER, "identifier")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_INTEGER, "integer")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_FLOAT, "float")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_CHAR, "char")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_STRING, "string")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_LPAREN, "(")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_RPAREN, ")")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_LBRACKET, "[")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_RBRACKET, "]")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_LCURLY, "{")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_RCURLY, "}")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_COMMA, ",")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_DECIMAL, ".")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_COLON, ":")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_SEMICOLON, ";")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_DOUBLE_COLON, "::")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_RARROW, "->")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_BOOL, "bool")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_INT, "int")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_FLOAT, "float")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_STR, "str")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_STRUCT, "struct")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_SELF, "self")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_RETURN, "return")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_IF, "if")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_ELSE, "else")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_NIL, "nil")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_FOR, "for")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_WHILE, "while")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_BREAK, "break")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_CONTINUE, "continue")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_TRUE, "true")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_KW_FALSE, "false")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_ADD, "+")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_SUB, "-")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_MUL, "*")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_DIV, "/")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_EQUALS, "=")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_LESST, "<")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_GREATERT, ">")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_COMPARE, "==")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_NOT, "!")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_BITSHIFTL, "<<")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_BITSHIFTR, ">>")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_BIT_XOR, "^")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_BIT_AND, "&")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_BIT_OR, "|")
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_OPERATOR_CONCAT, "++");
+        TOK_TO_STRING_TEMPLATE(LAB_TOK_EOF, "end of file")
         default: {
             break;
         }
@@ -112,11 +112,11 @@ bool alpha_callback(const lab_vec_t* code,
                             switch(ident_start[2]) {
                                 case 'r': {
                                     if(iter->iter - begin_pos.iter + 1 == 3) {
-                                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_str, NULL, begin_pos.line, begin_pos.column);
+                                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_STR, NULL, begin_pos.line, begin_pos.column);
                                         return true;
                                     }
                                     else if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 3, 3, "uct")) {
-                                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_struct, NULL, begin_pos.line, begin_pos.column);
+                                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_STRUCT, NULL, begin_pos.line, begin_pos.column);
                                         return true;
                                     }
                                 }
@@ -127,7 +127,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'e': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 2, "lf")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_self, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_SELF, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -138,7 +138,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'r': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 5, "eturn")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_return, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_RETURN, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -148,7 +148,7 @@ bool alpha_callback(const lab_vec_t* code,
                     switch(ident_start[1]) {
                         case 'f': {
                             if(iter->iter - begin_pos.iter + 1 == 2) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_if, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_IF, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -156,7 +156,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'n': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "t")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_int, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_INT, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -167,7 +167,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'e': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 3, "lse")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_else, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_ELSE, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -177,7 +177,7 @@ bool alpha_callback(const lab_vec_t* code,
                     switch(ident_start[1]) {
                         case 'o': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "t")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_not, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_NOT, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -185,7 +185,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'i': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "l")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_nil, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_NIL, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -198,7 +198,7 @@ bool alpha_callback(const lab_vec_t* code,
                     switch(ident_start[1]) {
                         case 'o': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 1, "r")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_for, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_FOR, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -206,7 +206,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'a': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 3, "lse")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_false, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_FALSE, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -214,7 +214,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'l': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 3, "oat")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_float, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_FLOAT, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -225,7 +225,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'w': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 4, "hile")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_while, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_WHILE, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -235,7 +235,7 @@ bool alpha_callback(const lab_vec_t* code,
                     switch(ident_start[1]) {
                         case 'r': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 3, "eak")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_break, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_BREAK, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -243,7 +243,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                         case 'o': {
                             if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 2, 2, "ol")) {
-                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_bool, NULL, begin_pos.line, begin_pos.column);
+                                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_BOOL, NULL, begin_pos.line, begin_pos.column);
                                 return true;
                             }
                         }
@@ -254,7 +254,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'c': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 7, "ontinue")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_continue, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_CONTINUE, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -262,7 +262,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 't': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 3, "rue")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_if, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_TRUE, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -270,7 +270,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'o': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 1, "r")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_or, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_OR, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -278,7 +278,7 @@ bool alpha_callback(const lab_vec_t* code,
 
                 case 'a': {
                     if(match_str_rest(ident_start, iter->iter - begin_pos.iter + 1, 1, 2, "nd")) {
-                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_kw_and, NULL, begin_pos.line, begin_pos.column);
+                        lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_KW_AND, NULL, begin_pos.line, begin_pos.column);
                         return true;
                     }
                 }
@@ -304,7 +304,7 @@ bool alpha_callback(const lab_vec_t* code,
 
             }
 
-            lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_identifier, ident, begin_pos.line, begin_pos.column);
+            lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_IDENTIFIER, ident, begin_pos.line, begin_pos.column);
             return true;
         }
     }
@@ -350,7 +350,7 @@ bool numeric_callback(const lab_vec_t* code,
                 }
                 lab_noticeln("Continuing at line %d, column %d", iter->line, iter->column);
                 lab_errorln("==> %.*s", (iter->iter - begin_pos.iter) + 1, raw_code + begin_pos.iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_err, "MULTIPLE DECIMALS IN NUMBER", begin_pos.line, begin_pos.column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_ERR, "MULTIPLE DECIMALS IN NUMBER", begin_pos.line, begin_pos.column);
                 return false;
             }
             is_float = true;
@@ -370,7 +370,7 @@ bool numeric_callback(const lab_vec_t* code,
 
                 num[(iter->iter - begin_pos.iter) + 1] = '\0';
                 memcpy(num, raw_code + begin_pos.iter, (iter->iter - begin_pos.iter) + 1);
-                lab_lexer_token_container_append(tokens, code, iter->iter, is_float ? (int)lab_tok_float : (int)lab_tok_integer, num, begin_pos.line, begin_pos.column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, is_float ? (int)LAB_TOK_FLOAT : (int)LAB_TOK_INTEGER, num, begin_pos.line, begin_pos.column);
                 return true;
             }
         }
@@ -388,27 +388,27 @@ bool symbol_callback(const lab_vec_t* code,
                             void* user_data){
 
     switch(((char*)code->raw_data)[iter->iter]) {
-        case '(': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lparen,    NULL, iter->line, iter->column); break;
-        case ')': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rparen,    NULL, iter->line, iter->column); break;
-        case '[': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lbracket,  NULL, iter->line, iter->column); break;
-        case ']': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rbracket,  NULL, iter->line, iter->column); break;
-        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_lcurly,   NULL, iter->line, iter->column); break;
-        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rcurly,   NULL, iter->line, iter->column); break;
-        case '.': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_decimal,   NULL, iter->line, iter->column); break;
-        case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_comma,     NULL, iter->line, iter->column); break;
+        case '(': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LPAREN,    NULL, iter->line, iter->column); break;
+        case ')': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RPAREN,    NULL, iter->line, iter->column); break;
+        case '[': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LBRACKET,  NULL, iter->line, iter->column); break;
+        case ']': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RBRACKET,  NULL, iter->line, iter->column); break;
+        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LCURLY,   NULL, iter->line, iter->column); break;
+        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RCURLY,   NULL, iter->line, iter->column); break;
+        case '.': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_DECIMAL,   NULL, iter->line, iter->column); break;
+        case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_COMMA,     NULL, iter->line, iter->column); break;
         case ':': {
             if(((char*)code->raw_data)[iter->iter + 1]==':') {
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_double_colon,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_DOUBLE_COLON,  NULL, iter->line, iter->column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_colon,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_COLON,  NULL, iter->line, iter->column);
                 return true;
             }
 
             break;
         }
-        case ';': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_semicolon, NULL, iter->line, iter->column); break;
+        case ';': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_SEMICOLON, NULL, iter->line, iter->column); break;
         default:  return false;
     }
 
@@ -427,10 +427,10 @@ bool operator_callback(const lab_vec_t* code,
         case '+': {
             if(((char*)code->raw_data)[iter->iter + 1]=='+') {
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_concat,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_CONCAT,  NULL, iter->line, iter->column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_add,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_ADD,  NULL, iter->line, iter->column);
                 return true;
             }
 
@@ -439,32 +439,32 @@ bool operator_callback(const lab_vec_t* code,
         case '-': {
             if(((char*)code->raw_data)[iter->iter + 1]=='>') {
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_rarrow,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RARROW,  NULL, iter->line, iter->column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_sub,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_SUB,  NULL, iter->line, iter->column);
                 return true;
             }
 
             break;
         }
-        case '*': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_mul,    NULL, iter->line, iter->column); break;
+        case '*': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_MUL,    NULL, iter->line, iter->column); break;
 
         case '=': {
             if(((char*)code->raw_data)[iter->iter + 1]=='=') {
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_compare,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_COMPARE,  NULL, iter->line, iter->column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_equals,  NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_EQUALS,  NULL, iter->line, iter->column);
                 return true;
             }
 
             break;
         }
-        case '^': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bit_xor,NULL, iter->line, iter->column); break;
-        case '|': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bit_or, NULL, iter->line, iter->column); break;
-        case '!': lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_not,    NULL, iter->line, iter->column); break;
+        case '^': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_BIT_XOR,NULL, iter->line, iter->column); break;
+        case '|': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_BIT_OR, NULL, iter->line, iter->column); break;
+        case '!': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_NOT,    NULL, iter->line, iter->column); break;
         case '/': { // Check to see if comment or not
             if(((char*)code->raw_data)[iter->iter + 1]=='/') {
                 lab_lexer_iterator_t begin_pos = *iter;
@@ -476,7 +476,7 @@ bool operator_callback(const lab_vec_t* code,
                 lab_errorln("Failed to find end of comment starting at line: %d, column: %d", begin_pos.line, begin_pos.column);
                 return false;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_div, NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_DIV, NULL, iter->line, iter->column);
             }
             break;
         }
@@ -484,10 +484,10 @@ bool operator_callback(const lab_vec_t* code,
             if(((char*)code->raw_data)[iter->iter + 1]=='<') {
                 lab_lexer_iterator_t begin_pos = *iter;
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bitshiftl, NULL, begin_pos.line, begin_pos.column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_BITSHIFTL, NULL, begin_pos.line, begin_pos.column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_lesst, NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_LESST, NULL, iter->line, iter->column);
                 return true;
             }
             break;
@@ -496,10 +496,10 @@ bool operator_callback(const lab_vec_t* code,
             if(((char*)code->raw_data)[iter->iter + 1]=='>') {
                 lab_lexer_iterator_t begin_pos = *iter;
                 lab_lexer_iter_next(code, iter);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_bitshiftr, NULL, begin_pos.line, begin_pos.column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_BITSHIFTR, NULL, begin_pos.line, begin_pos.column);
                 return true;
             } else {
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_operator_greatert, NULL, iter->line, iter->column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_OPERATOR_GREATERT, NULL, iter->line, iter->column);
                 return true;
             }
             break;
@@ -557,7 +557,7 @@ bool string_callback(const lab_vec_t* code,
 
             buffer[end_of_string - begin_pos.iter] = '\0';
             memcpy(buffer, raw_code + begin_pos.iter + 1, end_of_string - begin_pos.iter);
-            lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_string, buffer, begin_pos.line, begin_pos.column);
+            lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_STRING, buffer, begin_pos.line, begin_pos.column);
             return true;
 
         }
@@ -574,7 +574,7 @@ bool eof_callback(const lab_vec_t* code,
                          lab_lexer_token_container_t* tokens, 
                          void* user_data) {
 
-    lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_eof, NULL, iter->line, iter->column);
+    lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_EOF, NULL, iter->line, iter->column);
     return true;
 
 }

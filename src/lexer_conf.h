@@ -4,7 +4,7 @@
 #include "lexer.h"
 #include "tokens.h"
 
-extern char* tok_to_string(lab_tokens_e tok);
+extern char* tok_to_string(lab_tokens_e_t tok);
 
 extern bool alpha_callback_rule(char c);
 extern bool alpha_callback(const lab_vec_t* code,
