@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) {
         }
 
         if(debug_mode) {
-            lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
+            lab_noticeln("%d tokens for file: \"%s\"", lab_vec_size(&tokens), (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
 
             lab_noticeln(LAB_ANSI_COLOR_CYAN"%.22s%s-|-%.32sline, column"LAB_ANSI_COLOR_RESET, PRINT_LINE, "Token type", "Token data"PRINT_LINE);
 

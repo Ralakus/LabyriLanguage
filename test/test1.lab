@@ -1,4 +1,4 @@
-main :: (args: [] str) {
+main :: (args: [] str) -> int {
     x: str = "Hello world!"; // Test variable
     print(x ++ "\n");
     return 0;
