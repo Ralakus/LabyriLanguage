@@ -34,4 +34,5 @@ run:
     - ./lab -h
     - ./lab -v
     - ./lab -f ../test/test1.lab -d
+    - ./lab -f ../test/test2.lab -d
     - gcovr

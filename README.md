@@ -6,7 +6,7 @@
 
 # Made in pure C11
 Why not use C++?
-I chose C since it is what most other languages are programmed in
+
 
 # Current state
 All that there is of the compiler is the lexer

@@ -96,7 +96,7 @@ bool alpha_callback(const lab_vec_t* code,
 
     for(;iter->iter < code->used_size; lab_lexer_iter_next(code, iter) ) {
 
-        if(!alpha_callback_rule(raw_code[iter->iter + 1])) {
+        if(!alpha_callback_rule(raw_code[iter->iter + 1]) && !isdigit(raw_code[iter->iter + 1])) {
 
             const char* ident_start = raw_code + begin_pos.iter;
 
@@ -465,12 +465,14 @@ bool string_callback(const lab_vec_t* code,
 
     for(; iter->iter < code->used_size; lab_lexer_iter_next(code, iter)) {
 
-        if(raw_code[iter->iter]=='\"' && mode == 1) {
-            end_of_string = iter->iter - 1;
-            break;
-        } else if(raw_code[iter->iter]=='\'' && mode == -1) {
-            end_of_string = iter->iter -1;
-            break;
+        if(raw_code[iter->iter-1]!='\\') {
+            if(raw_code[iter->iter]=='\"' && mode == 1) {
+                end_of_string = iter->iter - 1;
+                break;
+            } else if(raw_code[iter->iter]=='\'' && mode == -1) {
+                end_of_string = iter->iter -1;
+                break;
+            }
         }
 
     }
@@ -530,14 +532,12 @@ bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens,
     for (pos.iter = 0; pos.iter < code->used_size; lab_lexer_iter_next(code, &pos)) {
         
         char cur_char = raw_code[pos.iter];
-
-        if(alpha_callback_rule(cur_char)) {
+        if(isspace(cur_char)) {
+            continue;
+        } else if(alpha_callback_rule(cur_char)) {
             alpha_callback(code, &pos, tokens, user_data);
         } else if (numeric_callback_rule(cur_char)) {
            numeric_callback(code, &pos, tokens, user_data);
-        } else if(isspace(cur_char)) {
-            continue;
-            // lab_token_container_append(tokens, whitespace_callback(code, &pos, code_len, user_data), &pos, code_len);
         } else if (symbol_callback_rule(cur_char)) {
             symbol_callback(code, &pos, tokens, user_data);
         } else if (operator_callback_rule(cur_char)) {

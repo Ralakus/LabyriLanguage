@@ -233,7 +233,27 @@ int main(int argc, char* argv[]) {
             fseek(cur_file, 0, SEEK_SET);
 
             temp.used_size = temp.alloc_size;
-            fread(temp.raw_data, 1, lab_vec_size(&temp), cur_file);
+            size_t bytes_read = fread(temp.raw_data, 1, lab_vec_size(&temp), cur_file);
+            if(bytes_read < (file_size - 1)) {
+                lab_errorln("Failed to read file: \"%s\" into buffer!", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
+
+                for(size_t i = 0; i < lab_vec_size(&args); i++) {       // Free arguments vector
+                    lab_vec_free((lab_vec_t*)lab_vec_at(&args, i));
+                }
+                lab_vec_free(&args);
+
+                for(size_t i = 0; i < lab_vec_size(&file_names); i++) {  // Free file name vector
+                    lab_vec_free((lab_vec_t*)lab_vec_at(&file_names, i));
+                }
+                lab_vec_free(&file_names);
+
+                for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {  // Free file content vector
+                    lab_vec_free((lab_vec_t*)lab_vec_at(&file_contents, i));
+                }
+                lab_vec_free(&file_contents);
+
+                return 1;
+            }
 
             lab_vec_push_back(&file_contents, &temp);
 
@@ -283,9 +303,9 @@ int main(int argc, char* argv[]) {
                 lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
                 char* tok_str = tok_to_string(tok->id);
 
-                lab_println(LAB_ANSI_COLOR_GREEN"%32s"LAB_ANSI_COLOR_RESET
+                lab_println(LAB_ANSI_COLOR_GREEN"%32.32s"LAB_ANSI_COLOR_RESET
                             " : "
-                            LAB_ANSI_COLOR_YELLOW"%-32s"LAB_ANSI_COLOR_RESET
+                            LAB_ANSI_COLOR_YELLOW"%-32.32s"LAB_ANSI_COLOR_RESET
                             "("
                             LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
                             ", "
