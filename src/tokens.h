@@ -23,7 +23,10 @@ typedef enum lab_tokens_e {
     lab_tok_double_colon,
     lab_tok_rarrow,
 
-    lab_tok_kw_var,
+    lab_tok_kw_bool,
+    lab_tok_kw_int,
+    lab_tok_kw_float,
+    lab_tok_kw_str,
     lab_tok_kw_struct,
     lab_tok_kw_self,
     lab_tok_kw_return,

@@ -12,13 +12,13 @@ C was chosen due to it being more challenging
 All that there is of the compiler is the lexer
 
 # Variable types
-* Numbers
-* Strings
-* Arrays
+Since the language is under development, there will only be 2 basic types at first ( int and float )
+* Numbers  ( int and float )
+* Strings  ( str )
+* Arrays   ( [num] or [..] for dynamic, [num..] to preallocate )
+* Booleans ( bool )
 * Structs which the user can define
 
-## Other types
-Since the language will be interpreted at first, it will be dynamic
 ### Planned types
 * int8
 * int16
@@ -36,7 +36,7 @@ Since the language will be interpreted at first, it will be dynamic
 # Sample syntax 
 ```javascript
 main :: (args: [] str) {
-    x: var = "Hello world!"; // var because the language is currently dynamic
+    x: str = "Hello world!"; // Test variable
     print(x ++ "\n");
     return 0;
 }
