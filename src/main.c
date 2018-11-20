@@ -285,6 +285,8 @@ int main(int argc, char* argv[]) {
 
     lab_mempool_t token_data_mempool;
 
+    bool was_error = false;
+
     for(size_t i = 0; i < lab_vec_size(&file_contents); i++) {
         lab_lexer_token_container_init(&tokens);
 
@@ -292,7 +294,9 @@ int main(int argc, char* argv[]) {
 
         lab_mempool_init(&token_data_mempool, str_size * 7, str_size / 13);
 
-        lab_custom_lexer_lex(&tokens, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool);
+        if(!lab_custom_lexer_lex(&tokens, (lab_vec_t*)lab_vec_at(&file_contents, i), &token_data_mempool)) {
+            was_error = true;
+        }
 
         if(debug_mode) {
             lab_noticeln("Tokens for file: \"%s\"", (char*)((lab_vec_t*)lab_vec_at(&file_names, i))->raw_data);
@@ -301,20 +305,35 @@ int main(int argc, char* argv[]) {
 
             for(size_t j = 0; j < tokens.used_size; j++) {
                 lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&tokens, j);
-                char* tok_str = tok_to_string(tok->id);
 
-                lab_println(LAB_ANSI_COLOR_GREEN"%32.32s"LAB_ANSI_COLOR_RESET
-                            " : "
-                            LAB_ANSI_COLOR_YELLOW"%-32.32s"LAB_ANSI_COLOR_RESET
-                            "("
-                            LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
-                            ", "
-                            LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
-                            ")",
-                            (const char*)tok_str, tok->data == NULL ? " " : tok->data, tok->line, tok->column
-                );
+                if(tok->id == lab_tok_err) {
+                    lab_errorln(LAB_ANSI_COLOR_RED"%25.25s""%7.25s"
+                                " : "
+                                "%-32.32s"LAB_ANSI_COLOR_RESET
+                                "("
+                                LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                                ", "
+                                LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                                ")",
+                                PRINT_LINE, "<ERROR>", tok->data, tok->line, tok->column
+                    );
+                } else {
+                    char* tok_str = tok_to_string(tok->id);
 
-                free(tok_str);
+                    lab_println(LAB_ANSI_COLOR_GREEN"%32.32s"LAB_ANSI_COLOR_RESET
+                                " : "
+                                LAB_ANSI_COLOR_YELLOW"%-32.32s"LAB_ANSI_COLOR_RESET
+                                "("
+                                LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                                ", "
+                                LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                                ")",
+                                (const char*)tok_str, tok->data == NULL ? " " : tok->data, tok->line, tok->column
+                    );
+
+                    free(tok_str);
+                }
+
             }
 
             lab_noticeln(LAB_ANSI_COLOR_CYAN"%.32s---%.32s------------"LAB_ANSI_COLOR_RESET, PRINT_LINE, PRINT_LINE);
@@ -371,5 +390,9 @@ int main(int argc, char* argv[]) {
         lab_successln("Total time: %fms",            total_time       * 1000);
     }
 
-    return 0;
+    if(was_error) {
+        return 1;
+    } else {
+        return 0;
+    }
 }

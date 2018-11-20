@@ -23,7 +23,8 @@ char* tok_to_string(lab_tokens_e tok) {
     switch(tok) {
         TOK_TO_STRING_TEMPLATE(lab_tok_err, "error")
         TOK_TO_STRING_TEMPLATE(lab_tok_identifier, "identifier")
-        TOK_TO_STRING_TEMPLATE(lab_tok_number, "number")
+        TOK_TO_STRING_TEMPLATE(lab_tok_integer, "integer")
+        TOK_TO_STRING_TEMPLATE(lab_tok_float, "float")
         TOK_TO_STRING_TEMPLATE(lab_tok_char, "char")
         TOK_TO_STRING_TEMPLATE(lab_tok_string, "string")
         TOK_TO_STRING_TEMPLATE(lab_tok_lparen, "(")
@@ -331,7 +332,30 @@ bool numeric_callback(const lab_vec_t* code,
     lab_lexer_iterator_t begin_pos = *iter;
     char*                raw_code  = (char*)code->raw_data;
 
+    bool is_float = false;
+
     for(; iter->iter  < code->used_size; lab_lexer_iter_next(code, iter)) {
+        if(raw_code[iter->iter + 1]=='.') {
+            
+            if(is_float) {
+                lab_errorln("Multiple decimals in number starting at line %d, column %d", begin_pos.line, begin_pos.column);
+                lab_noticeln("Resyncronizing...");
+                for(; iter->iter  < code->used_size; lab_lexer_iter_next(code, iter)) {
+                    if(raw_code[iter->iter + 1]=='.') {
+                        continue;
+                    }
+                    if(!numeric_callback_rule(raw_code[iter->iter + 1])) {
+                        break;
+                    }
+                }
+                lab_noticeln("Continuing at line %d, column %d", iter->line, iter->column);
+                lab_errorln("==> %.*s", (iter->iter - begin_pos.iter) + 1, raw_code + begin_pos.iter);
+                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_err, "MULTIPLE DECIMALS IN NUMBER", begin_pos.line, begin_pos.column);
+                return false;
+            }
+            is_float = true;
+            continue;
+        }
         if(!numeric_callback_rule(raw_code[iter->iter + 1])) {
             lab_mempool_t* pool = (lab_mempool_t*)user_data;
             lab_mempool_suballoc_t* alloc = lab_mempool_suballoc_alloc(pool, (iter->iter - begin_pos.iter) + 2);
@@ -346,7 +370,7 @@ bool numeric_callback(const lab_vec_t* code,
 
                 num[(iter->iter - begin_pos.iter) + 1] = '\0';
                 memcpy(num, raw_code + begin_pos.iter, (iter->iter - begin_pos.iter) + 1);
-                lab_lexer_token_container_append(tokens, code, iter->iter, (int)lab_tok_number, num, begin_pos.line, begin_pos.column);
+                lab_lexer_token_container_append(tokens, code, iter->iter, is_float ? (int)lab_tok_float : (int)lab_tok_integer, num, begin_pos.line, begin_pos.column);
                 return true;
             }
         }
@@ -567,28 +591,46 @@ bool lab_custom_lexer_lex(lab_lexer_token_container_t* tokens,
 
     char* raw_code = (char*)code->raw_data;
 
+    bool was_error = false;
+
     for (pos.iter = 0; pos.iter < code->used_size; lab_lexer_iter_next(code, &pos)) {
         
         char cur_char = raw_code[pos.iter];
         if(isspace(cur_char)) {
             continue;
         } else if(alpha_callback_rule(cur_char)) {
-            alpha_callback(code, &pos, tokens, user_data);
+            if(!alpha_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
         } else if (numeric_callback_rule(cur_char)) {
-           numeric_callback(code, &pos, tokens, user_data);
+           if(!numeric_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
         } else if (symbol_callback_rule(cur_char)) {
-            symbol_callback(code, &pos, tokens, user_data);
+            if(!symbol_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
         } else if (operator_callback_rule(cur_char)) {
-            operator_callback(code, &pos, tokens, user_data);
+            if(!operator_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
         } else if(string_callback_rule(cur_char)) {
-            string_callback(code, &pos, tokens, user_data);
+            if(!string_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
         } else if(eof_callback_rule(cur_char)) {
-            eof_callback(code, &pos, tokens, user_data);
+            if(!eof_callback(code, &pos, tokens, user_data)) {
+                was_error = true;
+            }
             break;
         } else {
             lab_errorln("Unexpected character \'%c\' at line: %d, column: %d", cur_char, pos.line, pos.column);
         }
     }
 
-    return true;
+    if(was_error) {
+        return false;
+    } else {
+        return true;
+    }
 }

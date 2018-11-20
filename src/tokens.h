@@ -4,7 +4,8 @@ typedef enum lab_tokens_e {
     lab_tok_err,
 
     lab_tok_identifier,
-    lab_tok_number,
+    lab_tok_integer,
+    lab_tok_float,
 
     lab_tok_char,
     lab_tok_string,
