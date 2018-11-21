@@ -78,7 +78,7 @@ char* tok_to_string(lab_tokens_e_t tok) {
     return buffer;
 }
 
-bool match_str_rest(const char* str, size_t expected_len, size_t start, size_t length, const char* rest) {
+static inline bool match_str_rest(const char* str, size_t expected_len, size_t start, size_t length, const char* rest) {
 
     if(expected_len == (start + length)) {
         if(memcmp(str + start, rest, length) == 0) {

@@ -52,3 +52,13 @@ typedef struct lab_ast_expr_bin_t {
 } lab_ast_expr_bin_t;
 
 extern lab_ast_expr_bin_t* lab_ast_expr_bin_make(lab_mempool_t* pool, char op, lab_ast_expr_t* lhs, lab_ast_expr_t* rhs);
+
+typedef struct lab_ast_expr_call_t {
+
+    char* callee;
+    size_t argc;
+    lab_ast_expr_t* args;
+
+} lab_ast_expr_call_t;
+
+extern lab_ast_expr_call_t* lab_ast_expr_call_make(lab_mempool_t* pool, char* callee, size_t name_len, lab_ast_expr_t* args, size_t argc);

@@ -43,4 +43,16 @@ lab_ast_expr_bin_t* lab_ast_expr_bin_make(lab_mempool_t* pool, char op, lab_ast_
     b->op  = op;
     b->lhs = lhs;
     b->rhs = rhs;
+    return b;
+}
+
+lab_ast_expr_call_t* lab_ast_expr_call_make(lab_mempool_t* pool, char* callee, size_t name_len, lab_ast_expr_t* args, size_t argc) {
+    lab_mempool_suballoc_t* suballoc = lab_mempool_suballoc_alloc(pool, sizeof(lab_ast_expr_call_t) + name_len + 1);
+    lab_ast_expr_call_t* c = (lab_ast_expr_call_t*)suballoc->data;
+    c->callee = (char*)(suballoc->data + sizeof(lab_ast_expr_call_t));
+    c->callee[name_len] = '\0';
+    memcpy(c->callee, callee, name_len);
+    c->argc = argc;
+    c->args = args;
+    return c;
 }
