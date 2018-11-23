@@ -1,12 +1,10 @@
-# Labyrinth Langauge
+# Labyri Langauge
 
 [![build](https://gitlab.com/Ralakus/LabyrinthLanguage/badges/master/build.svg)](https://gitlab.com/Ralakus/LabyrinthLanguage/pipelines)
 [![coverage](https://gitlab.com/Ralakus/LabyrinthLanguage/badges/master/coverage.svg)](https://gitlab.com/Ralakus/LabyrinthLanguage/-/jobs)
 [![license](http://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 # Made in pure C11
-Why not use C++?
-C was chosen due to it being more challenging
 
 # Current state
 All that there is of the compiler is the lexer

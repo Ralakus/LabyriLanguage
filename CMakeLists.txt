@@ -6,9 +6,9 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 
 endif()
 
-project(Labyrinth VERSION 0.1.0
-                  DESCRIPTION "A Labyrinth project"
-                  LANGUAGES C)
+project(Labyri VERSION 0.1.0
+               DESCRIPTION "A Labyri project"
+               LANGUAGES C)
 
 file(GLOB_RECURSE all_c_src
     "${PROJECT_SOURCE_DIR}/src/*.c"
@@ -18,9 +18,9 @@ add_executable(lab ${all_c_src})
 
 set_property(TARGET lab PROPERTY C_STANDARD 11)
 
-target_include_directories(lab PUBLIC lib/LabyrinthCUtils/src)
+target_include_directories(lab PUBLIC lib/LabyriCUtils/src)
 
-add_subdirectory(lib/LabyrinthCUtils)
+add_subdirectory(lib/LabyriCUtils)
 target_link_libraries(lab PUBLIC LabCUtils)
 
 #set(CMAKE_C_FLAGS_RELEASE "-O3 -flto")
