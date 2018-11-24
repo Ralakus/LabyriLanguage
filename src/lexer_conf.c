@@ -349,7 +349,7 @@ bool numeric_callback(const lab_vec_t* code,
                     }
                 }
                 lab_noticeln("Continuing at line %d, column %d", iter->line, iter->column);
-                lab_errorln("==> %.*s", (iter->iter - begin_pos.iter) + 1, raw_code + begin_pos.iter);
+                lab_errorln("Error here ==> %.*s", (iter->iter - begin_pos.iter) + 1, raw_code + begin_pos.iter);
                 lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_ERR, "MULTIPLE DECIMALS IN NUMBER", begin_pos.line, begin_pos.column);
                 return false;
             }

@@ -41,7 +41,7 @@ typedef struct lab_ast_expr_var_t {
 
 } lab_ast_expr_var_t;
 
-extern lab_ast_expr_var_t* lab_ast_expr_var_make(lab_mempool_t* pool, const char* name, size_t name_len);
+extern lab_ast_expr_var_t* lab_ast_expr_var_make(lab_mempool_t* pool, const char* name);
 
 typedef struct lab_ast_expr_bin_t {
 
@@ -61,4 +61,37 @@ typedef struct lab_ast_expr_call_t {
 
 } lab_ast_expr_call_t;
 
-extern lab_ast_expr_call_t* lab_ast_expr_call_make(lab_mempool_t* pool, char* callee, size_t name_len, lab_ast_expr_t* args, size_t argc);
+extern lab_ast_expr_call_t* lab_ast_expr_call_make(lab_mempool_t* pool, char* callee, lab_ast_expr_t* args, size_t argc);
+
+typedef struct lab_ast_parameter_t {
+
+    char* name;
+
+    struct lab_ast_parameter_t* next;
+
+} lab_ast_parameter_t;
+
+extern lab_ast_parameter_t* lab_ast_parameter_make(lab_mempool_t* pool, char* name);
+
+typedef struct lab_ast_prototype_t {
+
+    char* name;
+    lab_ast_parameter_t* args;
+    size_t argc;
+
+    struct lab_ast_prototype_t* next;
+
+} lab_ast_prototype_t;
+
+extern lab_ast_prototype_t* lab_ast_prototype_make(lab_mempool_t* pool, lab_ast_parameter_t* args, size_t argc);
+
+typedef struct lab_ast_function_t {
+
+    lab_ast_prototype_t* head;
+    lab_ast_expr_t* body;
+
+    struct lab_ast_function_t* next;
+
+} lab_ast_function_t;
+
+extern lab_ast_function_t* lab_ast_function_make(lab_mempool_t* pool, lab_ast_prototype_t* head, lab_ast_expr_t* body);
