@@ -13,7 +13,7 @@ typedef enum lab_ast_expr_kind_e_t {
 
 typedef struct lab_ast_expr_t {
 
-    void* expr;
+    void*                 expr;
     lab_ast_expr_kind_e_t kind;
 
     struct lab_ast_expr_t* next;
@@ -23,7 +23,7 @@ typedef struct lab_ast_expr_t {
 extern lab_ast_expr_t* lab_ast_expr_make(lab_mempool_t* pool, void* expr, lab_ast_expr_kind_e_t kind);
 
 typedef struct lab_ast_expr_num_t {
-    
+
     bool is_float;
     union {
         size_t integer;
@@ -45,7 +45,7 @@ extern lab_ast_expr_var_t* lab_ast_expr_var_make(lab_mempool_t* pool, const char
 
 typedef struct lab_ast_expr_bin_t {
 
-    char op;             // Operator
+    char            op;  // Operator
     lab_ast_expr_t* lhs;
     lab_ast_expr_t* rhs;
 
@@ -55,8 +55,8 @@ extern lab_ast_expr_bin_t* lab_ast_expr_bin_make(lab_mempool_t* pool, char op, l
 
 typedef struct lab_ast_expr_call_t {
 
-    char* callee;
-    size_t argc;
+    char*           callee;
+    size_t          argc;
     lab_ast_expr_t* args;
 
 } lab_ast_expr_call_t;
@@ -75,9 +75,9 @@ extern lab_ast_parameter_t* lab_ast_parameter_make(lab_mempool_t* pool, char* na
 
 typedef struct lab_ast_prototype_t {
 
-    char* name;
+    char*                name;
     lab_ast_parameter_t* args;
-    size_t argc;
+    size_t               argc;
 
     struct lab_ast_prototype_t* next;
 
@@ -88,7 +88,7 @@ extern lab_ast_prototype_t* lab_ast_prototype_make(lab_mempool_t* pool, lab_ast_
 typedef struct lab_ast_function_t {
 
     lab_ast_prototype_t* head;
-    lab_ast_expr_t* body;
+    lab_ast_expr_t*      body;
 
     struct lab_ast_function_t* next;
 

@@ -392,8 +392,8 @@ bool symbol_callback(const lab_vec_t* code,
         case ')': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RPAREN,    NULL, iter->line, iter->column); break;
         case '[': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LBRACKET,  NULL, iter->line, iter->column); break;
         case ']': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RBRACKET,  NULL, iter->line, iter->column); break;
-        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LCURLY,   NULL, iter->line, iter->column); break;
-        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RCURLY,   NULL, iter->line, iter->column); break;
+        case '{': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_LCURLY,    NULL, iter->line, iter->column); break;
+        case '}': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_RCURLY,    NULL, iter->line, iter->column); break;
         case '.': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_DECIMAL,   NULL, iter->line, iter->column); break;
         case ',': lab_lexer_token_container_append(tokens, code, iter->iter, (int)LAB_TOK_COMMA,     NULL, iter->line, iter->column); break;
         case ':': {
@@ -417,7 +417,7 @@ bool symbol_callback(const lab_vec_t* code,
 }
 
 bool operator_callback_rule(char c) { return (c=='+' || c=='-' || c=='*' || c=='/' || c=='=' || c=='^' ||
-                                                     c=='&' || c=='<' || c=='>' || c=='|'); }
+                                                     c=='&' || c=='<' || c=='>' || c=='|' || c=='!'); }
 bool operator_callback(const lab_vec_t* code,
                               lab_lexer_iterator_t* iter, 
                               lab_lexer_token_container_t* tokens, 

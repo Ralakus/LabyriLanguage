@@ -1,0 +1,11 @@
+program -> declaration* EOF ;
+
+statement -> exprStmt
+           | forStmt
+           | ifStmt
+           | returnStmt
+           | whileStmt
+           | block ;
+
+exprStmt -> expression ";" ;
+block    -> "{" declaration* "}" ;
