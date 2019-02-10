@@ -12,7 +12,7 @@ typedef struct lab_lexer_iter {
 void lab_lexer_iter_next(const char* code, lab_lexer_iter_t* iter);
 void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter);
 
-const char* lab_token_to_string_lookup[46];
+const char* lab_token_to_string_lookup[47];
 
 typedef struct lab_lexer_token {
     lab_tokens_e_t type;

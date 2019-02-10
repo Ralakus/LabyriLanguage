@@ -33,6 +33,6 @@ Since the language is under development, there will only be 2 basic types at fir
 
 # Sample syntax 
 ```javascript
-x: str = "Hello world!"; // Test variable
+x: str = "Hello world!"; # Test variable
 print(x + "\n");
 ```

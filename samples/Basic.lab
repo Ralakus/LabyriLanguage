@@ -3,8 +3,8 @@ Rectangle :: struct {
     width:  int64;
     height: int64;
 
-    new :: (self, width: int64, height: int64) -> Rectangle { // Delcaring a function named "new" will override the default constructor
-                                                              // This function will be static despite it having "self" in it's parameter list
+    new :: (self, width: int64, height: int64) -> Rectangle { # Delcaring a function named "new" will override the default constructor
+                                                              # This function will be static despite it having "self" in it's parameter list
         self.width  = width;
         self.height = height;
 
@@ -12,7 +12,7 @@ Rectangle :: struct {
 
     }
 
-    area :: (self) -> int64 { // Function must have "self" in it's parameter list to be non-static
+    area :: (self) -> int64 { # Function must have "self" in it's parameter list to be non-static
 
         return self.width * self.height;
 
@@ -26,15 +26,15 @@ main :: ( args: [] str ) -> int16 {
 
     x: str = "Hello world!";
 
-    print(x ++ "\n"); // ++ is the array AND string concat operator
+    print(x + "\n")
 
-    print("Area: {rect.area()}\n");
+    print("Area: \{rect.area()}\n");
 
     boolean: bool = true;
-    print("(labyritnh == awesome) {boolean}\n");
+    print("(labyritnh == awesome) \{boolean}\n");
 
     boolean = false;
-    print("(labyrinth == terrible) {boolean}\n");
+    print("(labyrinth == terrible) \{boolean}\n");
 
     return 0;
 

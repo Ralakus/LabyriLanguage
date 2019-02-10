@@ -3,6 +3,8 @@
 typedef enum lab_tokens_e {
     LAB_TOK_ERR,           //
 
+    LAB_TOK_COMMENT,       // #
+
     LAB_TOK_IDENTIFIER,    // 
     LAB_TOK_INTEGER,       // 
     LAB_TOK_FLOAT,         //

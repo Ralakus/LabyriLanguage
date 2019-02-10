@@ -1,6 +1,11 @@
 #include <string.h>
 #include "lexer.h"
 
+ #define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
 bool lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
     if(!lab_vec_init(&container->tokens, sizeof(lab_lexer_token_t), 0)) {
         return false;
@@ -24,7 +29,7 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
     ++container->tokens.used_size;
     if(container->tokens.used_size > container->tokens.alloc_size) {
         if(!lab_vec_resize(&container->tokens, (
-            container->tokens.used_size + (code_size / iter.i + (code_size % iter.i != 0))
+            container->tokens.used_size + (code_size / max(iter.i + (code_size % max(iter.i, 1) != 0), 1))
         ))) {
             lab_errorln("Failed to resize token container after %d tokens!", container->tokens.used_size);
             return false;
@@ -45,13 +50,14 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
 bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
 #define CREATE_TOK(tok_iter, tok, data, data_len) lab_lexer_token_container_append(container, code_len, tok_iter, tok, data, data_len)
+#define NEXT() lab_lexer_iter_next(code, &iter)
 
     size_t code_len = strlen(code);
     container->code = code;
 
     bool was_error = false;
 
-    for(lab_lexer_iter_t iter = {0,1,1}; iter.i < code_len; lab_lexer_iter_next(code, &iter)) {
+    for(lab_lexer_iter_t iter = {0,1,1}; iter.i < code_len;) {
 
         char cur_char = code[iter.i];
 
@@ -64,6 +70,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '\t':
             case '\v':
             case '\f':
+                NEXT();
                 break;
             
 
@@ -78,7 +85,14 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '7':
             case '8':
             case '9': {
-
+                lab_lexer_iter_t start = iter;
+                while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
+                if(code[iter.i] == '.') {
+                    while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
+                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
+                } else {
+                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
+                }
             }
             break;
 
@@ -136,7 +150,9 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case 'X':
             case 'Y':
             case 'Z': {
-
+                lab_lexer_iter_t start = iter;
+                while(NEXT(), (code[iter.i] >= 'a' && code[iter.i] <= 'z') || (code[iter.i] >= 'A' && code[iter.i] <= 'Z'));
+                CREATE_TOK(start, LAB_TOK_IDENTIFIER, &code[start.i], iter.i - start.i);
             }
             break;
 
@@ -144,48 +160,63 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '\'':
             case '\"': {
                 lab_lexer_iter_t start = iter;
-                while(lab_lexer_iter_next(code, &iter), code[iter.i] != '"') {
-                    if(iter.i == '\0') {
+                NEXT();
+                while(code[iter.i] != '\"') {
+                    if(code[iter.i + 1] == '\0') {
                         was_error = true;
                         lab_errorln("Failed to find end of string declared at line: %d, column: %d!", start.line, start.column);
+                        CREATE_TOK(start, LAB_TOK_ERR, NULL, 0);
                         break;
+                    } else {
+                        NEXT();
                     }
                 }
-                CREATE_TOK(start, LAB_TOK_STRING, &code[start.i + 1], iter.i - start.i - 1);
+                if(!was_error) {
+                    CREATE_TOK(start, LAB_TOK_STRING, &code[start.i + 1], iter.i - start.i - 1);
+                    NEXT();
+                }
             }
             break;
 
             // Operators
-            case '+':
-            case '-':
-            case '*':
-            case '/':
-            case '=':
-            case '<':
-            case '>':
-                break;
+            case '+': CREATE_TOK(iter, LAB_TOK_OPERATOR_ADD,      NULL, 0); NEXT(); break;
+            case '-': CREATE_TOK(iter, 
+                (code[iter.i + 1] == '>' ? (NEXT(), LAB_TOK_RARROW) : LAB_TOK_OPERATOR_SUB),
+                NULL, 0); break;
+            case '*': CREATE_TOK(iter, LAB_TOK_OPERATOR_MUL,      NULL, 0); NEXT(); break;
+            case '/': CREATE_TOK(iter, LAB_TOK_OPERATOR_DIV,      NULL, 0); NEXT(); break;
+            case '=': CREATE_TOK(iter, LAB_TOK_OPERATOR_EQUALS,   NULL, 0); NEXT(); break;
+            case '<': CREATE_TOK(iter, LAB_TOK_OPERATOR_LESST,    NULL, 0); NEXT(); break;
+            case '>': CREATE_TOK(iter, LAB_TOK_OPERATOR_GREATERT, NULL, 0); NEXT(); break;
 
             // Symbols
-            case '(':
-            case ')':
-            case '{':
-            case '}':
-            case '[':
-            case ']':
-            case '.':
-            case ',':
-            case ':':
-            case ';':
-                break;
+            case '(': CREATE_TOK(iter, LAB_TOK_LPAREN,    NULL, 0); NEXT(); break;
+            case ')': CREATE_TOK(iter, LAB_TOK_RPAREN,    NULL, 0); NEXT(); break;
+            case '{': CREATE_TOK(iter, LAB_TOK_LCURLY,    NULL, 0); NEXT(); break;
+            case '}': CREATE_TOK(iter, LAB_TOK_RCURLY,    NULL, 0); NEXT(); break;
+            case '[': CREATE_TOK(iter, LAB_TOK_LBRACKET,  NULL, 0); NEXT(); break;
+            case ']': CREATE_TOK(iter, LAB_TOK_RBRACKET,  NULL, 0); NEXT(); break;
+            case '.': CREATE_TOK(iter, LAB_TOK_DECIMAL,   NULL, 0); NEXT(); break;
+            case ',': CREATE_TOK(iter, LAB_TOK_COMMA,     NULL, 0); NEXT(); break;
+            case ':': CREATE_TOK(iter, LAB_TOK_COLON,     NULL, 0); NEXT(); break;
+            case ';': CREATE_TOK(iter, LAB_TOK_SEMICOLON, NULL, 0); NEXT(); break;
+
+            // Comment
+            case '#': {
+                lab_lexer_iter_t start = iter;
+                while(NEXT(), code[iter.i] != '\n');
+                CREATE_TOK(start, LAB_TOK_COMMENT, &code[start.i + 1], iter.i - start.i - 1);
+            }
+            break;
 
             // End of string
-            case '\0':
-                break;
+            case '\0': CREATE_TOK(iter, LAB_TOK_EOF, NULL, 0); NEXT(); break;
 
             // Other
             default:
                 lab_errorln("Unexpected character \'%c\' at line: %d, column: %d", cur_char, iter.line, iter.column);
                 was_error = true;
+                NEXT();
                 break;
 
         }
@@ -242,8 +273,10 @@ void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter) {
 
 }
 
-const char* lab_token_to_string_lookup[46] = {
+const char* lab_token_to_string_lookup[47] = {
     "error",               // LAB_TOK_ERR
+
+    "comment",             // LAB_TOK_COMMENT
 
     "identifier",          // LAB_TOK_IDENTIFIER
     "integer",             // LAB_TOK_INTEGER
@@ -286,7 +319,6 @@ const char* lab_token_to_string_lookup[46] = {
     "or",                  // LAB_TOK_KW_OR
     "not",                 // LAB_TOK_KW_NOT,    
 
-
     "+",                   // LAB_TOK_OPERATOR_ADD
     "-",                   // LAB_TOK_OPERATOR_SUB
     "*",                   // LAB_TOK_OPERATOR_MUL
@@ -313,8 +345,8 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
 
     lab_noticeln(LAB_ANSI_COLOR_CYAN"%.22s%s-|-%.32sline, column"LAB_ANSI_COLOR_RESET, PRINT_LINE, "Token type", "Token data"PRINT_LINE);
 
-    for(size_t j = 0; j < container->tokens.used_size; j++) {
-        lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, j);
+    for(size_t i = 0; i < container->tokens.used_size; i++) {
+        lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, i);
 
         if(tok->type == LAB_TOK_ERR) {
             lab_errorln(LAB_ANSI_COLOR_RED"%25.25s""%7.25s"

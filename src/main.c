@@ -3,12 +3,10 @@
 
 int main(int argc, const char* argv[]) {
 
-
-
     lab_lexer_token_container_t tokens;
     lab_lexer_token_container_init(&tokens);
     
-    char code[] = "x: str = \"Hello world!\"; // Test variable\nprint(x + \"\\n\");";
+    char code[] = "x: str = \"Hello world!\"; # Test variable\nprint(x + \"\\n\");";
 
     lab_lexer_lex(&tokens, code);
 
