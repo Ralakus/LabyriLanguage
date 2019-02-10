@@ -205,7 +205,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             // Comment
             case '#': {
                 lab_lexer_iter_t start = iter;
-                while(NEXT(), code[iter.i] != '\n');
+                while(NEXT(), (code[iter.i] != '\n' && code[iter.i] != '\0'));
                 CREATE_TOK(start, LAB_TOK_COMMENT, &code[start.i + 1], iter.i - start.i - 1);
             }
             break;
