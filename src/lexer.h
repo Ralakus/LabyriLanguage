@@ -3,6 +3,8 @@
 #include "tokens.h"
 #include <lab/vector.h>
 
+const char* lab_token_to_string_lookup[45];
+
 typedef struct lab_lexer_token {
     lab_tokens_e_t type;
     const char* data;
