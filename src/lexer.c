@@ -16,17 +16,15 @@ void lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
 
 bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
                                       size_t code_size,
-                                      size_t iter,
+                                      lab_lexer_iter_t iter,
                                       lab_tokens_e_t type,
                                       const char* data,
-                                      size_t data_len,
-                                      size_t line,
-                                      size_t column) {
+                                      size_t data_len) {
 
     ++container->tokens.used_size;
     if(container->tokens.used_size > container->tokens.alloc_size) {
         if(!lab_vec_resize(&container->tokens, (
-            container->tokens.used_size + (code_size / iter + (code_size % iter != 0))
+            container->tokens.used_size + (code_size / iter.i + (code_size % iter.i != 0))
         ))) {
             lab_errorln("Failed to resize token container after %d tokens!", container->tokens.used_size);
             return false;
@@ -37,61 +35,19 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
     tok->type     = type;
     tok->data     = data;
     tok->data_len = data_len;
-    tok->line     = line;
-    tok->column   = column;
+    tok->line     = iter.line;
+    tok->column   = iter.column;
 
     return true;
 
 }
 
-typedef struct lab_lexer_iter {
-    size_t i;
-    size_t line;
-    size_t column;
-} lab_lexer_iter_t;
-
-void lab_lexer_iter_next(const char* code, lab_lexer_iter_t* iter) {
-
-    ++iter->i;
-
-    if(code[iter->i] == '\n') {
-
-        ++iter->line;
-          iter->column = 0;
-
-    } else {
-
-        ++iter->column;
-    }
-
-}
-
-void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter) {
-
-    --iter->i;
-
-    if(code[iter->i] == '\n') {
-
-        --iter->line;
-          iter->column = 1;
-        for(size_t i = iter->i; i > 0; i--) {
-            if(code[i] == '\n') {
-                break;
-            } else {
-                ++iter->column;
-            }
-        }
-
-    } else {
-
-        --iter->column;
-
-    }
-
-}
-
 bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
+
+#define CREATE_TOK(tok_iter, tok, data, data_len) lab_lexer_token_container_append(container, code_len, tok_iter, tok, data, data_len)
+
     size_t code_len = strlen(code);
+    container->code = code;
 
     bool was_error = false;
 
@@ -187,7 +143,15 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             // String
             case '\'':
             case '\"': {
-
+                lab_lexer_iter_t start = iter;
+                while(lab_lexer_iter_next(code, &iter), code[iter.i] != '"') {
+                    if(iter.i == '\0') {
+                        was_error = true;
+                        lab_errorln("Failed to find end of string declared at line: %d, column: %d!", start.line, start.column);
+                        break;
+                    }
+                }
+                CREATE_TOK(start, LAB_TOK_STRING, &code[start.i + 1], iter.i - start.i - 1);
             }
             break;
 
@@ -234,9 +198,51 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
         return false;
     }
 
+#undef CREATE_TOK
+
 }
 
-const char* lab_token_to_string_lookup[45] = {
+void lab_lexer_iter_next(const char* code, lab_lexer_iter_t* iter) {
+
+    ++iter->i;
+
+    if(code[iter->i] == '\n') {
+
+        ++iter->line;
+          iter->column = 0;
+
+    } else {
+
+        ++iter->column;
+    }
+
+}
+
+void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter) {
+
+    --iter->i;
+
+    if(code[iter->i] == '\n') {
+
+        --iter->line;
+          iter->column = 1;
+        for(size_t i = iter->i; i > 0; i--) {
+            if(code[i] == '\n') {
+                break;
+            } else {
+                ++iter->column;
+            }
+        }
+
+    } else {
+
+        --iter->column;
+
+    }
+
+}
+
+const char* lab_token_to_string_lookup[46] = {
     "error",               // LAB_TOK_ERR
 
     "identifier",          // LAB_TOK_IDENTIFIER
@@ -299,4 +305,48 @@ const char* lab_token_to_string_lookup[45] = {
     */
 
     "end of file",         // LAB_TOK_EOF
+};
+
+void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
+
+#define PRINT_LINE "-------------------------------------------------------------------------"
+
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"%.22s%s-|-%.32sline, column"LAB_ANSI_COLOR_RESET, PRINT_LINE, "Token type", "Token data"PRINT_LINE);
+
+    for(size_t j = 0; j < container->tokens.used_size; j++) {
+        lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, j);
+
+        if(tok->type == LAB_TOK_ERR) {
+            lab_errorln(LAB_ANSI_COLOR_RED"%25.25s""%7.25s"
+                        " : "
+                        "%-32.*s"LAB_ANSI_COLOR_RESET
+                        "("
+                        LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                        ", "
+                        LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                        ")",
+                        PRINT_LINE, "<ERROR>", tok->data_len, tok->data, tok->line, tok->column
+            );
+        } else {
+
+            lab_println(LAB_ANSI_COLOR_GREEN"%32.32s"LAB_ANSI_COLOR_RESET
+                        " : "
+                        LAB_ANSI_COLOR_YELLOW"%-32.*s"LAB_ANSI_COLOR_RESET
+                        "("
+                        LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                        ", "
+                        LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
+                        ")",
+                        lab_token_to_string_lookup[tok->type], tok->data_len == 0 ? 1 : tok->data_len, tok->data == NULL ? " " : tok->data, tok->line, tok->column
+            );
+
+        }
+
+    }
+
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"%.32s---%.32s------------"LAB_ANSI_COLOR_RESET, PRINT_LINE, PRINT_LINE);
+
+
+#undef PRINT_LINE
+
 }

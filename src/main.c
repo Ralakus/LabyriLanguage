@@ -3,6 +3,19 @@
 
 int main(int argc, const char* argv[]) {
 
+
+
+    lab_lexer_token_container_t tokens;
+    lab_lexer_token_container_init(&tokens);
+    
+    char code[] = "x: str = \"Hello world!\"; // Test variable\nprint(x + \"\\n\");";
+
+    lab_lexer_lex(&tokens, code);
+
+    lab_lexer_token_container_print(&tokens);
+
+    lab_lexer_token_container_free(&tokens);
+
     lab_vm_t vm;
     lab_vm_init(&vm);
 

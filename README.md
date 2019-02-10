@@ -33,9 +33,6 @@ Since the language is under development, there will only be 2 basic types at fir
 
 # Sample syntax 
 ```javascript
-main :: (args: [] str) {
-    x: str = "Hello world!"; // Test variable
-    print(x ++ "\n");
-    return 0;
-}
+x: str = "Hello world!"; // Test variable
+print(x + "\n");
 ```
