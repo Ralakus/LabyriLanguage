@@ -17,6 +17,7 @@ bool lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
 
 void lab_lexer_token_container_free(lab_lexer_token_container_t* container) {
     lab_vec_free(&container->tokens);
+    container->code = NULL;
 }
 
 bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
