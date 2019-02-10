@@ -6,8 +6,8 @@
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
 
-bool lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
-    if(!lab_vec_init(&container->tokens, sizeof(lab_lexer_token_t), 0)) {
+bool lab_lexer_token_container_init(lab_lexer_token_container_t* container, size_t init_size) {
+    if(!lab_vec_init(&container->tokens, sizeof(lab_lexer_token_t), init_size)) {
         return false;
     } else {
         container->code = NULL;
@@ -70,7 +70,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
     bool was_error = false;
 
-    for(lab_lexer_iter_t iter = {0,1,1}; iter.i < code_len;) {
+    for(lab_lexer_iter_t iter = {0,1,1}; iter.i < code_len + 1;) {
 
         char cur_char = code[iter.i];
 

@@ -51,7 +51,7 @@ size_t lab_vm_bytecode_write_constant(lab_vm_bytecode_t* bytecode, lab_vm_value_
 }
 
 void lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name) {
-    lab_noticeln("--== %s ==--", name);
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"--== %s ==--"LAB_ANSI_COLOR_RESET, name);
 
     for(size_t i = 0; i < lab_vec_size(&bytecode->bytes);) {
         i = lab_vm_bytecode_dissassemble_instruction(bytecode, i);
@@ -60,29 +60,29 @@ void lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name)
 }
 
 static size_t lab_vm_bytecode_dissassemble_instruction_simple(const char* name, size_t index) {
-    lab_print_raw("%s\n", name);
+    lab_print_raw(LAB_ANSI_COLOR_GREEN"%s\n"LAB_ANSI_COLOR_RESET, name);
     return index + 1;
 }
 
 static size_t lab_vm_bytecode_dissassemble_instruction_constant(const char* name, lab_vm_bytecode_t* bytecode, size_t index) {
     uint8_t constant = *(uint8_t*)lab_vec_at(&bytecode->bytes, index + 1);
-    lab_print_raw("%-16s %4d \'", name, constant);
+    lab_print_raw(LAB_ANSI_COLOR_GREEN"%-16s "LAB_ANSI_COLOR_YELLOW"%4d \'", name, constant);
     lab_vm_value_print(*(lab_vm_value_t*)lab_vec_at(&bytecode->constants, constant));
-    lab_print_raw("\'\n");
+    lab_print_raw("\'\n"LAB_ANSI_COLOR_RESET);
     return index + 2;
 }
 
 size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, size_t index) {
-    lab_print("%04d ", index);
+    lab_print(LAB_ANSI_COLOR_RED"%04d ", index);
 
     if(index > 0) {
         if(*(int*)lab_vec_at(&bytecode->lines, index) == *(int*)lab_vec_at(&bytecode->lines, index - 1)) {
-            lab_print_raw("   | ");
+            lab_print_raw("   | "LAB_ANSI_COLOR_RESET);
         } else {
-            lab_print_raw("%4d ", *(int*)lab_vec_at(&bytecode->lines, index));
+            lab_print_raw("%4d "LAB_ANSI_COLOR_RESET, *(int*)lab_vec_at(&bytecode->lines, index));
         }
     } else {
-        lab_print_raw("%4d ", *(int*)lab_vec_at(&bytecode->lines, index));
+        lab_print_raw("%4d "LAB_ANSI_COLOR_RESET, *(int*)lab_vec_at(&bytecode->lines, index));
     }
 
     uint8_t instruction = *(uint8_t*)lab_vec_at(&bytecode->bytes, index);
@@ -171,9 +171,9 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
         if(debug_trace) {
             lab_print("[STACK]:  ");
             for(lab_vm_value_t* slot = (lab_vm_value_t*)lab_vec_at_raw_alloc(&vm->stack, 0); slot < vm->stack_top; slot++) {
-                lab_print_raw("[ ");
+                lab_print_raw(LAB_ANSI_COLOR_YELLOW"[ ");
                 lab_vm_value_print(*slot);
-                lab_print_raw(" ]");
+                lab_print_raw(" ]"LAB_ANSI_COLOR_RESET);
             }
             lab_print_raw("\n");
             lab_vm_bytecode_dissassemble_instruction(vm->bytecode, (size_t)(vm->ip - (uint8_t*)lab_vec_at(&vm->bytecode->bytes, 0)));
@@ -214,9 +214,9 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
             break;
 
             case LAB_VM_OP_RETURN: {
-                lab_success("[RETURN]: ");
+                lab_success("[RETURN]: "LAB_ANSI_COLOR_YELLOW);
                 lab_vm_value_print(lab_vm_pop(vm));
-                lab_print_raw("\n");
+                lab_print_raw("\n"LAB_ANSI_COLOR_RESET);
                 return LAB_VM_INTERPRET_RESULT_SUCCESS;
             }
             break;

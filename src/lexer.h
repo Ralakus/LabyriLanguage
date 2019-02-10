@@ -27,7 +27,7 @@ typedef struct lab_lexer_token_container {
     const char* code;
 } lab_lexer_token_container_t;
 
-bool lab_lexer_token_container_init(lab_lexer_token_container_t* container);
+bool lab_lexer_token_container_init(lab_lexer_token_container_t* container, size_t init_size);
 void lab_lexer_token_container_free(lab_lexer_token_container_t* container);
 
 bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,

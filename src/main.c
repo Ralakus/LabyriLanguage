@@ -1,10 +1,12 @@
 #include "lexer.h"
 #include "vm.h"
 
+#include <stdio.h>
+
 int main(int argc, const char* argv[]) {
 
     lab_lexer_token_container_t tokens;
-    lab_lexer_token_container_init(&tokens);
+    lab_lexer_token_container_init(&tokens, 16);
     
     char code[] = "x: str = \"Hello world!\"; # Test variable\nprint(x + \"\\n\");";
     char code2[] = "return -(14.0 + 0.48)";
@@ -14,6 +16,19 @@ int main(int argc, const char* argv[]) {
     lab_lexer_token_container_print(&tokens);
 
     lab_lexer_token_container_free(&tokens);
+
+    /*char line[1024];
+    for(;;) {
+        lab_print("> ");
+        if (!fgets(line, sizeof(line), stdin)) {
+            lab_print_raw("\n");
+            break;
+        }
+        lab_lexer_token_container_init(&tokens, 16);
+        lab_lexer_lex(&tokens, line);
+        lab_lexer_token_container_print(&tokens);
+        lab_lexer_token_container_free(&tokens);
+    }*/
 
     lab_vm_t vm;
     lab_vm_init(&vm);
@@ -42,7 +57,7 @@ int main(int argc, const char* argv[]) {
 
     lab_vm_bytecode_dissassemble(&bytecode, "Test");
 
-    lab_noticeln("--== Run Test ==--");
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Run Test ==--"LAB_ANSI_COLOR_RESET);
 
     if(lab_vm_interpret_bytecode(&vm, &bytecode, true) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
         lab_errorln("Failed to execute bytecode!");
