@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tokens.h"
-#include "lab/vector.h"
+#include <lab/vector.h>
 
 typedef struct lab_lexer_token {
     lab_tokens_e_t type;
@@ -27,3 +27,5 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
                                       size_t data_len,
                                       size_t line,
                                       size_t column);
+
+bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code);

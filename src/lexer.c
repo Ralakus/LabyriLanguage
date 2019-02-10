@@ -1,3 +1,4 @@
+#include <string.h>
 #include "lexer.h"
 
 bool lab_lexer_token_container_init(lab_lexer_token_container_t* container) {
@@ -40,5 +41,13 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
     tok->column   = column;
 
     return true;
+
+}
+
+bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
+    size_t code_len = strlen(code);
+
+    
+    
 
 }
