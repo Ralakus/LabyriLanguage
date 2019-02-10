@@ -7,8 +7,9 @@ int main(int argc, const char* argv[]) {
     lab_lexer_token_container_init(&tokens);
     
     char code[] = "x: str = \"Hello world!\"; # Test variable\nprint(x + \"\\n\");";
+    char code2[] = "return -(14.0 + 0.48)";
 
-    lab_lexer_lex(&tokens, code);
+    lab_lexer_lex(&tokens, code2);
 
     lab_lexer_token_container_print(&tokens);
 

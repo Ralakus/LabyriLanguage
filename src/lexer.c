@@ -183,7 +183,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '+': CREATE_TOK(iter, LAB_TOK_OPERATOR_ADD,      NULL, 0); NEXT(); break;
             case '-': CREATE_TOK(iter, 
                 (code[iter.i + 1] == '>' ? (NEXT(), LAB_TOK_RARROW) : LAB_TOK_OPERATOR_SUB),
-                NULL, 0); break;
+                NULL, 0); NEXT(); break;
             case '*': CREATE_TOK(iter, LAB_TOK_OPERATOR_MUL,      NULL, 0); NEXT(); break;
             case '/': CREATE_TOK(iter, LAB_TOK_OPERATOR_DIV,      NULL, 0); NEXT(); break;
             case '=': CREATE_TOK(iter, LAB_TOK_OPERATOR_EQUALS,   NULL, 0); NEXT(); break;
