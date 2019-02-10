@@ -48,6 +48,18 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
 
 }
 
+static inline bool match_str_rest(const char* str, size_t expected_len, size_t start, size_t length, const char* rest) {
+
+    if(expected_len == (start + length)) {
+        if(memcmp(str + start, rest, length) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
 #define CREATE_TOK(tok_iter, tok, data, data_len) lab_lexer_token_container_append(container, code_len, tok_iter, tok, data, data_len)
@@ -153,7 +165,212 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case 'Z': {
                 lab_lexer_iter_t start = iter;
                 while(NEXT(), (code[iter.i] >= 'a' && code[iter.i] <= 'z') || (code[iter.i] >= 'A' && code[iter.i] <= 'Z'));
-                CREATE_TOK(start, LAB_TOK_IDENTIFIER, &code[start.i], iter.i - start.i);
+                bool matched = false;
+                switch (code[start.i]) {
+
+                    case 's': {
+                        switch(code[start.i + 1]) {
+                            case 't': {
+                                switch(code[start.i + 2]) {
+                                    case 'r': {
+                                        if(iter.i - start.i == 3) {
+                                            CREATE_TOK(start, LAB_TOK_KW_STR, NULL, 0);
+                                            matched = true;
+                                            break;
+                                        }
+                                        else if(match_str_rest(&code[start.i], iter.i - start.i, 3, 3, "uct")) {
+                                            CREATE_TOK(start, LAB_TOK_KW_STRUCT, NULL, 0);
+                                            matched = true;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'e': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 2, "lf")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_SELF, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'r': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 5, "eturn")) {
+                            CREATE_TOK(start, LAB_TOK_KW_RETURN, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'i': {
+                        switch(code[start.i + 1]) {
+                            case 'f': {
+                                if(iter.i - start.i == 2) {
+                                    CREATE_TOK(start, LAB_TOK_KW_IF, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'n': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "t")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_INT, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'e': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 3, "lse")) {
+                            CREATE_TOK(start, LAB_TOK_KW_ELSE, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'n': {
+                        switch(code[start.i + 1]) {
+                            case 'o': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "t")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_NOT, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'i': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "l")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_NIL, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'f': {
+                        switch(code[start.i + 1]) {
+                            case 'o': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "r")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_FOR, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'a': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "lse")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_FALSE, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'l': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "oat")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_FLOAT, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'w': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 4, "hile")) {
+                            CREATE_TOK(start, LAB_TOK_KW_WHILE, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'b': {
+                        switch(code[start.i + 1]) {
+                            case 'r': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "eak")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_BREAK, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
+                            case 'o': {
+                                if(match_str_rest(&code[start.i], iter.i - start.i, 2, 2, "ol")) {
+                                    CREATE_TOK(start, LAB_TOK_KW_BOOL, NULL, 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'c': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 7, "ontinue")) {
+                            CREATE_TOK(start, LAB_TOK_KW_CONTINUE, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 't': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 3, "rue")) {
+                            CREATE_TOK(start, LAB_TOK_KW_TRUE, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'o': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 1, "r")) {
+                            CREATE_TOK(start, LAB_TOK_KW_OR, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    case 'a': {
+                        if(match_str_rest(&code[start.i], iter.i - start.i, 1, 2, "nd")) {
+                            CREATE_TOK(start, LAB_TOK_KW_AND, NULL, 0);
+                            matched = true;
+                            break;
+                        }
+                    }
+                    break;
+
+                    default:
+                        break;
+                }
+                if(!matched){
+                    CREATE_TOK(start, LAB_TOK_IDENTIFIER, &code[start.i], iter.i - start.i);
+                }
             }
             break;
 

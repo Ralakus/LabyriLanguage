@@ -24,7 +24,7 @@ add_subdirectory(lib/LabyriCUtils)
 target_link_libraries(lab PUBLIC LabCUtils)
 
 set(CMAKE_C_FLAGS_RELEASE "-O3 -flto")
-set(CMAKE_C_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage -fPIC -O0 -g")
+set(CMAKE_C_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage -fPIC -O0")
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)     # 64 bit
 
