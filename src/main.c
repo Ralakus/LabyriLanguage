@@ -63,10 +63,17 @@ int main(int argc, const char* argv[]) {
 
         lab_parser_parse(&parser, &tokens, &bytecode);
 
-        lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
-        if(lab_vm_interpret_bytecode(&vm, &bytecode, true) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
-            lab_errorln("Failed to execute bytecode!");
+        lab_vm_bytecode_dissassemble(&bytecode, "Bytecode");
+
+        if(!parser.was_error) {
+            lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
+            if(lab_vm_interpret_bytecode(&vm, &bytecode, true) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
+                lab_errorln("Failed to execute bytecode!");
+            }
+        } else {
+            lab_warnln("There was an error in compiling the input thus it will not be ran on the Virtual Machine");
         }
+
 
         lab_lexer_token_container_free(&tokens);
         lab_vm_bytecode_free(&bytecode);

@@ -164,7 +164,10 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case 'Y':
             case 'Z': {
                 lab_lexer_iter_t start = iter;
-                while(NEXT(), (code[iter.i] >= 'a' && code[iter.i] <= 'z') || (code[iter.i] >= 'A' && code[iter.i] <= 'Z'));
+                while(NEXT(), (code[iter.i] >= 'a' && code[iter.i] <= 'z') ||
+                              (code[iter.i] >= 'A' && code[iter.i] <= 'Z') ||
+                              (code[iter.i] >= '0' && code[iter.i] <= '9') ||
+                               code[iter.i] == '_');
                 bool matched = false;
                 switch (code[start.i]) {
 

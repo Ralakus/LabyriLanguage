@@ -34,13 +34,13 @@ static void error_at(lab_parser_t* parser, lab_lexer_token_t* token, const char*
 
     if(token->type == LAB_TOK_EOF) {
         lab_error_raw(" at end");
-    } else if(token->type = LAB_TOK_ERR) {
+    } else if(token->type == LAB_TOK_ERR) {
         // Nothing
     } else {
         if(token->type >= LAB_TOK_COMMENT && token->type <= LAB_TOK_STRING) {
             lab_error_raw(" at \"%.*s\"", token->data_len, token->data);
         } else {
-            lab_error_raw(" at \"%s\"", lab_token_to_string_lookup[token->type]);
+            lab_error_raw(" at %d \"%s\"", token->type, lab_token_to_string_lookup[token->type]);
         }
     }
 
@@ -49,7 +49,7 @@ static void error_at(lab_parser_t* parser, lab_lexer_token_t* token, const char*
 }
 
 static void error(lab_parser_t* parser, const char* message) {
-    error_at(parser, parser->current - 1, message);
+    error_at(parser, (parser->current - 1), message);
 }
 
 static void error_at_current(lab_parser_t* parser, const char* message) {
@@ -290,9 +290,9 @@ bool lab_parser_parse(lab_parser_t* parser, lab_lexer_token_container_t* tokens,
     consume(parser, LAB_TOK_EOF, "Expected end of expression!");
     emit_return(parser);
 
-    if(!parser->was_error) {
+    /*if(!parser->was_error) {
         lab_vm_bytecode_dissassemble(parser->bytecode, "Bytecode");
-    }
+    }*/
 
     return !parser->was_error;
 }
