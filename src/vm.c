@@ -88,31 +88,31 @@ size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, siz
     uint8_t instruction = *(uint8_t*)lab_vec_at(&bytecode->bytes, index);
     switch (instruction) {
         case LAB_VM_OP_CONSTANT: {
-            return lab_vm_bytecode_dissassemble_instruction_constant("OP_CONSTANT", bytecode, index);
+            return lab_vm_bytecode_dissassemble_instruction_constant("constant", bytecode, index);
         }
 
         case LAB_VM_OP_NEGATE: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_NEGATE", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("negate", index);
         }
 
         case LAB_VM_OP_ADD: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_ADD", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("add", index);
         }
 
         case LAB_VM_OP_SUBTRACT: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_SUBTRACT", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("subtract", index);
         }
 
         case LAB_VM_OP_MULTIPLY: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_MULTIPLY", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("multiply", index);
         }
     
         case LAB_VM_OP_DIVIDE: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_DIVIDE", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("divide", index);
         }
 
         case LAB_VM_OP_RETURN: {
-            return lab_vm_bytecode_dissassemble_instruction_simple("OP_RETURN", index);
+            return lab_vm_bytecode_dissassemble_instruction_simple("return", index);
         }
 
         default: {
@@ -169,7 +169,7 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
     for(;;) {
 
         if(debug_trace) {
-            lab_print("[STACK]:  ");
+            lab_print("[stack]:  ");
             for(lab_vm_value_t* slot = (lab_vm_value_t*)lab_vec_at_raw_alloc(&vm->stack, 0); slot < vm->stack_top; slot++) {
                 lab_print_raw(LAB_ANSI_COLOR_YELLOW"[ ");
                 lab_vm_value_print(*slot);
@@ -214,7 +214,7 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
             break;
 
             case LAB_VM_OP_RETURN: {
-                lab_success("[RETURN]: "LAB_ANSI_COLOR_YELLOW);
+                lab_success("[return]: "LAB_ANSI_COLOR_YELLOW);
                 lab_vm_value_print(lab_vm_pop(vm));
                 lab_print_raw("\n"LAB_ANSI_COLOR_RESET);
                 return LAB_VM_INTERPRET_RESULT_SUCCESS;

@@ -24,6 +24,10 @@ void lab_vm_value_print(lab_vm_value_t value);
 #define LAB_VM_VALUE_BOOL(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_BOOLEAN, { .boolean = value }})
 #define LAB_VM_VALUE_NUMBER(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_NUMBER, { .number = value }})
 
+#define LAB_VM_VALUE_IS_NIL(value) ((value).type == LAB_VM_VALUE_TYPE_NIL)
+#define LAB_VM_VALUE_IS_BOOL(value) ((value).type == LAB_VM_VALUE_TYPE_BOOLEAN)
+#define LAB_VM_VALUE_IS_NUMBER(value) ((value).type == LAB_VM_VALUE_TYPE_NUMBER)
+
 typedef struct lab_vm_bytecode {
     lab_vec_t bytes;
     lab_vec_t lines;

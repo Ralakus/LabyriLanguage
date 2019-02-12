@@ -5,8 +5,8 @@
 
 typedef struct lab_lexer_iter {
     size_t i;
-    size_t line;
-    size_t column;
+    int line;
+    int column;
 } lab_lexer_iter_t;
 
 void lab_lexer_iter_next(const char* code, lab_lexer_iter_t* iter);
@@ -18,8 +18,8 @@ typedef struct lab_lexer_token {
     lab_tokens_e_t type;
     const char* data;
     size_t data_len;
-    size_t line;
-    size_t column;
+    int line;
+    int column;
 } lab_lexer_token_t;
 
 typedef struct lab_lexer_token_container {

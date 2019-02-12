@@ -174,12 +174,12 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                                 switch(code[start.i + 2]) {
                                     case 'r': {
                                         if(iter.i - start.i == 3) {
-                                            CREATE_TOK(start, LAB_TOK_KW_STR, NULL, 0);
+                                            CREATE_TOK(start, LAB_TOK_KW_STR, &code[start.i], 0);
                                             matched = true;
                                             break;
                                         }
                                         else if(match_str_rest(&code[start.i], iter.i - start.i, 3, 3, "uct")) {
-                                            CREATE_TOK(start, LAB_TOK_KW_STRUCT, NULL, 0);
+                                            CREATE_TOK(start, LAB_TOK_KW_STRUCT, &code[start.i], 0);
                                             matched = true;
                                             break;
                                         }
@@ -191,7 +191,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'e': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 2, "lf")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_SELF, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_SELF, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -203,7 +203,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'r': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 5, "eturn")) {
-                            CREATE_TOK(start, LAB_TOK_KW_RETURN, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_RETURN, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -214,7 +214,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                         switch(code[start.i + 1]) {
                             case 'f': {
                                 if(iter.i - start.i == 2) {
-                                    CREATE_TOK(start, LAB_TOK_KW_IF, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_IF, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -223,7 +223,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'n': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "t")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_INT, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_INT, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -235,7 +235,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'e': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 3, "lse")) {
-                            CREATE_TOK(start, LAB_TOK_KW_ELSE, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_ELSE, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -246,7 +246,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                         switch(code[start.i + 1]) {
                             case 'o': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "t")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_NOT, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_NOT, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -255,7 +255,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'i': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "l")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_NIL, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_NIL, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -269,7 +269,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                         switch(code[start.i + 1]) {
                             case 'o': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "r")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_FOR, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_FOR, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -278,7 +278,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'a': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "lse")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_FALSE, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_FALSE, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -287,7 +287,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'l': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "oat")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_FLOAT, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_FLOAT, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -299,7 +299,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'w': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 4, "hile")) {
-                            CREATE_TOK(start, LAB_TOK_KW_WHILE, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_WHILE, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -310,7 +310,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                         switch(code[start.i + 1]) {
                             case 'r': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 3, "eak")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_BREAK, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_BREAK, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -319,7 +319,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                             case 'o': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 2, "ol")) {
-                                    CREATE_TOK(start, LAB_TOK_KW_BOOL, NULL, 0);
+                                    CREATE_TOK(start, LAB_TOK_KW_BOOL, &code[start.i], 0);
                                     matched = true;
                                     break;
                                 }
@@ -331,7 +331,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'c': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 7, "ontinue")) {
-                            CREATE_TOK(start, LAB_TOK_KW_CONTINUE, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_CONTINUE, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -340,7 +340,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 't': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 3, "rue")) {
-                            CREATE_TOK(start, LAB_TOK_KW_TRUE, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_TRUE, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -349,7 +349,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'o': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 1, "r")) {
-                            CREATE_TOK(start, LAB_TOK_KW_OR, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_OR, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -358,7 +358,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
 
                     case 'a': {
                         if(match_str_rest(&code[start.i], iter.i - start.i, 1, 2, "nd")) {
-                            CREATE_TOK(start, LAB_TOK_KW_AND, NULL, 0);
+                            CREATE_TOK(start, LAB_TOK_KW_AND, &code[start.i], 0);
                             matched = true;
                             break;
                         }
@@ -416,7 +416,9 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case ']': CREATE_TOK(iter, LAB_TOK_RBRACKET,  NULL, 0); NEXT(); break;
             case '.': CREATE_TOK(iter, LAB_TOK_DECIMAL,   NULL, 0); NEXT(); break;
             case ',': CREATE_TOK(iter, LAB_TOK_COMMA,     NULL, 0); NEXT(); break;
-            case ':': CREATE_TOK(iter, LAB_TOK_COLON,     NULL, 0); NEXT(); break;
+            case ':': CREATE_TOK(iter, 
+                (code[iter.i + 1] == ':' ? (NEXT(), LAB_TOK_DOUBLE_COLON) : LAB_TOK_COLON),
+                NULL, 0); NEXT(); break;
             case ';': CREATE_TOK(iter, LAB_TOK_SEMICOLON, NULL, 0); NEXT(); break;
 
             // Comment
@@ -587,7 +589,7 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
                         ", "
                         LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
                         ")",
-                        lab_token_to_string_lookup[tok->type], tok->data_len == 0 ? 1 : tok->data_len, tok->data == NULL ? " " : tok->data, tok->line, tok->column
+                        lab_token_to_string_lookup[tok->type], (tok->data_len == 0 ? 1 : tok->data_len) > 32 ? 32 : tok->data_len, tok->data == NULL ? " " : tok->data, tok->line, tok->column
             );
 
         }

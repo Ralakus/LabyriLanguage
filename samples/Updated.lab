@@ -1,0 +1,41 @@
+Rectangle :: struct {
+
+    width:  int;
+    height: int;
+
+    new :: (self, width: int, height: int) -> Rectangle { # Delcaring a function named "new" will override the default constructor
+                                                          # This function will be static despite it having "self" in it's parameter list
+        self.width  = width;
+        self.height = height;
+
+        return self;
+
+    }
+
+    area :: (self) -> int { # Function must have "self" in it's parameter list to be non-static
+
+        return self.width * self.height;
+
+    }
+
+}
+
+main :: ( args: [] str ) -> int {
+
+    rect: Rectangle = Rectangle.new(10, 15);
+
+    x: str = "Hello world!";
+
+    print(x + "\n")
+
+    print("Area: \{rect.area()}\n");
+
+    boolean: bool = true;
+    print("(labyritnh == awesome) \{boolean}\n");
+
+    boolean = false;
+    print("(labyrinth == terrible) \{boolean}\n");
+
+    return 0;
+
+}
