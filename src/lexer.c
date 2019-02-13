@@ -406,9 +406,15 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                 &code[iter.i], 0); NEXT(); break;
             case '*': CREATE_TOK(iter, LAB_TOK_OPERATOR_MUL,      &code[iter.i], 0); NEXT(); break;
             case '/': CREATE_TOK(iter, LAB_TOK_OPERATOR_DIV,      &code[iter.i], 0); NEXT(); break;
-            case '=': CREATE_TOK(iter, LAB_TOK_OPERATOR_EQUALS,   &code[iter.i], 0); NEXT(); break;
-            case '<': CREATE_TOK(iter, LAB_TOK_OPERATOR_LESST,    &code[iter.i], 0); NEXT(); break;
-            case '>': CREATE_TOK(iter, LAB_TOK_OPERATOR_GREATERT, &code[iter.i], 0); NEXT(); break;
+            case '=': CREATE_TOK(iter, 
+                (code[iter.i + 1] == '=' ? (NEXT(), LAB_TOK_OPERATOR_COMPARE) : LAB_TOK_OPERATOR_EQUALS),
+                &code[iter.i], 0); NEXT(); break;
+            case '<': CREATE_TOK(iter, 
+                (code[iter.i + 1] == '=' ? (NEXT(), LAB_TOK_OPERATOR_LESST_EQU) : LAB_TOK_OPERATOR_LESST),
+                &code[iter.i], 0); NEXT(); break;
+            case '>': CREATE_TOK(iter, 
+                (code[iter.i + 1] == '=' ? (NEXT(), LAB_TOK_OPERATOR_GREATERT_EQU) : LAB_TOK_OPERATOR_GREATERT),
+                &code[iter.i], 0); NEXT(); break;
 
             // Symbols
             case '(': CREATE_TOK(iter, LAB_TOK_LPAREN,    &code[iter.i], 0); NEXT(); break;
@@ -496,7 +502,7 @@ void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter) {
 
 }
 
-const char* lab_token_to_string_lookup[47] = {
+const char* lab_token_to_string_lookup[49] = {
     "error",               // LAB_TOK_ERR
 
     "comment",             // LAB_TOK_COMMENT
@@ -549,6 +555,8 @@ const char* lab_token_to_string_lookup[47] = {
     "=",                   // LAB_TOK_OPERATOR_EQUALS
     "<",                   // LAB_TOK_OPERATOR_LESST
     ">",                   // LAB_TOK_OPERATOR_GREATERT
+    "<=",                  // LAB_TOK_OPERATOR_LESST_EQU
+    ">=",                  // LAB_TOK_OPERATOR_GREATERT_EQU
     "==",                  // LAB_TOK_OPERATOR_COMPARE
     /*
     "!",                   // LAB_TOK_OPERATOR_NOT
@@ -566,7 +574,7 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
 
 #define PRINT_LINE "-------------------------------------------------------------------------"
 
-    lab_noticeln(LAB_ANSI_COLOR_CYAN"%.22s%s-|-%.32sline, column"LAB_ANSI_COLOR_RESET, PRINT_LINE, "Token type", "Token data"PRINT_LINE);
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"----------------------Token type-|-Token data----------------------line, column"LAB_ANSI_COLOR_RESET, PRINT_LINE);
 
     for(size_t i = 0; i < container->tokens.used_size; i++) {
         lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, i);
@@ -599,7 +607,7 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
 
     }
 
-    lab_noticeln(LAB_ANSI_COLOR_CYAN"%.32s---%.32s------------"LAB_ANSI_COLOR_RESET, PRINT_LINE, PRINT_LINE);
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"-------------------------------------------------------------------------------"LAB_ANSI_COLOR_RESET);
 
 
 #undef PRINT_LINE

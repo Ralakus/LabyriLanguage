@@ -47,23 +47,25 @@ typedef enum lab_tokens_e {
     LAB_TOK_KW_NOT,        // not
     
 
-    LAB_TOK_OPERATOR_ADD,       // +
-    LAB_TOK_OPERATOR_SUB,       // -
-    LAB_TOK_OPERATOR_MUL,       // *
-    LAB_TOK_OPERATOR_DIV,       // /
-    LAB_TOK_OPERATOR_EQUALS,    // =
-    LAB_TOK_OPERATOR_LESST,     // <
-    LAB_TOK_OPERATOR_GREATERT,  // >
-    LAB_TOK_OPERATOR_COMPARE,   // ==
+    LAB_TOK_OPERATOR_ADD,          // +
+    LAB_TOK_OPERATOR_SUB,          // -
+    LAB_TOK_OPERATOR_MUL,          // *
+    LAB_TOK_OPERATOR_DIV,          // /
+    LAB_TOK_OPERATOR_EQUALS,       // =
+    LAB_TOK_OPERATOR_LESST,        // <
+    LAB_TOK_OPERATOR_GREATERT,     // >
+    LAB_TOK_OPERATOR_LESST_EQU,    // <=
+    LAB_TOK_OPERATOR_GREATERT_EQU, // >=
+    LAB_TOK_OPERATOR_COMPARE,      // ==
     /*
-    LAB_TOK_OPERATOR_NOT,       // !
-    LAB_TOK_OPERATOR_BITSHIFTL, // <<
-    LAB_TOK_OPERATOR_BITSHIFTR, // >>
-    LAB_TOK_OPERATOR_BIT_XOR,   // ^
-    LAB_TOK_OPERATOR_BIT_AND,   // &
-    LAB_TOK_OPERATOR_BIT_OR,    // |
+    LAB_TOK_OPERATOR_NOT,          // !
+    LAB_TOK_OPERATOR_BITSHIFTL,    // <<
+    LAB_TOK_OPERATOR_BITSHIFTR,    // >>
+    LAB_TOK_OPERATOR_BIT_XOR,      // ^
+    LAB_TOK_OPERATOR_BIT_AND,      // &
+    LAB_TOK_OPERATOR_BIT_OR,       // |
     */
 
-    LAB_TOK_EOF,                // \0
+    LAB_TOK_EOF,                   // \0
 
 }   lab_tokens_e_t;

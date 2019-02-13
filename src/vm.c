@@ -1,5 +1,8 @@
 #include "vm.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+
 void lab_vm_value_print(lab_vm_value_t value) {
     switch (value.type) {
         case LAB_VM_VALUE_TYPE_NIL: 
@@ -7,16 +10,31 @@ void lab_vm_value_print(lab_vm_value_t value) {
         break;
 
         case LAB_VM_VALUE_TYPE_BOOLEAN:
-            if(value.as.boolean == true) {
-                lab_print_raw("true");
-            } else {
-                lab_print_raw("false");
-            }
+            lab_print_raw(value.as.boolean ? "true" : "false");
         break;
 
         case LAB_VM_VALUE_TYPE_NUMBER:
             lab_print_raw("%g", value.as.number);
         break;
+    }
+}
+
+bool lab_vm_value_is_falsey(lab_vm_value_t value) {
+    return LAB_VM_VALUE_IS_NIL(value) || (LAB_VM_VALUE_IS_BOOL(value) && !value.as.boolean);
+}
+
+bool lab_vm_value_is_equal(lab_vm_value_t a, lab_vm_value_t b) {
+    if(a.type == b.type) {
+        switch(a.type) {
+            case LAB_VM_VALUE_TYPE_NIL:
+                return true;
+            case LAB_VM_VALUE_TYPE_BOOLEAN: 
+                return a.as.boolean == b.as.boolean;
+            case LAB_VM_VALUE_TYPE_NUMBER:
+                return a.as.number == b.as.number;
+        }
+    } else {
+        return false;
     }
 }
 
@@ -91,8 +109,36 @@ size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, siz
             return lab_vm_bytecode_dissassemble_instruction_constant("constant", bytecode, index);
         }
 
+        case LAB_VM_OP_TRUE: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("boolean true", index);
+        }
+
+        case LAB_VM_OP_FALSE: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("boolean false", index);
+        }
+
+        case LAB_VM_OP_NIL: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("nil value", index);
+        }
+
+        case LAB_VM_OP_EQUAL: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("equal", index);
+        }
+
+        case LAB_VM_OP_GREATER: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("greater than", index);
+        }
+
+        case LAB_VM_OP_LESSER: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("lesser than", index);
+        }
+
         case LAB_VM_OP_NEGATE: {
             return lab_vm_bytecode_dissassemble_instruction_simple("negate", index);
+        }
+
+        case LAB_VM_OP_NOT: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("not", index);
         }
 
         case LAB_VM_OP_ADD: {
@@ -149,6 +195,21 @@ lab_vm_value_t lab_vm_pop(lab_vm_t* vm) {
     return *vm->stack_top;
 }
 
+lab_vm_value_t lab_vm_peek(lab_vm_t* vm, int distance) {
+    return vm->stack_top[-1 - distance];
+}
+
+static void runtime_error(lab_vm_t* vm, const char* fmt, ...) {
+    lab_error("[Instruction: %d]: ", *(int*)lab_vec_at(&vm->bytecode->lines, vm->ip - (uint8_t*)lab_vec_at(&vm->bytecode->bytes, 0)));
+
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(lab_error_stream(), fmt, args);
+    va_end(args);
+
+    lab_vm_reset_stack(vm);
+}
+
 lab_vm_interpret_result_e_t lab_vm_interpret_bytecode(lab_vm_t* vm, lab_vm_bytecode_t* bytecode, bool debug_trace) {
     vm->bytecode = bytecode;
     vm->ip = (uint8_t*)lab_vec_at(&vm->bytecode->bytes, 0);
@@ -159,11 +220,15 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
 
 #define READ_BYTE() (*vm->ip++)
 #define READ_CONSTANT() (*(lab_vm_value_t*)lab_vec_at(&vm->bytecode->constants, READ_BYTE()))
-#define BINARY_OP(op) \
+#define BINARY_OP(type, op) \
     do { \
-      double b = lab_vm_pop(vm).as.number; \
-      double a = lab_vm_pop(vm).as.number; \
-      lab_vm_push(vm, LAB_VM_VALUE_NUMBER(a op b)); \
+        if(!LAB_VM_VALUE_IS_NUMBER(lab_vm_peek(vm, 0)) || !LAB_VM_VALUE_IS_NUMBER(lab_vm_peek(vm, 1))) { \
+            runtime_error(vm, "Binary operands must be numbers\n"); \
+            return LAB_VM_INTERPRET_RESULT_RUNTIME_ERROR; \
+        } \
+        double b = lab_vm_pop(vm).as.number; \
+        double a = lab_vm_pop(vm).as.number; \
+        lab_vm_push(vm, type(a op b)); \
     } while (false)
 
     for(;;) {
@@ -188,28 +253,69 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
             }
             break;
 
+            case LAB_VM_OP_TRUE: {
+                lab_vm_push(vm, LAB_VM_VALUE_BOOL(true));
+            }
+            break;
+
+            case LAB_VM_OP_FALSE: {
+                lab_vm_push(vm, LAB_VM_VALUE_BOOL(false));
+            }
+            break;
+
+            case LAB_VM_OP_EQUAL: {
+                lab_vm_value_t a = lab_vm_pop(vm);
+                lab_vm_value_t b = lab_vm_pop(vm);
+                lab_vm_push(vm, LAB_VM_VALUE_BOOL(lab_vm_value_is_equal(a, b)));
+            }
+            break;
+
+            case LAB_VM_OP_GREATER: {
+                BINARY_OP(LAB_VM_VALUE_BOOL, >);
+            }
+            break;
+
+            case LAB_VM_OP_LESSER: {
+                BINARY_OP(LAB_VM_VALUE_BOOL, <);
+            }
+            break;
+
+            case LAB_VM_OP_NIL: {
+                lab_vm_push(vm, LAB_VM_VALUE_NIL);
+            }
+            break;
+
             case LAB_VM_OP_NEGATE: {
+                if(!LAB_VM_VALUE_IS_NUMBER(lab_vm_peek(vm, 0))) {
+                    runtime_error(vm, "Operand must be a number\n");
+                    return LAB_VM_INTERPRET_RESULT_RUNTIME_ERROR;
+                }
                 lab_vm_push(vm, LAB_VM_VALUE_NUMBER(-(lab_vm_pop(vm).as.number)));
             }
             break;
 
+            case LAB_VM_OP_NOT: {
+                lab_vm_push(vm, LAB_VM_VALUE_BOOL(lab_vm_value_is_falsey(lab_vm_pop(vm))));
+            }
+            break;
+
             case LAB_VM_OP_ADD: {
-                BINARY_OP(+);
+                BINARY_OP(LAB_VM_VALUE_NUMBER, +);
             }
             break;
 
             case LAB_VM_OP_SUBTRACT: {
-                BINARY_OP(-);
+                BINARY_OP(LAB_VM_VALUE_NUMBER, -);
             }
             break;
 
             case LAB_VM_OP_MULTIPLY: {
-                BINARY_OP(*);
+                BINARY_OP(LAB_VM_VALUE_NUMBER, *);
             }
             break;
         
             case LAB_VM_OP_DIVIDE: {
-                BINARY_OP(/);
+                BINARY_OP(LAB_VM_VALUE_NUMBER, /);
             }
             break;
 

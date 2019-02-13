@@ -18,7 +18,9 @@ typedef struct lab_vm_value {
     } as;
 } lab_vm_value_t;
 
-void lab_vm_value_print(lab_vm_value_t value);
+void lab_vm_value_print    (lab_vm_value_t value);
+bool lab_vm_value_is_falsey(lab_vm_value_t value);
+bool lab_vm_value_is_equal (lab_vm_value_t a, lab_vm_value_t b);
 
 #define LAB_VM_VALUE_NIL ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_NIL, { .number = 0 }})
 #define LAB_VM_VALUE_BOOL(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_BOOLEAN, { .boolean = value }})
@@ -40,13 +42,20 @@ void lab_vm_bytecode_free(lab_vm_bytecode_t* bytecode);
 
 
 typedef enum lab_vm_op_e {
-    LAB_VM_OP_CONSTANT,
-    LAB_VM_OP_NEGATE,
-    LAB_VM_OP_ADD,
-    LAB_VM_OP_SUBTRACT,
-    LAB_VM_OP_MULTIPLY,
-    LAB_VM_OP_DIVIDE,
-    LAB_VM_OP_RETURN,
+    LAB_VM_OP_CONSTANT, // Loads a constant value onto the stack, no longer constant once on the stack
+    LAB_VM_OP_NIL,      // Loads a nil value onto the stack
+    LAB_VM_OP_TRUE,     // Loads a boolean true value onto the stack
+    LAB_VM_OP_FALSE,    // Loads a boolean false value onto the stack
+    LAB_VM_OP_EQUAL,    // Checks if two values from stack are equal
+    LAB_VM_OP_GREATER,  // Checks if the second top value is greater than the top value
+    LAB_VM_OP_LESSER,   // Checks if the second top value is lesser than the top value
+    LAB_VM_OP_NEGATE,   // Negates a number ( - ) from stack
+    LAB_VM_OP_NOT,      // Not operator, ( ! )
+    LAB_VM_OP_ADD,      // Adds two numbers from stack
+    LAB_VM_OP_SUBTRACT, // Subtracts two numbers from stack
+    LAB_VM_OP_MULTIPLY, // Multiplies two numbers from stack
+    LAB_VM_OP_DIVIDE,   // Divies two numbers from the stack
+    LAB_VM_OP_RETURN,   // Returns the value at stack top and halts the program
 } lab_vm_op_e_t;
 
 bool lab_vm_bytecode_write_byte (lab_vm_bytecode_t* bytecode, int line, uint8_t  byte);
@@ -78,6 +87,7 @@ void lab_vm_reset_stack(lab_vm_t* vm);
 
 void           lab_vm_push(lab_vm_t* vm, lab_vm_value_t value);
 lab_vm_value_t lab_vm_pop (lab_vm_t* vm);
+lab_vm_value_t lab_vm_peek(lab_vm_t* vm, int distance);
 
 lab_vm_interpret_result_e_t lab_vm_interpret_bytecode(lab_vm_t* vm, lab_vm_bytecode_t* bytecode, bool debug_trace);
 lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace);
