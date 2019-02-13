@@ -386,7 +386,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                     if(code[iter.i + 1] == '\0') {
                         was_error = true;
                         lab_errorln("Failed to find end of string declared at line: %d, column: %d!", start.line, start.column);
-                        CREATE_TOK(start, LAB_TOK_ERR, &code[iter.i], 0);
+                        CREATE_TOK(start, LAB_TOK_ERR, &code[start.i], 0);
                         break;
                     } else {
                         NEXT();
@@ -580,15 +580,14 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
         lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, i);
 
         if(tok->type == LAB_TOK_ERR) {
-            lab_errorln(LAB_ANSI_COLOR_RED"%25.25s""%7.25s"
-                        " : "
+            lab_errorln(LAB_ANSI_COLOR_RED"-------------------------<ERROR> : "
                         "%-32.*s"LAB_ANSI_COLOR_RESET
                         "("
                         LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
                         ", "
                         LAB_ANSI_COLOR_RED"%4d"LAB_ANSI_COLOR_RESET
                         ")",
-                        PRINT_LINE, "<ERROR>", tok->data_len, tok->data, tok->line, tok->column
+                        tok->data_len, tok->data, tok->line, tok->column
             );
         } else {
 

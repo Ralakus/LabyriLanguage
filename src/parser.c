@@ -5,7 +5,6 @@
 void lab_parser_init(lab_parser_t* parser) {
     parser->container  = NULL;
     parser->current    = NULL;
-    parser->index      = 0;
     parser->bytecode   = NULL;
     parser->was_error  = false;
     parser->panic_mode = false;
@@ -14,7 +13,6 @@ void lab_parser_init(lab_parser_t* parser) {
 void lab_parser_free(lab_parser_t* parser) {
     parser->container  = NULL;
     parser->current    = NULL;
-    parser->index      = 0;
     parser->bytecode   = NULL;
     parser->was_error  = false;
     parser->panic_mode = false;
@@ -57,12 +55,11 @@ static void error_at_current(lab_parser_t* parser, const char* message) {
 }
 
 static void advance(lab_parser_t* parser) {
-    ++parser->index;
     ++parser->current;
 
-    /*if(parser->current->type == LAB_TOK_ERR) {
+    if(parser->current->type == LAB_TOK_ERR && (parser->current - (lab_lexer_token_t*)lab_vec_at(&parser->container->tokens, 0) < lab_vec_size(&parser->container->tokens))) {
         error_at_current(parser, parser->current->data);
-    }*/
+    }
 }
 
 static void consume(lab_parser_t* parser, lab_tokens_e_t token_type, const char* message) {

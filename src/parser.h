@@ -6,7 +6,6 @@
 typedef struct lab_parser {
     lab_lexer_token_container_t* container;
     lab_lexer_token_t* current;
-    size_t index;
     lab_vm_bytecode_t* bytecode;
     bool was_error;
     bool panic_mode;
