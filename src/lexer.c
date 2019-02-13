@@ -386,7 +386,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                     if(code[iter.i + 1] == '\0') {
                         was_error = true;
                         lab_errorln("Failed to find end of string declared at line: %d, column: %d!", start.line, start.column);
-                        CREATE_TOK(start, LAB_TOK_ERR, NULL, 0);
+                        CREATE_TOK(start, LAB_TOK_ERR, &code[iter.i], 0);
                         break;
                     } else {
                         NEXT();
@@ -400,29 +400,29 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             break;
 
             // Operators
-            case '+': CREATE_TOK(iter, LAB_TOK_OPERATOR_ADD,      NULL, 0); NEXT(); break;
+            case '+': CREATE_TOK(iter, LAB_TOK_OPERATOR_ADD,      &code[iter.i], 0); NEXT(); break;
             case '-': CREATE_TOK(iter, 
                 (code[iter.i + 1] == '>' ? (NEXT(), LAB_TOK_RARROW) : LAB_TOK_OPERATOR_SUB),
-                NULL, 0); NEXT(); break;
-            case '*': CREATE_TOK(iter, LAB_TOK_OPERATOR_MUL,      NULL, 0); NEXT(); break;
-            case '/': CREATE_TOK(iter, LAB_TOK_OPERATOR_DIV,      NULL, 0); NEXT(); break;
-            case '=': CREATE_TOK(iter, LAB_TOK_OPERATOR_EQUALS,   NULL, 0); NEXT(); break;
-            case '<': CREATE_TOK(iter, LAB_TOK_OPERATOR_LESST,    NULL, 0); NEXT(); break;
-            case '>': CREATE_TOK(iter, LAB_TOK_OPERATOR_GREATERT, NULL, 0); NEXT(); break;
+                &code[iter.i], 0); NEXT(); break;
+            case '*': CREATE_TOK(iter, LAB_TOK_OPERATOR_MUL,      &code[iter.i], 0); NEXT(); break;
+            case '/': CREATE_TOK(iter, LAB_TOK_OPERATOR_DIV,      &code[iter.i], 0); NEXT(); break;
+            case '=': CREATE_TOK(iter, LAB_TOK_OPERATOR_EQUALS,   &code[iter.i], 0); NEXT(); break;
+            case '<': CREATE_TOK(iter, LAB_TOK_OPERATOR_LESST,    &code[iter.i], 0); NEXT(); break;
+            case '>': CREATE_TOK(iter, LAB_TOK_OPERATOR_GREATERT, &code[iter.i], 0); NEXT(); break;
 
             // Symbols
-            case '(': CREATE_TOK(iter, LAB_TOK_LPAREN,    NULL, 0); NEXT(); break;
-            case ')': CREATE_TOK(iter, LAB_TOK_RPAREN,    NULL, 0); NEXT(); break;
-            case '{': CREATE_TOK(iter, LAB_TOK_LCURLY,    NULL, 0); NEXT(); break;
-            case '}': CREATE_TOK(iter, LAB_TOK_RCURLY,    NULL, 0); NEXT(); break;
-            case '[': CREATE_TOK(iter, LAB_TOK_LBRACKET,  NULL, 0); NEXT(); break;
-            case ']': CREATE_TOK(iter, LAB_TOK_RBRACKET,  NULL, 0); NEXT(); break;
-            case '.': CREATE_TOK(iter, LAB_TOK_DECIMAL,   NULL, 0); NEXT(); break;
-            case ',': CREATE_TOK(iter, LAB_TOK_COMMA,     NULL, 0); NEXT(); break;
+            case '(': CREATE_TOK(iter, LAB_TOK_LPAREN,    &code[iter.i], 0); NEXT(); break;
+            case ')': CREATE_TOK(iter, LAB_TOK_RPAREN,    &code[iter.i], 0); NEXT(); break;
+            case '{': CREATE_TOK(iter, LAB_TOK_LCURLY,    &code[iter.i], 0); NEXT(); break;
+            case '}': CREATE_TOK(iter, LAB_TOK_RCURLY,    &code[iter.i], 0); NEXT(); break;
+            case '[': CREATE_TOK(iter, LAB_TOK_LBRACKET,  &code[iter.i], 0); NEXT(); break;
+            case ']': CREATE_TOK(iter, LAB_TOK_RBRACKET,  &code[iter.i], 0); NEXT(); break;
+            case '.': CREATE_TOK(iter, LAB_TOK_DECIMAL,   &code[iter.i], 0); NEXT(); break;
+            case ',': CREATE_TOK(iter, LAB_TOK_COMMA,     &code[iter.i], 0); NEXT(); break;
             case ':': CREATE_TOK(iter, 
                 (code[iter.i + 1] == ':' ? (NEXT(), LAB_TOK_DOUBLE_COLON) : LAB_TOK_COLON),
-                NULL, 0); NEXT(); break;
-            case ';': CREATE_TOK(iter, LAB_TOK_SEMICOLON, NULL, 0); NEXT(); break;
+                &code[iter.i], 0); NEXT(); break;
+            case ';': CREATE_TOK(iter, LAB_TOK_SEMICOLON, &code[iter.i], 0); NEXT(); break;
 
             // Comment
             case '#': {
@@ -433,7 +433,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             break;
 
             // End of string
-            case '\0': CREATE_TOK(iter, LAB_TOK_EOF, NULL, 0); NEXT(); break;
+            case '\0': CREATE_TOK(iter, LAB_TOK_EOF, &code[iter.i], 0); NEXT(); break;
 
             // Other
             default:

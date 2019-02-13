@@ -7,7 +7,7 @@
 # Made in pure C11
 
 # Current state
-All that there is of the compiler is the lexer
+It can lex, parse, and run basic math expressions on it's virtual machine
 
 # Variable types
 Since the language is under development, there will only be 2 basic types at first ( int and float )
