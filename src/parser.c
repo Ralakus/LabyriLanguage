@@ -108,11 +108,11 @@ typedef enum precedence_e {
   PREC_ASSIGNMENT,  // =
   PREC_OR,          // or
   PREC_AND,         // and
-  PREC_UNARY,       // not -
   PREC_EQUALITY,    // == !=
   PREC_COMPARISON,  // < > <= >=
   PREC_TERM,        // + -
   PREC_FACTOR,      // * /
+  PREC_UNARY,       // not -
   PREC_CALL,        // . () []
   PREC_PRIMARY
 } precedence_e_t;
