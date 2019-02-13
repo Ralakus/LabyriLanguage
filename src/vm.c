@@ -90,6 +90,14 @@ static size_t lab_vm_bytecode_dissassemble_instruction_constant(const char* name
     return index + 2;
 }
 
+static size_t lab_vm_bytecode_dissassemble_instruction_constant_2_long(const char* name, lab_vm_bytecode_t* bytecode, size_t index) {
+    short constant = *(short*)lab_vec_at(&bytecode->bytes, index + 1);
+    lab_print_raw(LAB_ANSI_COLOR_GREEN"%-16s "LAB_ANSI_COLOR_YELLOW"%4d \'", name, constant);
+    lab_vm_value_print(*(lab_vm_value_t*)lab_vec_at(&bytecode->constants, constant));
+    lab_print_raw("\'\n"LAB_ANSI_COLOR_RESET);
+    return index + 3;
+}
+
 size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, size_t index) {
     lab_print(LAB_ANSI_COLOR_RED"%04d ", index);
 
@@ -107,6 +115,10 @@ size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, siz
     switch (instruction) {
         case LAB_VM_OP_CONSTANT: {
             return lab_vm_bytecode_dissassemble_instruction_constant("constant", bytecode, index);
+        }
+
+        case LAB_VM_OP_CONSTANT_2L: {
+            return lab_vm_bytecode_dissassemble_instruction_constant_2_long("constant long", bytecode, index);
         }
 
         case LAB_VM_OP_TRUE: {
@@ -249,6 +261,13 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
 
             case LAB_VM_OP_CONSTANT: {
                 lab_vm_value_t value = READ_CONSTANT();
+                lab_vm_push(vm, value);
+            }
+            break;
+
+            case LAB_VM_OP_CONSTANT_2L: {
+                lab_vm_value_t value = (*(lab_vm_value_t*)lab_vec_at(&vm->bytecode->constants, *(short*)(vm->ip++)));
+                ++vm->ip;
                 lab_vm_push(vm, value);
             }
             break;

@@ -83,18 +83,24 @@ static bool emit_return(lab_parser_t* parser) {
     return emit_byte(parser, LAB_VM_OP_RETURN);
 }
 
-static uint8_t make_constant(lab_parser_t* parser, lab_vm_value_t value) {
+static short make_constant(lab_parser_t* parser, lab_vm_value_t value) {
     int constant = lab_vm_bytecode_write_constant(parser->bytecode, value);
-    if(constant > UINT8_MAX) {
-        error(parser, "Too many constants in on chunk of bytecode");
+    if(constant > UINT16_MAX) {
+        error(parser, "Too many constants in on chunk of bytecode, exceeded 65535 constants");
         return 0;
     }
 
-    return (uint8_t)constant;
+    return (short)constant;
 }
 
 static bool emit_constant(lab_parser_t* parser, lab_vm_value_t value) {
-    return emit_bytes(parser, LAB_VM_OP_CONSTANT, make_constant(parser, value));
+    short index = make_constant(parser, value);
+    if(index <= UINT8_MAX) {
+        return emit_bytes(parser, LAB_VM_OP_CONSTANT, make_constant(parser, value));
+    } else {
+        return emit_byte(parser, LAB_VM_OP_CONSTANT_2L) &&
+               emit_bytes(parser, ((uint8_t*)&index)[0], ((uint8_t*)&index)[1]);
+    }
 }
 
 typedef enum precedence_e {                  

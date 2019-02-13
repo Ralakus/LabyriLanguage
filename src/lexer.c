@@ -1,10 +1,7 @@
 #include <string.h>
 #include "lexer.h"
 
- #define max(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
+#include <lab/math.h>
 
 bool lab_lexer_token_container_init(lab_lexer_token_container_t* container, size_t init_size) {
     if(!lab_vec_init(&container->tokens, sizeof(lab_lexer_token_t), init_size)) {
