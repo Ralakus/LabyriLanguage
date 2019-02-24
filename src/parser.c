@@ -1,6 +1,7 @@
 #include "parser.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 void lab_parser_init(lab_parser_t* parser) {
     parser->container  = NULL;
@@ -84,9 +85,14 @@ static bool emit_return(lab_parser_t* parser) {
 }
 
 static short make_constant(lab_parser_t* parser, lab_vm_value_t value) {
+    for(size_t i = 0; i < lab_vec_size(&parser->bytecode->constants); i++) {
+        if(memcmp(&value, (lab_vm_value_t*)lab_vec_at(&parser->bytecode->constants, i), sizeof(lab_vm_value_t))==0) {
+            return (short)i;
+        }
+    }
     int constant = lab_vm_bytecode_write_constant(parser->bytecode, value);
     if(constant > UINT16_MAX) {
-        error(parser, "Too many constants in on chunk of bytecode, exceeded 65535 constants");
+        error(parser, "Too many constants in one chunk of bytecode, exceeded 65535 constants");
         return 0;
     }
 
