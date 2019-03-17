@@ -52,6 +52,7 @@ typedef enum lab_vm_op_e {
     LAB_VM_OP_LESSER,        // Checks if the second top value is lesser than the top value
     LAB_VM_OP_NEGATE,        // Negates a number ( - ) from stack
     LAB_VM_OP_NOT,           // Not operator, ( ! )
+    LAB_VM_OP_AND,           // Boolean and operator ( and )
     LAB_VM_OP_ADD,           // Adds two numbers from stack
     LAB_VM_OP_SUBTRACT,      // Subtracts two numbers from stack
     LAB_VM_OP_MULTIPLY,      // Multiplies two numbers from stack

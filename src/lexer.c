@@ -221,6 +221,15 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                             }
                             break;
 
+                            case 's': {
+                                if(iter.i - start.i == 2) {
+                                    CREATE_TOK(start, LAB_TOK_KW_IS, &code[start.i], 0);
+                                    matched = true;
+                                    break;
+                                }
+                            }
+                            break;
+
                             case 'n': {
                                 if(match_str_rest(&code[start.i], iter.i - start.i, 2, 1, "t")) {
                                     CREATE_TOK(start, LAB_TOK_KW_INT, &code[start.i], 0);
@@ -431,7 +440,7 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '#': {
                 lab_lexer_iter_t start = iter;
                 while(NEXT(), (code[iter.i] != '\n' && code[iter.i] != '\0'));
-                CREATE_TOK(start, LAB_TOK_COMMENT, &code[start.i + 1], iter.i - start.i - 1);
+                //CREATE_TOK(start, LAB_TOK_COMMENT, &code[start.i + 1], iter.i - start.i - 1);
             }
             break;
 
@@ -499,7 +508,7 @@ void lab_lexer_iter_prev(const char* code, lab_lexer_iter_t* iter) {
 
 }
 
-const char* lab_token_to_string_lookup[49] = {
+const char* lab_token_to_string_lookup[50] = {
     "error",               // LAB_TOK_ERR
 
     "comment",             // LAB_TOK_COMMENT
@@ -543,7 +552,8 @@ const char* lab_token_to_string_lookup[49] = {
     "false",               // LAB_TOK_KW_FALSE
     "and",                 // LAB_TOK_KW_AND
     "or",                  // LAB_TOK_KW_OR
-    "not",                 // LAB_TOK_KW_NOT,    
+    "not",                 // LAB_TOK_KW_NOT,
+    "is",                  // LAB_TOK_KW_IS
 
     "+",                   // LAB_TOK_OPERATOR_ADD
     "-",                   // LAB_TOK_OPERATOR_SUB

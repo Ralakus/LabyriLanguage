@@ -80,6 +80,16 @@ int main(int argc, const char* argv[]) {
 
         lab_parser_parse(&parser, &tokens, &bytecode);
 
+        for(size_t i = 0; i < lab_vec_size(&bytecode.constants); i++) {
+            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.constants, i));
+        }
+        for(size_t i = 0; i < lab_vec_size(&bytecode.bytes); i++) {
+            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.bytes, i));
+        }
+        for(size_t i = 0; i < lab_vec_size(&bytecode.lines); i++) {
+            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.lines, i));
+        }
+
         end = clock();
 
         parse_time = ((double)(end - start)) / CLOCKS_PER_SEC;

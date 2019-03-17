@@ -71,6 +71,15 @@ size_t lab_vm_bytecode_write_constant(lab_vm_bytecode_t* bytecode, lab_vm_value_
 void lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name) {
     lab_noticeln(LAB_ANSI_COLOR_CYAN"--== %s ==--"LAB_ANSI_COLOR_RESET, name);
 
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"- Constants -"LAB_ANSI_COLOR_RESET);
+    for (size_t i = 0; i <lab_vec_size(&bytecode->constants); i++) {
+        lab_print(LAB_ANSI_COLOR_RED"%04d      "LAB_ANSI_COLOR_YELLOW, i);
+        lab_vm_value_print(*(lab_vm_value_t*)lab_vec_at(&bytecode->constants, i));
+        lab_println_raw(LAB_ANSI_COLOR_RESET);
+    }
+
+    lab_noticeln(LAB_ANSI_COLOR_CYAN"- Instructions -"LAB_ANSI_COLOR_RESET);
+
     for(size_t i = 0; i < lab_vec_size(&bytecode->bytes);) {
         i = lab_vm_bytecode_dissassemble_instruction(bytecode, i);
     }
@@ -151,6 +160,10 @@ size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, siz
 
         case LAB_VM_OP_NOT: {
             return lab_vm_bytecode_dissassemble_instruction_simple("not", index);
+        }
+
+        case LAB_VM_OP_AND: {
+            return lab_vm_bytecode_dissassemble_instruction_simple("and", index);
         }
 
         case LAB_VM_OP_ADD: {
@@ -315,6 +328,18 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
 
             case LAB_VM_OP_NOT: {
                 lab_vm_push(vm, LAB_VM_VALUE_BOOL(lab_vm_value_is_falsey(lab_vm_pop(vm))));
+            }
+            break;
+
+            case LAB_VM_OP_AND: {
+                 if(!LAB_VM_VALUE_IS_BOOL(lab_vm_peek(vm, 0)) || !LAB_VM_VALUE_IS_BOOL(lab_vm_peek(vm, 1))) {
+                     runtime_error(vm, "Two operands must be booleans!\n");
+                     return LAB_VM_INTERPRET_RESULT_RUNTIME_ERROR;
+                 } else {
+                    bool b = lab_vm_pop(vm).as.boolean;
+                    bool a = lab_vm_pop(vm).as.boolean;
+                    lab_vm_push(vm, LAB_VM_VALUE_BOOL(a && b));
+                 }
             }
             break;
 

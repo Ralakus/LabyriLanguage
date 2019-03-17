@@ -131,6 +131,7 @@ typedef struct parse_rule {
     precedence_e_t precedence;
 } parse_rule_t;
 
+static void skip(lab_parser_t* parser);
 static void number(lab_parser_t* parser);
 static void literal(lab_parser_t* parser);
 static void expression(lab_parser_t* parser);
@@ -139,9 +140,9 @@ static void unary(lab_parser_t* parser);
 static void binary(lab_parser_t* parser);
 static void parse_precedence(lab_parser_t* parser, precedence_e_t precedence);
 
-parse_rule_t rules[49] = {
+parse_rule_t rules[50] = {
     { NULL,     NULL,   PREC_NONE       },  // LAB_TOK_ERR
-    { NULL,     NULL,   PREC_NONE       },  // LAB_TOK_COMMENT
+    { skip,     NULL,   PREC_NONE       },  // LAB_TOK_COMMENT
     { NULL,     NULL,   PREC_NONE       },  // LAB_TOK_IDENTIFIER
     { NULL,     NULL,   PREC_NONE       },  // LAB_TOK_INTEGER
     { number,   NULL,   PREC_NONE       },  // LAB_TOK_FLOAT
@@ -175,9 +176,10 @@ parse_rule_t rules[49] = {
     { NULL,     NULL,   PREC_NONE       },  // LAB_TOK_KW_CONTINUE
     { literal,  NULL,   PREC_NONE       },  // LAB_TOK_KW_TRUE
     { literal,  NULL,   PREC_NONE       },  // LAB_TOK_KW_FALSE
-    { NULL,     NULL,   PREC_AND        },  // LAB_TOK_KW_AND
+    { NULL,     binary, PREC_AND        },  // LAB_TOK_KW_AND
     { NULL,     NULL,   PREC_OR         },  // LAB_TOK_KW_OR
-    { unary,    NULL,   PREC_NONE       },  // LAB_TOK_KW_NOT,    
+    { unary,    NULL,   PREC_NONE       },  // LAB_TOK_KW_NOT
+    { NULL,     binary, PREC_EQUALITY   },  // LAB_TOK_KW_IS
     { NULL,     binary, PREC_TERM       },  // LAB_TOK_OPERATOR_ADD
     { unary,    binary, PREC_TERM       },  // LAB_TOK_OPERATOR_SUB
     { NULL,     binary, PREC_FACTOR     },  // LAB_TOK_OPERATOR_MUL
@@ -219,6 +221,10 @@ static void parse_precedence(lab_parser_t* parser, precedence_e_t precedence) {
             infix_rule(parser);
         }
     }
+}
+
+static void skip(lab_parser_t* parser) {
+    return;
 }
 
 static void number(lab_parser_t* parser) {
@@ -272,12 +278,27 @@ static void unary(lab_parser_t* parser) {
 static void binary(lab_parser_t* parser) {
     lab_tokens_e_t operator_type = (parser->current - 1)->type;
 
+    if(operator_type == LAB_TOK_KW_IS && (parser->current)->type == LAB_TOK_KW_NOT) {
+        advance(parser);
+        parse_rule_t* rule = get_rule(operator_type);                 
+        parse_precedence(parser, (precedence_e_t)(rule->precedence + 1));
+
+        emit_bytes(parser, LAB_VM_OP_EQUAL, LAB_VM_OP_NOT);
+
+        return;
+    }
+
     
     parse_rule_t* rule = get_rule(operator_type);                 
     parse_precedence(parser, (precedence_e_t)(rule->precedence + 1));
 
     switch (operator_type)
     {
+
+        case LAB_TOK_KW_AND:
+            emit_byte(parser, LAB_VM_OP_AND);
+            break;
+        
         case LAB_TOK_OPERATOR_ADD:
             emit_byte(parser, LAB_VM_OP_ADD);
             break;
@@ -303,6 +324,8 @@ static void binary(lab_parser_t* parser) {
         case LAB_TOK_OPERATOR_GREATERT_EQU:
             emit_bytes(parser, LAB_VM_OP_LESSER, LAB_VM_OP_NOT);
             break;
+        
+        case LAB_TOK_KW_IS:
         case LAB_TOK_OPERATOR_COMPARE:
             emit_byte(parser, LAB_VM_OP_EQUAL);
             break;

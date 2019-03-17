@@ -45,6 +45,7 @@ typedef enum lab_tokens_e {
     LAB_TOK_KW_AND,        // and
     LAB_TOK_KW_OR,         // or
     LAB_TOK_KW_NOT,        // not
+    LAB_TOK_KW_IS,         // is
     
 
     LAB_TOK_OPERATOR_ADD,          // +
