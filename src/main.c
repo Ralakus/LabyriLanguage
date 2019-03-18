@@ -81,7 +81,7 @@ int main(int argc, const char* argv[]) {
         lab_parser_parse(&parser, &tokens, &bytecode);
 
         size_t serialized_len = 0;
-        uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len);
+        uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len, false);
 
         lab_notice("Serialized ");
         for(size_t i = 6; i < serialized_len; i++) {
@@ -111,6 +111,9 @@ int main(int argc, const char* argv[]) {
             }
 
             end = clock();
+
+            run_time = ((double)(end - start)) / CLOCKS_PER_SEC;
+
         } else {
             lab_warnln("There was an error in compiling the input thus it will not be ran on the Virtual Machine");
         }

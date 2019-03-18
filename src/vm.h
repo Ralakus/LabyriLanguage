@@ -71,6 +71,8 @@ void   lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* nam
 /*
     Serial Format
 
+    Note: lab_vm_value_t has 4 bytes of padding in between 'type' and 'as'
+
     HEADER - If any value is zero, it is interpreted as not existing
     32 bit unsigned integer: Index of where constant data starts
     32 bit unsigned integer: Length of constant data
@@ -84,7 +86,7 @@ void   lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* nam
     LINE_DATA
 
 */
-uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size);
+uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size, bool include_line_data);
 bool     lab_vm_bytecode_deserialize(lab_vm_bytecode_t* bytecode, uint8_t* data);
 
 typedef enum lab_vm_interpret_result_e_t {
