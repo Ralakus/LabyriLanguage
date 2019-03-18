@@ -194,6 +194,97 @@ size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, siz
 
 }
 
+/*
+    Serial Format
+
+    HEADER - If any value is zero, it is interpreted as not existing
+    32 bit unsigned integer: Index of where constant data starts
+    32 bit unsigned integer: Length of constant data
+    32 bit unsigned integer: Index of where the bytecode starts
+    32 bit unsigned integer: Length of bytecode
+    32 bit unsigned integer: Index of where the line data starts
+    32 bit unsigned integer: Length of line data
+    DATA - Starts 192 bits ( 24 bytes ) from the begining
+    CONSTANTS
+    BYTECODE
+    LINE_DATA
+
+*/
+uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size) {
+
+    #define HEADER_OFFSET (sizeof(uint32_t) * 6)
+
+    uint32_t header[6] = {0, 0, 0, 0, 0, 0};
+
+    #define constants_start_index header[0]
+    #define constants_len header[1]
+    #define bytecode_start_index header[2]
+    #define bytecode_len header[3]
+    #define line_data_start_index header[4]
+    #define line_data_len header[5]
+
+    /* Calculates each length */
+    for(size_t i = 0; i < lab_vec_size(&bytecode->constants); i++) {
+        for(size_t j = 0; j < sizeof(lab_vm_value_t); j++) {
+            constants_len++;
+        }
+    }
+    for(size_t i = 0; i < lab_vec_size(&bytecode->bytes); i++) {
+        for(size_t j = 0; j < sizeof(uint8_t); j++) {
+            bytecode_len++;
+        }
+    }
+    for(size_t i = 0; i < lab_vec_size(&bytecode->lines); i++) {
+        for(size_t j = 0; j < sizeof(int); j++) {
+            line_data_len++;
+        }
+    }
+
+    /* Calulate header */
+    constants_start_index = HEADER_OFFSET;
+    bytecode_start_index  = HEADER_OFFSET + constants_len;
+    line_data_start_index = HEADER_OFFSET + constants_len + bytecode_len;
+    uint32_t total_len    = HEADER_OFFSET + constants_len + bytecode_len + line_data_len;
+
+    lab_vec_t serialized;
+    lab_vec_init(&serialized, 1, total_len);
+
+    lab_vec_push_back_arr(&serialized, header, sizeof(header));
+    lab_vec_push_back_arr(&serialized, bytecode->constants.raw_data, bytecode->constants.used_size * bytecode->constants.type_size);
+    lab_vec_push_back_arr(&serialized, bytecode->bytes.raw_data, bytecode->bytes.used_size         * bytecode->bytes.type_size);
+    lab_vec_push_back_arr(&serialized, bytecode->lines.raw_data, bytecode->lines.used_size         * bytecode->lines.type_size);
+
+    *size = serialized.used_size;
+
+    return serialized.raw_data;
+
+    #undef HEADER_OFFSET
+}
+
+bool     lab_vm_bytecode_deserialize(lab_vm_bytecode_t* bytecode, uint8_t* data) {
+    lab_vm_bytecode_free(bytecode);
+
+    uint32_t* header = (uint32_t*)data;
+
+    #define constants_start_index header[0]
+    #define constants_len header[1]
+    #define bytecode_start_index header[2]
+    #define bytecode_len header[3]
+    #define line_data_start_index header[4]
+    #define line_data_len header[5]
+
+    lab_vec_init(&bytecode->constants, sizeof(lab_vm_value_t),   constants_len / sizeof(lab_vm_value_t));
+    lab_vec_init(&bytecode->bytes,     sizeof(uint8_t),          bytecode_len);
+    lab_vec_init(&bytecode->lines,     sizeof(int),              line_data_len / sizeof(int));
+
+    lab_vec_push_back_arr(&bytecode->constants, &data[constants_start_index], constants_len / sizeof(lab_vm_value_t));
+    lab_vec_push_back_arr(&bytecode->bytes,     &data[bytecode_start_index],  bytecode_len);
+    lab_vec_push_back_arr(&bytecode->lines,     &data[line_data_len],         line_data_len / sizeof(int));
+
+    return true;
+
+}
+
 bool lab_vm_init(lab_vm_t* vm) {
     if(!lab_vec_init(&vm->stack, sizeof(lab_vm_value_t), 256)) {
         return false;

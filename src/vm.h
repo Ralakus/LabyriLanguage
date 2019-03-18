@@ -68,6 +68,24 @@ size_t lab_vm_bytecode_write_constant(lab_vm_bytecode_t* bytecode, lab_vm_value_
 size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, size_t index);
 void   lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name);
 
+/*
+    Serial Format
+
+    HEADER - If any value is zero, it is interpreted as not existing
+    32 bit unsigned integer: Index of where constant data starts
+    32 bit unsigned integer: Length of constant data
+    32 bit unsigned integer: Index of where the bytecode starts
+    32 bit unsigned integer: Length of bytecode
+    32 bit unsigned integer: Index of where the line data starts
+    32 bit unsigned integer: Length of line data
+    DATA - Starts 192 bits ( 24 bytes ) from the begining
+    CONSTANTS
+    BYTECODE
+    LINE_DATA
+
+*/
+uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size);
+bool     lab_vm_bytecode_deserialize(lab_vm_bytecode_t* bytecode, uint8_t* data);
 
 typedef enum lab_vm_interpret_result_e_t {
     LAB_VM_INTERPRET_RESULT_SUCCESS,

@@ -80,15 +80,20 @@ int main(int argc, const char* argv[]) {
 
         lab_parser_parse(&parser, &tokens, &bytecode);
 
-        for(size_t i = 0; i < lab_vec_size(&bytecode.constants); i++) {
-            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.constants, i));
+        size_t serialized_len = 0;
+        uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len);
+
+        lab_notice("Serialized ");
+        for(size_t i = 6; i < serialized_len; i++) {
+            lab_print_raw("%02hhx ", serialized[i]);
         }
-        for(size_t i = 0; i < lab_vec_size(&bytecode.bytes); i++) {
-            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.bytes, i));
-        }
-        for(size_t i = 0; i < lab_vec_size(&bytecode.lines); i++) {
-            lab_print("%x ", *(uint8_t*)lab_vec_at(&bytecode.lines, i));
-        }
+        lab_println_raw("");
+
+        lab_vm_bytecode_deserialize(&bytecode, serialized);
+
+        lab_noticeln("Deserialzed");
+
+        free(serialized);
 
         end = clock();
 
