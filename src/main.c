@@ -10,14 +10,10 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include <getopt.h>
+#include "arg_parser.h"
 
-int main(int argc, char* const argv[]) {
+int main(int argc, const char* argv[]) {
 
-    int opt = 0;
-
-    /*lab_vec_t file_names;
-    lab_vec_init(&file_names, sizeof(char*), 8);*/
 
     char* file_name = NULL;
     char* output_name = NULL;
@@ -26,49 +22,59 @@ int main(int argc, char* const argv[]) {
 
     bool debug_prints = false;
 
-    while((opt = getopt(argc, argv, "f:b:co:d")) != -1) {
-        switch(opt) {
+    lab_arg_parser_t arg_parser;
+    lab_arg_parser_init(&arg_parser);
 
-            case 'd':
-                lab_println("Debug mode enabled");
-                debug_prints = true;
-                break;
 
-            case 'c':
-                lab_println("Compiling source files");
-                compile_flag = true;
-                break;
+    lab_arg_t arg_debug;
+    lab_arg_init(&arg_debug, "d", "debug", "Enables debug printout from lexer, parser, and virtual machine", false);
+    lab_arg_parser_add_arg(&arg_parser, &arg_debug);
 
-            case 'f':
-                lab_println("Source file: %s", optarg);
-                file_name = malloc(strlen(optarg) + 1);
-                memcpy(file_name, optarg, strlen(optarg) + 1);
-                bytecode_flag = false;
-                break;
+    lab_arg_t arg_compile;
+    lab_arg_init(&arg_compile, "c", "compile", "Compiles source files into bytecode files", false);
+    lab_arg_parser_add_arg(&arg_parser, &arg_compile);
 
-            case 'b':
-                lab_println("Bytecode file: %s", optarg);
-                file_name = malloc(strlen(optarg) + 1);
-                memcpy(file_name, optarg, strlen(optarg) + 1);
-                bytecode_flag = true;
-                break;
+    lab_arg_t arg_files;
+    lab_arg_init(&arg_files, "f", "file", "Input files", true);
+    lab_arg_parser_add_arg(&arg_parser, &arg_files);
 
-            case 'o': 
-                lab_println("Outputing to file: %s", optarg);
-                output_name = malloc(strlen(optarg) + 1);
-                memcpy(output_name, optarg, strlen(optarg) + 1);
-                break;
+    lab_arg_t arg_bytecode;
+    lab_arg_init(&arg_bytecode, "b", "bytecode", "Runs bytecode from input, does not lex or parse", false);
+    lab_arg_parser_add_arg(&arg_parser, &arg_bytecode);
 
-            case '?': 
-                lab_errorln("Unknown option %c", optopt);
-                free(file_name);
-                free(output_name);
-                return EXIT_FAILURE;
+    lab_arg_t arg_output;
+    lab_arg_init(&arg_output, "o", "output", "Outputs to file", true);
+    lab_arg_parser_add_arg(&arg_parser, &arg_output);
 
-            default:
-                break;
-        }
+
+    if(!lab_arg_parser_parse(&arg_parser, argc, argv)) {
+        lab_errorln("Error parsing arguments!");
+        return EXIT_FAILURE;
     }
+
+    lab_arg_parser_free(&arg_parser);
+
+    if(arg_debug.found)    { debug_prints  = true; lab_println("Debug mode enabled");     }
+    if(arg_compile.found)  { compile_flag  = true; lab_println("Compiling source files"); }
+    if(arg_bytecode.found) { bytecode_flag = true; lab_println("Bytecode mode"); }
+
+    if(arg_output.found) {
+        lab_println("Outputing to file: %s", *(const char**)lab_vec_at(&arg_output.preceeding_args, 0));
+        output_name = malloc(strlen(*(const char**)lab_vec_at(&arg_output.preceeding_args, 0)) + 1);
+        memcpy(output_name, *(const char**)lab_vec_at(&arg_output.preceeding_args, 0), strlen(*(const char**)lab_vec_at(&arg_output.preceeding_args, 0)) + 1);
+    }
+
+    if(arg_files.found) {
+        lab_println("Input file: %s", *(const char**)lab_vec_at(&arg_files.preceeding_args, 0));
+        file_name = malloc(strlen(*(const char**)lab_vec_at(&arg_files.preceeding_args, 0)) + 1);
+        memcpy(file_name, *(const char**)lab_vec_at(&arg_files.preceeding_args, 0), strlen(*(const char**)lab_vec_at(&arg_files.preceeding_args, 0)) + 1);
+    }
+
+    lab_arg_free(&arg_debug);
+    lab_arg_free(&arg_compile);
+    lab_arg_free(&arg_files);
+    lab_arg_free(&arg_bytecode);
+    lab_arg_free(&arg_output);
 
     if(file_name==NULL) {
         lab_errorln("No input files!");
@@ -137,12 +143,15 @@ int main(int argc, char* const argv[]) {
 
         lab_lexer_lex(&tokens, file_contents);
 
+
         if(debug_prints) lab_lexer_token_container_print(&tokens);
 
         lab_vm_bytecode_init(&bytecode, 16);
         lab_parser_init(&parser);
 
         lab_parser_parse(&parser, &tokens, &bytecode);
+
+        free(file_contents);
 
         size_t serialized_len = 0;
         uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len, true);
@@ -204,6 +213,7 @@ int main(int argc, char* const argv[]) {
             lab_errorln("Failed to read '%s'!", file_name);
             free(file_name);
             free(output_name);
+            free(file_contents);
             return EXIT_FAILURE;
         }
 
@@ -211,12 +221,18 @@ int main(int argc, char* const argv[]) {
 
         fclose(file);
 
+
+
         lab_lexer_token_container_t tokens;
         lab_parser_t parser;
         lab_vm_bytecode_t bytecode;
 
+
+
         lab_vm_t vm;
         lab_vm_init(&vm);
+
+
 
         lab_lexer_token_container_init(&tokens, 16);
 
@@ -224,13 +240,17 @@ int main(int argc, char* const argv[]) {
 
         if(debug_prints) lab_lexer_token_container_print(&tokens);
 
+
+
         lab_parser_init(&parser);
         lab_vm_bytecode_init(&bytecode, 16);
 
         lab_parser_parse(&parser, &tokens, &bytecode);
 
+        free(file_contents);
 
         if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, "Bytecode");
+
 
         if(!parser.was_error) {
             if(debug_prints) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
@@ -294,6 +314,8 @@ int main(int argc, char* const argv[]) {
         lab_vm_bytecode_init(&bytecode, 0);
         lab_vm_bytecode_deserialize(&bytecode, file_contents);
 
+        free(file_contents);
+
         if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, file_name);
 
         if(debug_prints) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
@@ -306,6 +328,9 @@ int main(int argc, char* const argv[]) {
         lab_vm_free(&vm);
 
     }
+
+    free(file_name);
+    free(output_name);
 
     return 0;
 
