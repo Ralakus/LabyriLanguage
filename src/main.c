@@ -46,6 +46,9 @@ int main(int argc, const char* argv[]) {
     lab_arg_init(&arg_output, "o", "output", "Outputs to file", true);
     lab_arg_parser_add_arg(&arg_parser, &arg_output);
 
+    lab_arg_t arg_repl;
+    lab_arg_init(&arg_repl, "r", "repl", "Starts up in repl environment", false);
+    lab_arg_parser_add_arg(&arg_parser, &arg_repl);
 
     if(!lab_arg_parser_parse(&arg_parser, argc, argv)) {
         lab_errorln("Error parsing arguments!");
@@ -75,6 +78,71 @@ int main(int argc, const char* argv[]) {
     lab_arg_free(&arg_files);
     lab_arg_free(&arg_bytecode);
     lab_arg_free(&arg_output);
+    lab_arg_free(&arg_repl);
+
+    if(arg_repl.found) {
+
+        lab_lexer_token_container_t tokens;
+        lab_parser_t                parser;
+        lab_vm_bytecode_t           bytecode;
+        lab_vm_t                    vm;
+        lab_vm_init(&vm);
+
+        char line[65536];
+        for(;;) {
+
+            lab_print("> ");
+            if (!fgets(line, sizeof(line), stdin)) {
+                lab_print_raw("\n");
+                break;
+            }
+
+
+            lab_lexer_token_container_init(&tokens, 16);
+            lab_lexer_lex(&tokens, line);
+
+            if(((lab_lexer_token_t*)lab_vec_at(&tokens.tokens, 0))->type == LAB_TOK_IDENTIFIER) {
+                if(memcmp(((lab_lexer_token_t*)lab_vec_at(&tokens.tokens, 0))->data, "exit", min(4, ((lab_lexer_token_t*)lab_vec_at(&tokens.tokens, 0))->data_len))==0) {
+                    lab_lexer_token_container_free(&tokens);
+                    break;
+                }
+            }
+
+            if(debug_prints) lab_lexer_token_container_print(&tokens);
+
+            lab_parser_init(&parser);
+            lab_vm_bytecode_init(&bytecode, 16);
+
+            lab_parser_parse(&parser, &tokens, &bytecode);
+
+            if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, "REPL");
+
+            if(!parser.was_error) {
+                if(debug_prints) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
+
+
+                if(lab_vm_interpret_bytecode(&vm, &bytecode, true) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
+                    lab_errorln("Failed to execute bytecode!");
+                }
+
+            } else {
+                lab_warnln("There was an error in compiling the input thus it will not be ran on the Virtual Machine");
+            }
+
+
+            lab_lexer_token_container_free(&tokens);
+            lab_vm_bytecode_free(&bytecode);
+
+        }
+
+        lab_vm_free(&vm);
+
+        free(file_name);
+        free(output_name);
+
+        return EXIT_SUCCESS;
+        
+    }
 
     if(file_name==NULL) {
         lab_errorln("No input files!");
@@ -154,13 +222,13 @@ int main(int argc, const char* argv[]) {
         free(file_contents);
 
         size_t serialized_len = 0;
-        uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len, true);
+        uint8_t* serialized = lab_vm_bytecode_serialize(&bytecode, &serialized_len, debug_prints);
 
         if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, file_name);
 
         if(debug_prints) {
             lab_notice("Serialized ");
-            for(size_t i = 24; i < serialized_len; i++) {
+            for(size_t i = 0; i < serialized_len; i++) {
                 lab_print_raw("%02hhx ", serialized[i]);
             }
             lab_println_raw("");

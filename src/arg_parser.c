@@ -12,7 +12,7 @@ void lab_arg_init(lab_arg_t* arg, const char* short_name, const char* long_name,
     arg->expect_preceeding = expect_preceeding;
 
     arg->found = false;
-    lab_vec_init(&arg->preceeding_args, sizeof(const char*), expect_preceeding ? 4 : 0);
+    lab_vec_init(&arg->preceeding_args, sizeof(const char*), expect_preceeding ? 1 : 0);
 
 }
 
