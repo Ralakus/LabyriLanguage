@@ -1,6 +1,8 @@
 
 #include "arg_parser.h"
 
+#include <lab/math.h>
+
 #include <string.h>
 
 void lab_arg_init(lab_arg_t* arg, const char* short_name, const char* long_name, const char* description,  bool expect_preceeding) {
@@ -41,15 +43,43 @@ bool lab_arg_parser_parse  (lab_arg_parser_t* parser, int argc, const char** arg
 
             bool arg_found = false;
 
-            for(size_t j = 0; j < lab_vec_size(&parser->args); j++) {
+            if(argv[i][1] == '-')  {
 
-                lab_arg_t* cur_arg = *(lab_arg_t**)lab_vec_at(&parser->args, j);
+                for(size_t j = 0; j < lab_vec_size(&parser->args); j++) {
 
-                if(strcmp(argv[i][1] == '-' ? cur_arg->long_name : cur_arg->short_name, argv[i][1] == '-' ? &argv[i][2] :  &argv[i][1])==0) {
-                    cur_arg->found = true;
-                    prev_arg = cur_arg;
-                    arg_found = true;
-                    break;
+                    lab_arg_t* cur_arg = *(lab_arg_t**)lab_vec_at(&parser->args, j);
+
+                    if(strcmp(cur_arg->long_name, &argv[i][2])==0) {
+                        cur_arg->found = true;
+                        prev_arg = cur_arg;
+                        arg_found = true;
+                        break;
+                    }
+
+                }
+
+            } else {
+
+                size_t arg_len = strlen(argv[i]);
+                
+                for(size_t j = 0; j < lab_vec_size(&parser->args); j++) {
+
+                    lab_arg_t* cur_arg = *(lab_arg_t**)lab_vec_at(&parser->args, j);
+
+                    for(size_t k = 1; k < arg_len; k++) {
+
+                        if(
+                            memcmp(cur_arg->short_name, &argv[i][k],
+                            min(
+                            strlen(cur_arg->short_name), strlen(&argv[i][k])
+                            ))==0) {
+                            cur_arg->found = true;
+                            prev_arg = cur_arg;
+                            arg_found = true;
+                            break;
+                        }
+
+                    }
                 }
 
             }

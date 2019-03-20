@@ -115,13 +115,13 @@ int main(int argc, const char* argv[]) {
 
             lab_parser_parse(&parser, &tokens, &bytecode);
 
-            if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, "REPL");
+            if(debug_prints) lab_vm_bytecode_dissassemble(&bytecode, "REPL Bytecode");
 
             if(!parser.was_error) {
                 if(debug_prints) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
 
 
-                if(lab_vm_interpret_bytecode(&vm, &bytecode, true) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
+                if(lab_vm_interpret_bytecode(&vm, &bytecode, debug_prints) != LAB_VM_INTERPRET_RESULT_SUCCESS) {
                     lab_errorln("Failed to execute bytecode!");
                 }
 
