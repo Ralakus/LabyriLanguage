@@ -58,7 +58,7 @@ static void error_at_current(lab_parser_t* parser, const char* message) {
 static void advance(lab_parser_t* parser) {
     ++parser->current;
 
-    if(parser->current->type == LAB_TOK_ERR && (parser->current - (lab_lexer_token_t*)lab_vec_at(&parser->container->tokens, 0) < lab_vec_size(&parser->container->tokens))) {
+    if(parser->current->type == LAB_TOK_ERR && (parser->current - (lab_lexer_token_t*)lab_vec_at(&parser->container->tokens, 0) < lab_vec_len(&parser->container->tokens))) {
         error_at_current(parser, parser->current->data);
     }
 }
@@ -85,7 +85,7 @@ static bool emit_return(lab_parser_t* parser) {
 }
 
 static short make_constant(lab_parser_t* parser, lab_vm_value_t value) {
-    for(size_t i = 0; i < lab_vec_size(&parser->bytecode->constants); i++) {
+    for(size_t i = 0; i < lab_vec_len(&parser->bytecode->constants); i++) {
         if(memcmp(&value, (lab_vm_value_t*)lab_vec_at(&parser->bytecode->constants, i), sizeof(lab_vm_value_t))==0) {
             return (short)i;
         }

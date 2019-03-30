@@ -64,7 +64,7 @@ size_t lab_vm_bytecode_write_constant(lab_vm_bytecode_t* bytecode, lab_vm_value_
     if(lab_vec_push_back(&bytecode->constants, &value)==NULL) {
         return -1;
     } else {
-        return lab_vec_size(&bytecode->constants) - 1;
+        return lab_vec_len(&bytecode->constants) - 1;
     }
 }
 
@@ -72,7 +72,7 @@ void lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name)
     lab_noticeln(LAB_ANSI_COLOR_CYAN"--== %s ==--"LAB_ANSI_COLOR_RESET, name);
 
     lab_noticeln(LAB_ANSI_COLOR_CYAN"- Constants -"LAB_ANSI_COLOR_RESET);
-    for (size_t i = 0; i <lab_vec_size(&bytecode->constants); i++) {
+    for (size_t i = 0; i <lab_vec_len(&bytecode->constants); i++) {
         lab_print(LAB_ANSI_COLOR_RED"%04d      "LAB_ANSI_COLOR_YELLOW, i);
         lab_vm_value_print(*(lab_vm_value_t*)lab_vec_at(&bytecode->constants, i));
         lab_println_raw(LAB_ANSI_COLOR_RESET);
@@ -80,7 +80,7 @@ void lab_vm_bytecode_dissassemble(lab_vm_bytecode_t* bytecode, const char* name)
 
     lab_noticeln(LAB_ANSI_COLOR_CYAN"- Instructions -"LAB_ANSI_COLOR_RESET);
 
-    for(size_t i = 0; i < lab_vec_size(&bytecode->bytes);) {
+    for(size_t i = 0; i < lab_vec_len(&bytecode->bytes);) {
         i = lab_vm_bytecode_dissassemble_instruction(bytecode, i);
     }
 
@@ -110,7 +110,7 @@ static size_t lab_vm_bytecode_dissassemble_instruction_constant_2_long(const cha
 size_t lab_vm_bytecode_dissassemble_instruction(lab_vm_bytecode_t* bytecode, size_t index) {
     lab_print(LAB_ANSI_COLOR_RED"%04d ", index);
 
-    if(lab_vec_size(&bytecode->lines) > 0) {
+    if(lab_vec_len(&bytecode->lines) > 0) {
         if(index > 0) {
             if(*(int*)lab_vec_at(&bytecode->lines, index) == *(int*)lab_vec_at(&bytecode->lines, index - 1)) {
                 lab_print_raw("   | "LAB_ANSI_COLOR_RESET);
@@ -230,9 +230,9 @@ uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size, 
     #define line_data_len header[5]
 
     /* Calculates each length */
-    constants_len = lab_vec_size(&bytecode->constants) * sizeof(lab_vm_value_t);
-    bytecode_len  = lab_vec_size(&bytecode->bytes)     * sizeof(uint8_t);
-    line_data_len = lab_vec_size(&bytecode->lines)     * sizeof(int);
+    constants_len = lab_vec_len(&bytecode->constants) * sizeof(lab_vm_value_t);
+    bytecode_len  = lab_vec_len(&bytecode->bytes)     * sizeof(uint8_t);
+    line_data_len = lab_vec_len(&bytecode->lines)     * sizeof(int);
 
     /* Calulate header */
     constants_start_index = HEADER_OFFSET;
@@ -250,16 +250,16 @@ uint8_t* lab_vm_bytecode_serialize  (lab_vm_bytecode_t* bytecode, size_t* size, 
     lab_vec_init(&serialized, 1, total_len);
 
     lab_vec_push_back_arr(&serialized, header, sizeof(header));
-    lab_vec_push_back_arr(&serialized, bytecode->constants.raw_data, bytecode->constants.used_size * bytecode->constants.type_size);
-    lab_vec_push_back_arr(&serialized, bytecode->bytes.raw_data, bytecode->bytes.used_size         * bytecode->bytes.type_size);
+    lab_vec_push_back_arr(&serialized, bytecode->constants.data, bytecode->constants.used_len * bytecode->constants.type_size);
+    lab_vec_push_back_arr(&serialized, bytecode->bytes.data, bytecode->bytes.used_len         * bytecode->bytes.type_size);
     
     if(include_line_data) {
-        lab_vec_push_back_arr(&serialized, bytecode->lines.raw_data, bytecode->lines.used_size         * bytecode->lines.type_size);
+        lab_vec_push_back_arr(&serialized, bytecode->lines.data, bytecode->lines.used_len         * bytecode->lines.type_size);
     }
 
-    *size = serialized.used_size;
+    *size = serialized.used_len;
 
-    return serialized.raw_data;
+    return serialized.data;
 
     #undef HEADER_OFFSET
 }
@@ -307,7 +307,7 @@ void lab_vm_free(lab_vm_t* vm) {
 }
 
 void lab_vm_reset_stack(lab_vm_t* vm) {
-    vm->stack_top = (lab_vm_value_t*)lab_vec_at_raw_alloc(&vm->stack, 0);    
+    vm->stack_top = (lab_vm_value_t*)lab_vec_at_alloc(&vm->stack, 0);    
 }
 
 void lab_vm_push(lab_vm_t* vm, lab_vm_value_t value) {
@@ -360,7 +360,7 @@ lab_vm_interpret_result_e_t lab_vm_run(lab_vm_t* vm, bool debug_trace) {
 
         if(debug_trace) {
             lab_print("[stack]:  ");
-            for(lab_vm_value_t* slot = (lab_vm_value_t*)lab_vec_at_raw_alloc(&vm->stack, 0); slot < vm->stack_top; slot++) {
+            for(lab_vm_value_t* slot = (lab_vm_value_t*)lab_vec_at_alloc(&vm->stack, 0); slot < vm->stack_top; slot++) {
                 lab_print_raw(LAB_ANSI_COLOR_YELLOW"[ ");
                 lab_vm_value_print(*slot);
                 lab_print_raw(" ]"LAB_ANSI_COLOR_RESET);

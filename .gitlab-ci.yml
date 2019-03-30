@@ -7,11 +7,14 @@ variables:
 
 build:
     stage: build
-    image: ubuntu
+    image: ubuntu:devel
     before_script:
     - apt update
-    - apt install gcc cmake ninja-build -y
+    - apt install gcc cmake ninja-build tup -y
     script:
+    - cd lib/LabyriCUtils
+    - tup
+    - cd ../..
     - CC=gcc cmake . -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Debug
     - cd build
     - cmake --build . --config Debug
@@ -23,7 +26,7 @@ build:
 
 run:
     stage: run
-    image: ubuntu
+    image: ubuntu:devel
     before_script:
     - apt update
     - apt install python3-pip -y

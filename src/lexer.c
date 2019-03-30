@@ -3,6 +3,8 @@
 
 #include <lab/math.h>
 
+#include <lab/logger.h>
+
 bool lab_lexer_token_container_init(lab_lexer_token_container_t* container, size_t init_size) {
     if(!lab_vec_init(&container->tokens, sizeof(lab_lexer_token_t), init_size)) {
         return false;
@@ -24,17 +26,17 @@ bool lab_lexer_token_container_append(lab_lexer_token_container_t* container,
                                       const char* data,
                                       size_t data_len) {
 
-    ++container->tokens.used_size;
-    if(container->tokens.used_size > container->tokens.alloc_size) {
+    ++container->tokens.used_len;
+    if(container->tokens.used_len > container->tokens.alloc_len) {
         if(!lab_vec_resize(&container->tokens, (
-            container->tokens.used_size + (code_size / max(iter.i + (code_size % max(iter.i, 1) != 0), 1))
+            container->tokens.used_len + (code_size / max(iter.i + (code_size % max(iter.i, 1) != 0), 1))
         ))) {
-            lab_errorln("Failed to resize token container after %d tokens!", container->tokens.used_size);
+            lab_errorln("Failed to resize token container after %d tokens!", container->tokens.used_len);
             return false;
         }
     }
 
-    lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, container->tokens.used_size - 1);
+    lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, container->tokens.used_len - 1);
     tok->type     = type;
     tok->data     = data;
     tok->data_len = data_len;
@@ -583,7 +585,7 @@ void lab_lexer_token_container_print(lab_lexer_token_container_t* container) {
 
     lab_noticeln(LAB_ANSI_COLOR_CYAN"----------------------Token type-|-Token data----------------------line, column"LAB_ANSI_COLOR_RESET, PRINT_LINE);
 
-    for(size_t i = 0; i < container->tokens.used_size; i++) {
+    for(size_t i = 0; i < container->tokens.used_len; i++) {
         lab_lexer_token_t* tok = (lab_lexer_token_t*)lab_vec_at(&container->tokens, i);
 
         if(tok->type == LAB_TOK_ERR) {

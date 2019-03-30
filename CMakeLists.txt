@@ -20,8 +20,10 @@ set_property(TARGET lab PROPERTY C_STANDARD 11)
 
 target_include_directories(lab PUBLIC lib/LabyriCUtils/src)
 
-add_subdirectory(lib/LabyriCUtils)
-target_link_libraries(lab PUBLIC LabCUtils)
+execute_process(COMMAND "cd lib/LabyriCUtils && tup")
+
+target_link_directories(lab PUBLIC lib/LabyriCUtils/build/bin)
+target_link_libraries(lab PUBLIC labcutils)
 
 set(CMAKE_C_FLAGS_RELEASE "-O3 -flto")
 set(CMAKE_C_FLAGS_DEBUG "-fprofile-arcs -ftest-coverage -fPIC -O0 -g")

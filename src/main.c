@@ -10,7 +10,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "arg_parser.h"
+#include <lab/arg_parser.h>
 
 int main(int argc, const char* argv[]) {
 
