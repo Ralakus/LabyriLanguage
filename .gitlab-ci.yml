@@ -34,5 +34,5 @@ run:
     - pip3 install gcovr
     script:
     - cd build
-    - ./lab -f ../test/runtest.lab -d
+    - ./lab -f ../test/test1.lab -d
     - gcovr
