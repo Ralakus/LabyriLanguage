@@ -1,5 +1,2 @@
-main :: (args: [] str) -> int {
-    x: str = "Hello world!"; // Test variable
-    print(x ++ "\n");
-    return 0;
-}
+(14 + 48) * (14 + 48) -
+(14 + 48) * (14 + 48)

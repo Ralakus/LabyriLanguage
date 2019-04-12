@@ -1,10 +1,10 @@
 Rectangle :: struct {
 
-    width:  int64;
-    height: int64;
+    width:  int;
+    height: int;
 
-    new :: (self, width: int64, height: int64) -> Rectangle { # Delcaring a function named "new" will override the default constructor
-                                                              # This function will be static despite it having "self" in it's parameter list
+    new :: (self, width: int, height: int) -> Rectangle { # Delcaring a function named "new" will override the default constructor
+                                                          # This function will be static despite it having "self" in it's parameter list
         self.width  = width;
         self.height = height;
 
@@ -12,7 +12,7 @@ Rectangle :: struct {
 
     }
 
-    area :: (self) -> int64 { # Function must have "self" in it's parameter list to be non-static
+    area :: (self) -> int { # Function must have "self" in it's parameter list to be non-static
 
         return self.width * self.height;
 
@@ -20,22 +20,16 @@ Rectangle :: struct {
 
 }
 
-main :: ( args: [] str ) -> int16 {
+rect: Rectangle = Rectangle.new(10, 15);
 
-    rect: Rectangle = Rectangle.new(10, 15);
+x: str = "Hello world!";
 
-    x: str = "Hello world!";
+System.print(x + "\n")
 
-    print(x + "\n")
+System.print("Area: \{rect.area()}\n");
 
-    print("Area: \{rect.area()}\n");
+boolean: bool = true;
+System.print("(labyritnh == awesome) \{boolean}\n");
 
-    boolean: bool = true;
-    print("(labyritnh == awesome) \{boolean}\n");
-
-    boolean = false;
-    print("(labyrinth == terrible) \{boolean}\n");
-
-    return 0;
-
-}
+boolean = false;
+System.print("(labyrinth == terrible) \{boolean}\n");

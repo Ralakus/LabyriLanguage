@@ -14,7 +14,6 @@
 
 int main(int argc, const char* argv[]) {
 
-
     char* file_name = NULL;
     char* output_name = NULL;
     bool bytecode_flag = false;
@@ -34,13 +33,13 @@ int main(int argc, const char* argv[]) {
     lab_arg_init(&arg_compile, "c", "compile", "Compiles source files into bytecode files", false);
     lab_arg_parser_add_arg(&arg_parser, &arg_compile);
 
-    lab_arg_t arg_files;
-    lab_arg_init(&arg_files, "f", "file", "Input files", true);
-    lab_arg_parser_add_arg(&arg_parser, &arg_files);
-
     lab_arg_t arg_bytecode;
     lab_arg_init(&arg_bytecode, "b", "bytecode", "Runs bytecode from input, does not lex or parse", false);
     lab_arg_parser_add_arg(&arg_parser, &arg_bytecode);
+    
+    lab_arg_t arg_files;
+    lab_arg_init(&arg_files, "f", "file", "Input files", true);
+    lab_arg_parser_add_arg(&arg_parser, &arg_files);
 
     lab_arg_t arg_output;
     lab_arg_init(&arg_output, "o", "output", "Outputs to file", true);
