@@ -103,7 +103,6 @@ int main(int argc, const char* argv[]) {
 
     if(file_name==NULL) {
         lab_errorln("No input files!");
-        lab_noticeln("Type input files after the \'-f\' or \'--file\' argument");
         return EXIT_FAILURE;
     }
 
