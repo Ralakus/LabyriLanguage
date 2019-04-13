@@ -1,6 +1,18 @@
 
 is_64_bit = true
 
+
+
+
+
+linux, windows = 1, 2
+
+build_os = linux
+
+if package.config:sub(1,1) == '\\' then
+    build_os = windows
+end
+
 workspace "Labyri"
     language "C"
     cdialect "C11"
@@ -50,6 +62,11 @@ project "lab"
 
     filter "configurations:Debug"
         defines { "DEBUG" }
+
+        if build_os == linux then 
+            buildoptions { "-fprofile-arcs", "-ftest-coverage" }
+            linkoptions  { "-fprofile-arcs", "-ftest-coverage" }
+        end
 
     filter "configurations:Release"
         defines { "NDEBUG" }
