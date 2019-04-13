@@ -13,23 +13,9 @@ It can lex, parse, and run basic math expressions on it's virtual machine
 Since the language is under development, there will only be 2 basic types at first ( int and float )
 * Numbers  ( int and float )
 * Strings  ( str )
-* Arrays   ( [num] or [..] for dynamic, [num..] to preallocate )
+* Arrays   ( [num] for static or [..] for dynamic, [num..] to preallocate dynamic )
 * Booleans ( bool )
 * Structs which the user can define
-
-### Planned types
-* int8
-* int16
-* int32
-* int64
-* isize
-* uint8
-* uint16
-* uint32
-* uint64
-* usize
-* float32
-* float64
 
 # Sample syntax 
 ```javascript
