@@ -17,7 +17,7 @@ bool compile_file(const char* input_file, const char* output_file, bool debug);
 
 int main(int argc, const char* argv[]) {
 
-    const char* file_name = NULL;
+    const char* file_name   = NULL;
     const char* output_name = NULL;
 
     lab_arg_parser_t arg_parser;

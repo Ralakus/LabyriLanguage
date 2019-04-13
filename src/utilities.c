@@ -23,7 +23,7 @@ char* lab_read_file(const char* file_name, bool binary) {
     file_size = ftell(file) + 1;
     rewind(file);
 
-    file_contents = malloc(file_size);
+    file_contents = malloc(file_size + 1);
     if(file_contents == NULL) {
         lab_errorln("Failed to allocate buffer for '%s'!", file_name);
         return NULL;
