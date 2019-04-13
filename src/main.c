@@ -23,6 +23,10 @@ int main(int argc, const char* argv[]) {
     lab_arg_parser_t arg_parser;
     lab_arg_parser_init(&arg_parser);
 
+    lab_arg_t arg_help;
+    lab_arg_init(&arg_help, "h", "help", "Displays this help message", false);
+    lab_arg_parser_add_arg(&arg_parser, &arg_help);
+
     lab_arg_t arg_debug;
     lab_arg_init(&arg_debug, "d", "debug", "Enables debug printout from lexer, parser, and virtual machine", false);
     lab_arg_parser_add_arg(&arg_parser, &arg_debug);
@@ -34,10 +38,6 @@ int main(int argc, const char* argv[]) {
     lab_arg_t arg_bytecode;
     lab_arg_init(&arg_bytecode, "b", "bytecode", "Runs bytecode from input, does not lex or parse", false);
     lab_arg_parser_add_arg(&arg_parser, &arg_bytecode);
-    
-    lab_arg_t arg_files;
-    lab_arg_init(&arg_files, "f", "file", "Input files", true);
-    lab_arg_parser_add_arg(&arg_parser, &arg_files);
 
     lab_arg_t arg_output;
     lab_arg_init(&arg_output, "o", "output", "Outputs to file", true);
@@ -52,7 +52,23 @@ int main(int argc, const char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    lab_arg_parser_free(&arg_parser);
+    if(lab_vec_len(&arg_parser.extra_args) > 0) {
+        file_name = LAB_VEC_TYPE_AT(&arg_parser.extra_args, 0, const char*);
+        lab_println("Input file: %s", file_name);
+    }
+
+    if(arg_help.found)     {
+        lab_arg_parser_print_help(&arg_parser, "Labyri Version: 0.1.0");
+        lab_arg_free(&arg_debug);
+        lab_arg_free(&arg_compile);
+        lab_arg_free(&arg_bytecode);
+        lab_arg_free(&arg_output);
+        lab_arg_free(&arg_repl);
+
+        lab_arg_parser_free(&arg_parser);
+
+        return EXIT_SUCCESS;
+    }
 
     if(arg_debug.found)    { lab_noticeln("Debug mode enabled");     }
     if(arg_compile.found)  { lab_noticeln("Compiling source files"); }
@@ -61,7 +77,6 @@ int main(int argc, const char* argv[]) {
     if(arg_bytecode.found && arg_compile.found) {
         lab_arg_free(&arg_debug);
         lab_arg_free(&arg_compile);
-        lab_arg_free(&arg_files);
         lab_arg_free(&arg_bytecode);
         lab_arg_free(&arg_output);
         lab_arg_free(&arg_repl);
@@ -70,21 +85,16 @@ int main(int argc, const char* argv[]) {
     }
 
     if(arg_output.found) {
-        lab_println("Outputing to file: %s", *(const char**)lab_vec_at(&arg_output.preceeding_args, 0));
         output_name = LAB_VEC_TYPE_AT(&arg_output.preceeding_args, 0, const char*);
+        lab_println("Outputing to file: %s", output_name);
     }
-
-    if(arg_files.found) {
-        lab_println("Input file: %s", *(const char**)lab_vec_at(&arg_files.preceeding_args, 0));
-        file_name = LAB_VEC_TYPE_AT(&arg_files.preceeding_args, 0, const char*);
-    }
-
     lab_arg_free(&arg_debug);
     lab_arg_free(&arg_compile);
-    lab_arg_free(&arg_files);
     lab_arg_free(&arg_bytecode);
     lab_arg_free(&arg_output);
     lab_arg_free(&arg_repl);
+
+    lab_arg_parser_free(&arg_parser);
 
     if(arg_repl.found) {
         if(!lab_repl(arg_debug.found)) return EXIT_FAILURE;
@@ -93,6 +103,7 @@ int main(int argc, const char* argv[]) {
 
     if(file_name==NULL) {
         lab_errorln("No input files!");
+        lab_noticeln("Type input files after the \'-f\' or \'--file\' argument");
         return EXIT_FAILURE;
     }
 
@@ -150,7 +161,6 @@ int main(int argc, const char* argv[]) {
     lab_vm_bytecode_free(&bytecode);
     lab_vm_free(&vm);
     
-
     return EXIT_SUCCESS;
 
 }

@@ -41,7 +41,7 @@ bool lab_repl(bool debug_mode) {
         lab_lexer_lex(&tokens, line);
 
         if(((lab_lexer_token_t*)lab_vec_at(&tokens.tokens, 0))->type == LAB_TOK_COLON) {
-            if(lab_vec_len(&tokens.tokens) > 1) {
+            if(lab_vec_len(&tokens.tokens) > 2) {
 
                 if(((lab_lexer_token_t*)lab_vec_at(&tokens.tokens, 1))->type == LAB_TOK_IDENTIFIER) {
 
@@ -63,13 +63,16 @@ bool lab_repl(bool debug_mode) {
                         lab_noticeln("\'loadb\' loads and runs Labyri bytecode from file");
                         lab_noticeln("\'exit\' exits repl");
                     } else if(COMMAND_EQ("sys")) {
-                        if(lab_vec_len(&tokens.tokens) > 2)
-                        if(system(TOK_AT_INDEX(2)->data)) {
-                            lab_errorln("Invalid command: \'%s\'", TOK_AT_INDEX(2)->data);
+                        if(lab_vec_len(&tokens.tokens) > 3) {
+                            if(system(TOK_AT_INDEX(2)->data)) {
+                                lab_errorln("Invalid command: \'%s\'", TOK_AT_INDEX(2)->data);
+                            }
+                        } else {
+                            lab_errorln("Expected argument after sys!");
                         }
                     } else if(COMMAND_EQ("loadf")) {
 
-                        if(lab_vec_len(&tokens.tokens) > 2) {
+                        if(lab_vec_len(&tokens.tokens) > 3) {
 
                             bool was_error = false;
 
@@ -88,12 +91,16 @@ bool lab_repl(bool debug_mode) {
                             if(code == NULL) {
                                 was_error = true;
                             }
-                            free(file_name);
+                            
                             if(!was_error)
                             if(!lab_lex_and_parse(&bytecode, code, TOK_AT_INDEX(2)->data, debug_mode)) {
                                 was_error = true;
                             }
                             free(code);
+
+                            if(debug_mode) lab_vm_bytecode_dissassemble(&bytecode, file_name);
+
+                            free(file_name);
 
                             if(!was_error) {
                                 if(debug_mode) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
@@ -108,11 +115,13 @@ bool lab_repl(bool debug_mode) {
                                 lab_warnln("There was an error in compiling the input thus it will not be ran on the Virtual Machine");
                             }
 
+                        } else {
+                            lab_errorln("Expected argument after loadf!");
                         }
 
                     } else if(COMMAND_EQ("loadb")) {
 
-                        if(lab_vec_len(&tokens.tokens) > 2) {
+                        if(lab_vec_len(&tokens.tokens) > 3) {
 
                             bool was_error = false;
 
@@ -131,7 +140,7 @@ bool lab_repl(bool debug_mode) {
                             if(serialized == NULL) {
                                 was_error = true;
                             }
-                            free(file_name);
+
                             lab_vm_bytecode_init(&bytecode, 8);
                             if(!was_error)
                             if(!lab_vm_bytecode_deserialize(&bytecode, serialized)) {
@@ -139,6 +148,10 @@ bool lab_repl(bool debug_mode) {
                                 was_error = true;
                             }
                             free(serialized);
+
+                            if(debug_mode) lab_vm_bytecode_dissassemble(&bytecode, file_name);
+
+                            free(file_name);
 
                             if(!was_error) {
                                 if(debug_mode) lab_noticeln(LAB_ANSI_COLOR_CYAN"--== Virtual Machine Stack Trace ==--"LAB_ANSI_COLOR_RESET);
@@ -152,6 +165,8 @@ bool lab_repl(bool debug_mode) {
                             } else {
                                 lab_warnln("There was an error in compiling the input thus it will not be ran on the Virtual Machine");
                             }
+                        } else {
+                            lab_errorln("Expected argument after loadb!");
                         }
 
                     } else {

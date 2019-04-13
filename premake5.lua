@@ -1,7 +1,7 @@
 
 is_64_bit = true
 
-
+coverage_test = false
 
 
 
@@ -28,10 +28,14 @@ workspace "Labyri"
     configurations { "Debug", "Release" }
 
     filter { "configurations:Debug" }
-            symbols "On"
+        symbols "On"
+        optimize "Off"
 
     filter { "configurations:Release" }
-            optimize "On"
+        symbols "Off"
+        optimize "Speed"
+        linkoptions  { "-flto" }
+        
     filter { }
 
     targetdir ("build/bin/")
@@ -63,7 +67,7 @@ project "lab"
     filter "configurations:Debug"
         defines { "DEBUG" }
 
-        if build_os == linux then 
+        if build_os == linux and coverage_test then 
             buildoptions { "-fprofile-arcs", "-ftest-coverage" }
             linkoptions  { "-fprofile-arcs", "-ftest-coverage" }
         end
