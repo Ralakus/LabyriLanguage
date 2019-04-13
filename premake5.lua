@@ -33,7 +33,14 @@ project "lab"
     includedirs "src"
     includedirs "lib/LabyriCUtils/src"
 
-    files { "src/**.h", "src/**.c"}
+    files {
+        "src/main.c",
+        "src/lexer.c",
+        "src/parser.c",
+        "src/vm.c",
+        "src/repl.c",
+        "src/utilities.c",
+    }
 
     if is_64_bit then
         defines { "LAB_64_BIT" }
