@@ -22,3 +22,8 @@ Since the language is under development, there will only be 2 basic types at fir
 x: str = "Hello world!"; # Test variable
 print(x + "\n");
 ```
+
+# How to compile
+* Premake5 is highly recommended over Cmake
+* Build c utility library first using premake or tup ( 'lib/LabyriCUtils' )
+* Build LabyriLanguage using premake
