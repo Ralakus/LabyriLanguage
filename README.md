@@ -1,7 +1,7 @@
 # Labyri Language
 
-[![build](https://gitlab.com/Ralakus/LabyriLanguage/badges/master/build.svg)](https://gitlab.com/Ralakus/LabyrinthLanguage/pipelines)
-[![coverage](https://gitlab.com/Ralakus/LabyriLanguage/badges/master/coverage.svg)](https://gitlab.com/Ralakus/LabyrinthLanguage/-/jobs)
+[![build](https://gitlab.com/Ralakus/LabyriLanguage/badges/master/build.svg)](https://gitlab.com/Ralakus/LabyriLanguage/pipelines)
+[![coverage](https://gitlab.com/Ralakus/LabyriLanguage/badges/master/coverage.svg)](https://gitlab.com/Ralakus/LabyriLanguage/-/jobs)
 [![license](http://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 # Made in pure C11
