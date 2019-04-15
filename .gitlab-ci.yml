@@ -45,5 +45,5 @@ run:
     - ./lab ../test/test0.lab --compile --output out.clab --debug
     - ./lab out.clab -bd
     - ./lab out.clab --bytecode --debug
-    - ./lab -r < ./test/replcommandstest
+    - ./lab -r < ../test/replcommandstest
     - gcovr
