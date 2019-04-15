@@ -70,9 +70,9 @@ int main(int argc, const char* argv[]) {
         return EXIT_SUCCESS;
     }
 
-    if(arg_debug.found)    { lab_noticeln("Debug mode enabled");     }
-    if(arg_compile.found)  { lab_noticeln("Compiling source files"); }
-    if(arg_bytecode.found) { lab_noticeln("Bytecode mode");          }
+    if(arg_debug.found)    { lab_println("Debug mode enabled");     }
+    if(arg_compile.found)  { lab_println("Compiling source files"); }
+    if(arg_bytecode.found) { lab_println("Bytecode mode");          }
 
     if(arg_bytecode.found && arg_compile.found) {
         lab_arg_free(&arg_debug);
@@ -112,6 +112,7 @@ int main(int argc, const char* argv[]) {
     }
 
     lab_vm_bytecode_t bytecode;
+    lab_vm_bytecode_init(&bytecode, 0);
 
     bool was_error = false;
 

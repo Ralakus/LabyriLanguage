@@ -34,5 +34,16 @@ run:
     - pip3 install gcovr
     script:
     - cd build
-    - ./lab -f ../test/test1.lab -d
+    - ./lab -h
+    - ./lab --help
+    - ./lab ../test/test0.lab -d
+    - ./lab ../test/test0.lab --debug
+    - ./lab ../test/test1.lab -d
+    - ./lab ../test/test1.lab --debug
+    - ./lab ../test/test1mil.lab
+    - ./lab ../test/test0.lab -co out.clab -d
+    - ./lab ../test/test0.lab --compile --output out.clab --debug
+    - ./lab out.clab -bd
+    - ./lab out.clab --bytecode --debug
+    - ./lab -r < ./test/replcommandstest
     - gcovr

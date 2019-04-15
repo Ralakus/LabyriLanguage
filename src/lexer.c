@@ -84,29 +84,6 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
             case '\f':
                 NEXT();
                 break;
-            
-
-            // Numeric
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9': {
-                lab_lexer_iter_t start = iter;
-                while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
-                if(code[iter.i] == '.') {
-                    while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
-                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
-                } else {
-                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
-                }
-            }
-            break;
 
             // Alpha
             case '_':
@@ -381,6 +358,28 @@ bool lab_lexer_lex(lab_lexer_token_container_t* container, const char* code) {
                 }
                 if(!matched){
                     CREATE_TOK(start, LAB_TOK_IDENTIFIER, &code[start.i], iter.i - start.i);
+                }
+            }
+            break;
+
+            // Numeric
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                lab_lexer_iter_t start = iter;
+                while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
+                if(code[iter.i] == '.') {
+                    while(NEXT(), code[iter.i] >= '0' && code[iter.i] <= '9');
+                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
+                } else {
+                    CREATE_TOK(start, LAB_TOK_FLOAT, &code[start.i], iter.i - start.i);
                 }
             }
             break;
