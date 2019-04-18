@@ -6,10 +6,10 @@
 14 == 14
 48 == 48
 (14 + 48) == (14 + 48)
-:sys ./lab ./test/test0.lab -co out.clab -d 
+:sys ./lab ../test/test0.lab -co out.clab -d 
 :debug
-:loadf ./test/test0.lab
+:loadf ../test/test0.lab
 :loadb out.clab
 :debug
-:loadf ./test/test0.lab
+:loadf ../test/test0.lab
 :loadb out.clab

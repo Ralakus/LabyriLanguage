@@ -3,6 +3,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+bool lab_vm_value_object_is_type(lab_vm_value_t value, lab_vm_object_type_e_t type) {
+    return LAB_VM_VALUE_IS_OBJ(value) && value.as.object->type == type;
+}
+
 void lab_vm_value_print(lab_vm_value_t value) {
     switch (value.type) {
         case LAB_VM_VALUE_TYPE_NIL: 

@@ -4,10 +4,19 @@
 #include <lab/logger.h>
 #include <lab/vector.h>
 
+typedef enum lab_vm_object_type_e {
+    LAB_VM_OBJECT_STRING
+} lab_vm_object_type_e_t;
+
+typedef struct lab_vm_object {
+    lab_vm_object_type_e_t type;
+} lab_vm_object_t;
+
 typedef enum lab_vm_value_type_e {
     LAB_VM_VALUE_TYPE_NIL,
     LAB_VM_VALUE_TYPE_BOOLEAN,
     LAB_VM_VALUE_TYPE_NUMBER,
+    LAB_VM_VALUE_TYPE_OBJECT,
 } lab_vm_value_type_e_t;
 
 typedef struct lab_vm_value {
@@ -15,20 +24,42 @@ typedef struct lab_vm_value {
     union {
         bool   boolean;
         double number;
+        lab_vm_object_t* object;
     } as;
 } lab_vm_value_t;
+
+bool lab_vm_value_object_is_type(lab_vm_value_t value, lab_vm_object_type_e_t type);
 
 void lab_vm_value_print    (lab_vm_value_t value);
 bool lab_vm_value_is_falsey(lab_vm_value_t value);
 bool lab_vm_value_is_equal (lab_vm_value_t a, lab_vm_value_t b);
 
-#define LAB_VM_VALUE_NIL ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_NIL, { .number = 0 }})
-#define LAB_VM_VALUE_BOOL(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_BOOLEAN, { .boolean = value }})
+#define LAB_VM_VALUE_NIL           ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_NIL, { .number = 0 }})
+#define LAB_VM_VALUE_BOOL(value)   ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_BOOLEAN, { .boolean = value }})
 #define LAB_VM_VALUE_NUMBER(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_NUMBER, { .number = value }})
+#define LAB_VM_VALUE_OBJECT(value) ((lab_vm_value_t){ .type = LAB_VM_VALUE_TYPE_OBJECT, { .object = value }})
 
-#define LAB_VM_VALUE_IS_NIL(value) ((value).type == LAB_VM_VALUE_TYPE_NIL)
-#define LAB_VM_VALUE_IS_BOOL(value) ((value).type == LAB_VM_VALUE_TYPE_BOOLEAN)
+#define LAB_VM_VALUE_IS_NIL(value)    ((value).type == LAB_VM_VALUE_TYPE_NIL)
+#define LAB_VM_VALUE_IS_BOOL(value)   ((value).type == LAB_VM_VALUE_TYPE_BOOLEAN)
 #define LAB_VM_VALUE_IS_NUMBER(value) ((value).type == LAB_VM_VALUE_TYPE_NUMBER)
+#define LAB_VM_VALUE_IS_OBJ(value)    ((value).type == LAB_VM_VALUE_TYPE_OBJECT) 
+
+#define LAB_VM_VALUE_IS_STRING(value) (lab_vm_value_object_is_type(value, LAB_VM_OBJECT_STRING))
+
+
+typedef struct lab_vm_obj_string {
+    lab_vm_object_t object;
+    uint32_t len;
+    char* data;
+} lab_vm_obj_string_t;
+
+#define LAB_VM_VALUE_AS_STR(value)  ((lab_vm_obj_string*)value.as.object)
+#define LAB_VM_VALUE_AS_CSTR(value) (LAB_VM_VALUE_AS_STR(value)->data)
+
+
+
+
+
 
 typedef struct lab_vm_bytecode {
     lab_vec_t bytes;
